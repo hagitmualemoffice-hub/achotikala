@@ -1,0 +1,1031 @@
+<!doctype html>
+<!-- PROTECTED: production file:// + NetFree bootstrap/updater. Do not refactor casually.
+     See docs/OFFLINE-ARCHITECTURE.md (chunk size, XOR key, AK.part signature, DJB2 are invariants). -->
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>אחותי כלה</title>
+<style>
+  html,body{margin:0;padding:0;font-family:"Segoe UI",Arial,sans-serif;background:#fff;color:#2b2b2b}
+  #ak-boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2147483000}
+  #ak-boot .box{max-width:460px;width:88%;text-align:center}
+  #ak-boot h1{font-size:22px;margin:0 0 10px;font-weight:600}
+  #ak-boot p{font-size:15px;color:#666;margin:0 0 18px;line-height:1.6}
+  #ak-bar{height:10px;background:#f0eaf0;border-radius:99px;overflow:hidden}
+  #ak-bar i{display:block;height:100%;width:0;background:#c98ba9;transition:width .25s}
+  #ak-pct{font-size:13px;color:#999;margin-top:10px}
+  #ak-ver{font-size:12px;color:#b3a6ae;margin-top:14px;direction:ltr;font-family:monospace;letter-spacing:.3px}
+  #ak-err{display:none;margin-top:16px;font-size:14px;color:#a33;line-height:1.6}
+  #ak-toast{position:fixed;bottom:16px;inset-inline-start:16px;background:#2b2b2b;color:#fff;padding:12px 16px;
+    border-radius:12px;font-size:14px;z-index:2147483001;display:none;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+  #ak-toast button{margin-inline-start:12px;background:#c98ba9;color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+</style>
+</head>
+<body>
+<div id="ak-boot"><div class="box">
+  <h1>אחותי כלה</h1>
+  <p id="ak-msg">פותחת את האתר…</p>
+  <div id="ak-bar"><i></i></div>
+  <div id="ak-pct"></div>
+  <div id="ak-err"></div>
+  <div id="ak-ver"></div>
+</div></div>
+<div id="ak-toast"></div>
+
+<script>
+/* ================================================================
+   אחותי כלה — קובץ הפתיחה הקבוע (bootstrap)
+   מוריד את האתר פעם אחת, שומר אותו במחשב, ומעדכן רק מה שהשתנה.
+   ================================================================ */
+(function () {
+  "use strict";
+
+  var qs = new URLSearchParams(location.search);
+  // rev 14: רשימת מקורות — הריפו הייעודי קודם, הישן כגיבוי. מניפסט יכול להפנות למקור חדש
+  // (שדה origin), שנשמר ב-META ונוסה ראשון מאז — מעבר עתידי ללא התקנה מחדש.
+  var ORIGINS = qs.get("origin") ? [qs.get("origin")] : __UPDATE_ORIGINS__;
+  var ORIGIN = ORIGINS[0];
+  var DB_NAME = "achotikala-app";
+  var BOOT_REV = 14;           // גרסת קובץ הפתיחה
+  window.AK_BOOT_REV = BOOT_REV; // האפליקציה מתייגת בו ניסיונות התחברות (offline-rev14)
+  var MIN_STAGE = "full";     // התקנות ישנות ללא תמונות — יעודכנו מיד
+  var BLOBS = "blobs";
+  var META = "meta";
+
+  var boxEl = document.getElementById("ak-boot");
+  var msgEl = document.getElementById("ak-msg");
+  var barEl = document.querySelector("#ak-bar i");
+  var pctEl = document.getElementById("ak-pct");
+  var errEl = document.getElementById("ak-err");
+  var toastEl = document.getElementById("ak-toast");
+  var verEl = document.getElementById("ak-ver");
+  // שורת גרסאות קבועה על המסך: גרסת קובץ ההפעלה + גרסת החבילה המקומית + זו שבשרת.
+  var verInfo = { local: null, remote: null };
+  function showVer() {
+    if (!verEl) return;
+    verEl.textContent =
+      "launcher rev " + BOOT_REV +
+      " | package " + (verInfo.local == null ? "—" : "v" + verInfo.local) +
+      " | server " + (verInfo.remote == null ? "—" : "v" + verInfo.remote);
+  }
+  function setVer(which, v) { verInfo[which] = v; showVer(); }
+  showVer();
+  var updateState = window.ACHOTIKALA_UPDATE_STATUS = {
+    localVersion: null,
+    remoteVersion: null,
+    lastCheck: null,
+    source: "NOT CHECKED",
+    result: "Update check has not run yet",
+    error: ""
+  };
+
+  function say(t) { msgEl.textContent = t; }
+  function progress(done, total) {
+    var p = total ? Math.round((done / total) * 100) : 0;
+    barEl.style.width = p + "%";
+    pctEl.textContent = total ? p + "%" : "";
+  }
+  function fail(html) {
+    errEl.style.display = "block";
+    errEl.innerHTML = html;
+  }
+  function toast(text, actionText, action) {
+    toastEl.textContent = text;
+    if (actionText) {
+      var b = document.createElement("button");
+      b.textContent = actionText;
+      b.onclick = action;
+      toastEl.appendChild(b);
+    }
+    toastEl.style.display = "block";
+  }
+
+  /* ---------------- יומן עדכון מתמיד (שורד רענון וגיבוי לאחור) ----------------
+     נשמר ב-meta.updateLog. אין בו שום מידע אישי — רק שלבים, גרסאות ושגיאות. */
+  var LOG_MAX = 160;
+  var updateLog = { rev: null, entries: [] };
+  function logAdd(step, info) {
+    var e = { t: Date.now(), s: step };
+    if (info !== undefined && info !== null && info !== "") e.d = info;
+    updateLog.entries.push(e);
+    if (updateLog.entries.length > LOG_MAX) updateLog.entries.splice(0, updateLog.entries.length - LOG_MAX);
+    updateLog.rev = BOOT_REV;
+    persistLog();
+    return e;
+  }
+  function errInfo(e) {
+    if (!e) return "unknown";
+    var name = (e.name || "Error");
+    var msg = (e.message || String(e));
+    var extra = "";
+    try { if (e.detail) extra = " | " + JSON.stringify(e.detail); } catch (x) {}
+    return name + ": " + msg + extra;
+  }
+  var logSaving = false, logDirty = false;
+  function persistLog() {
+    if (!db) return;
+    if (logSaving) { logDirty = true; return; }
+    logSaving = true;
+    put(db, META, "updateLog", JSON.parse(JSON.stringify(updateLog)))
+      .catch(function () {})
+      .then(function () {
+        logSaving = false;
+        if (logDirty) { logDirty = false; persistLog(); }
+      });
+  }
+  function two(n) { return (n < 10 ? "0" : "") + n; }
+  function logText() {
+    return "bootstrap rev: " + BOOT_REV + "\n" +
+      updateLog.entries.map(function (e) {
+        var d = new Date(e.t);
+        return d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()) + " " +
+          two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds()) +
+          "  " + e.s + (e.d ? "  " + e.d : "");
+      }).join("\n");
+  }
+
+  /* ---------------- IndexedDB ---------------- */
+  function openDb() {
+    return new Promise(function (res, rej) {
+      var settled = false;
+      var r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = function () {
+        var d = r.result;
+        if (!d.objectStoreNames.contains(BLOBS)) d.createObjectStore(BLOBS);
+        if (!d.objectStoreNames.contains(META)) d.createObjectStore(META);
+      };
+      r.onsuccess = function () { if (!settled) { settled = true; res(r.result); } };
+      r.onerror = function () { if (!settled) { settled = true; rej(r.error || new Error("idb-open-error")); } };
+      r.onblocked = function () {
+        if (settled) return;
+        settled = true;
+        var e = new Error("idb-open-blocked (another copy of the app is probably open)");
+        e.name = "BlockedError";
+        rej(e);
+      };
+    });
+  }
+  function tx(db, store, mode, fn) {
+    return new Promise(function (res, rej) {
+      var t;
+      try { t = db.transaction(store, mode); }
+      catch (e) { rej(e); return; }
+      var out;
+      try { out = fn(t.objectStore(store)); }
+      catch (e2) { try { t.abort(); } catch (e3) {} rej(e2); return; }
+      if (out && typeof IDBRequest !== "undefined" && out instanceof IDBRequest) {
+        out.onerror = function () { /* מטופל ב-onerror/onabort של הטרנזקציה */ };
+      }
+      t.oncomplete = function () { res(out && typeof IDBRequest !== "undefined" && out instanceof IDBRequest ? out.result : out); };
+      t.onerror = function () { rej(t.error || new Error("idb-tx-error")); };
+      // ללא onabort טרנזקציה שנקטעה (למשל QuotaExceededError) הייתה משאירה
+      // את ההבטחה תלויה לנצח — והעדכון היה נתקע בלי שום שגיאה גלויה.
+      t.onabort = function () {
+        var err = t.error || new Error("idb-tx-aborted");
+        if (!err.name) err.name = "AbortError";
+        rej(err);
+      };
+    });
+  }
+  function isQuotaError(e) {
+    if (!e) return false;
+    var n = String(e.name || ""), m = String(e.message || "");
+    return n === "QuotaExceededError" || /quota|storage is full|not enough space/i.test(n + " " + m);
+  }
+  function get(db, store, key) { return tx(db, store, "readonly", function (s) { return s.get(key); }); }
+  function put(db, store, key, val) { return tx(db, store, "readwrite", function (s) { return s.put(val, key); }); }
+  function del(db, store, key) { return tx(db, store, "readwrite", function (s) { return s.delete(key); }); }
+  function keys(db, store) { return tx(db, store, "readonly", function (s) { return s.getAllKeys(); }); }
+  function switchManifest(db, current, remote) {
+    return new Promise(function (res, rej) {
+      var t = db.transaction(META, "readwrite");
+      var s = t.objectStore(META);
+      s.put(current, "previous");
+      s.put(remote, "current");
+      s.put({ version: remote.version, attempts: 0, verified: false }, "boot");
+      t.oncomplete = function () { res(); };
+      t.onerror = function () { rej(t.error); };
+      t.onabort = function () { rej(t.error || new Error("manifest-switch-aborted")); };
+    });
+  }
+
+  /* ---------------- checksum (crypto.subtle לא זמין ב-file://) ---------------- */
+  function djb2(buf) {
+    var v = new Uint8Array(buf), h = 5381;
+    for (var i = 0; i < v.length; i++) h = ((h * 33) ^ v[i]) >>> 0;
+    return h.toString(16);
+  }
+
+  /* ---------------- הבאת המניפסט דרך תג script (הערוץ המוכח) ---------------- */
+  function validOrigin(o) {
+    return typeof o === "string" && /^https:\/\/[^\s"'<>]+$/.test(o) ? o.replace(/\/$/, "") : null;
+  }
+  function preferOrigin(o) {
+    o = validOrigin(o);
+    if (!o) return;
+    ORIGINS = [o].concat(ORIGINS.filter(function (x) { return x !== o; }));
+  }
+  // מנסה כל מקור בתורו; החלקים נטענים מהמקור שממנו הגיע המניפסט.
+  function loadManifest(timeoutMs) {
+    var list = ORIGINS.slice(), i = 0, errs = [];
+    function next() {
+      if (i >= list.length) {
+        var e = new Error(errs[errs.length - 1] || "manifest-blocked");
+        e.message = errs.join(" | ") || "manifest-blocked";
+        return Promise.reject(e);
+      }
+      var o = list[i++];
+      return loadManifestFrom(o, timeoutMs).then(function (m) {
+        ORIGIN = o;
+        logAdd("origin", "manifest from " + o + (i > 1 ? " (fallback #" + i + ")" : ""));
+        var redirect = validOrigin(m && m.origin);
+        if (redirect && redirect !== o && db) {
+          logAdd("origin-redirect", "manifest points to " + redirect + " — saved for next checks");
+          put(db, META, "originOverride", redirect).catch(function () {});
+          preferOrigin(redirect);
+        }
+        return m;
+      }, function (e) {
+        errs.push((e && e.message || "error") + "@" + o);
+        logAdd("origin-failed", o + " — " + (e && e.message));
+        return next();
+      });
+    }
+    return next();
+  }
+  function loadManifestFrom(ORIGIN, timeoutMs) {
+    return new Promise(function (res, rej) {
+      var done = false;
+      var s = document.createElement("script");
+      var callback = function (m) {
+        if (done) return;
+        done = true;
+        updateState.remoteVersion = m && m.version != null ? m.version : null;
+        setVer("remote", updateState.remoteVersion);
+        updateState.source = "NETWORK (cache-busted script)";
+        cleanup();
+        res(m);
+      };
+      window.AKUPD_MANIFEST = callback;
+      function cleanup() {
+        if (window.AKUPD_MANIFEST === callback) delete window.AKUPD_MANIFEST;
+        try { s.remove(); } catch (e) {}
+      }
+      s.onerror = function () { if (!done) { cleanup(); rej(new Error("manifest-blocked")); } };
+      // A unique URL forces a network request. A file:// app has no Service Worker
+      // controller, and the update manifest is never read from IndexedDB/Cache Storage.
+      s.src = ORIGIN + "/updates/manifest.js?t=" + Date.now() + "&nonce=" +
+        Math.random().toString(36).slice(2);
+      s.setAttribute("data-cache", "no-store");
+      document.head.appendChild(s);
+      setTimeout(function () {
+        if (!done) { done = true; cleanup(); rej(new Error("manifest-timeout")); }
+      }, Math.min(timeoutMs || 15000, 15000));
+    });
+  }
+
+  /* ---------------- ערוץ ההעברה: קבצי .js אמיתיים בתג script ---------------- */
+  var AK = window.AK = window.AK || {};
+  var partSink = null;            // תאימות לאחור
+  var partSinks = Object.create(null); // hash -> { index: b64 } (מאפשר הורדה מקבילה)
+  AK.part = function (hash, index, total, b64, masked) {
+    var sink = partSinks[hash];
+    if (sink) sink[index] = { b64: b64, masked: masked };
+    if (partSink && partSink.hash === hash) partSink.receive(index, total, b64, masked);
+  };
+  /* ---- seed: חלקים מוטמעים בתוך קובץ ההתקנה עצמו (התקנה ראשונה בלי רשת) ---- */
+  var seedStore = Object.create(null); // hash -> { index: b64 }
+  AK.seedPart = function (hash, index, total, b64) {
+    if (!seedStore[hash]) seedStore[hash] = Object.create(null);
+    seedStore[hash][index] = b64;
+  };
+  AK.seedDone = function () {
+    window.AK_SEED_PENDING = 0;
+    if (typeof AK.seedReady === "function") { var f = AK.seedReady; AK.seedReady = null; f(); }
+  };
+  var XOR_KEY = [0x5a, 0x3c, 0xa7, 0x11, 0x6d, 0xf2, 0x89, 0x24];
+  function b64ToBytes(b64, masked) {
+    var bin = atob(b64), len = bin.length, out = new Uint8Array(len);
+    for (var i = 0; i < len; i++) out[i] = bin.charCodeAt(i);
+    if (masked) for (var j = 0; j < len; j++) out[j] ^= XOR_KEY[j % 8];
+    return out;
+  }
+  function loadPartScript(url, hash, index) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      var settled = false;
+      function finish(fn, arg) { if (settled) return; settled = true; try { s.remove(); } catch (e) {} fn(arg); }
+      s.src = url;
+      s.onload = function () { finish(res); };
+      s.onerror = function () {
+        var e = new Error("part-blocked");
+        e.detail = { stage: "טעינת חלק JS", url: url, file: hash, index: index };
+        finish(rej, e);
+      };
+      document.head.appendChild(s);
+      setTimeout(function () {
+        var e = new Error("part-timeout");
+        e.detail = { stage: "טעינת חלק JS (פסק זמן)", url: url, file: hash, index: index };
+        finish(rej, e);
+      }, 45000);
+    });
+  }
+
+  /** מוריד חלק בודד, מאמת אותו, ומנסה שוב עד 4 פעמים אם הוא הגיע חסר */
+  function downloadChunk(f, meta, i, total, attempt) {
+    attempt = attempt || 1;
+    var received = null;
+    if (!partSinks[f.h]) partSinks[f.h] = Object.create(null);
+    var url = ORIGIN + meta.u + (attempt > 1 ? "?r=" + attempt + "." + Date.now() : "");
+    // חלק שהגיע מוטמע בקובץ ההתקנה — אותו פורמט ואותו אימות, בלי בקשת רשת.
+    // בניסיון חוזר עוברים לרשת, כדי שחלק פגום בקובץ לא ייתקע בלופ.
+    var seeded = attempt === 1 && seedStore[f.h] ? seedStore[f.h][i] : null;
+    var fetchPart = seeded
+      ? Promise.resolve().then(function () { AK.part(f.h, i, total, seeded, 0); })
+      : loadPartScript(url, f.p, i);
+    return fetchPart.then(function () {
+      var slot = partSinks[f.h] && partSinks[f.h][i];
+      if (slot) { received = b64ToBytes(slot.b64, slot.masked); delete partSinks[f.h][i]; }
+      var bad = null;
+      if (!received) bad = "חלק לא התקבל";
+      else if (meta.l != null && received.length !== meta.l) bad = "חלק קטוע";
+      else if (meta.c != null && djb2(received.buffer.slice(received.byteOffset, received.byteOffset + received.length)) !== meta.c) bad = "חלק פגום";
+      if (bad) {
+        var e = new Error(bad);
+        e.detail = {
+          stage: "אימות חלק", url: url, file: f.p, index: i + 1, of: total,
+          expectedBytes: meta.l, gotBytes: received ? received.length : 0, attempt: attempt,
+        };
+        throw e;
+      }
+      return received;
+    }).catch(function (e) {
+      if (partSinks[f.h]) delete partSinks[f.h][i];
+      if (attempt < 4) {
+        return new Promise(function (r) { setTimeout(r, 400 * attempt); })
+          .then(function () { return downloadChunk(f, meta, i, total, attempt + 1); });
+      }
+      throw e;
+    });
+  }
+
+  /** מוריד קובץ שלם דרך חלקי ה-JS שלו ומחזיר ArrayBuffer מאומת */
+  function downloadFile(f, onChunk) {
+    var metas = f.k && f.k.length
+      ? f.k
+      : (f.j || []).map(function (u) { return { u: u }; });
+    if (!metas.length) return Promise.reject(new Error("no-js-parts"));
+    var chunks = new Array(metas.length);
+    // הורדה מקבילה מוגבלת — כל חלק עדיין מאומת בנפרד (אורך + checksum)
+    var CONCURRENCY = 4;
+    var nextIdx = 0, firstErr = null;
+    function worker() {
+      if (firstErr || nextIdx >= metas.length) return Promise.resolve();
+      var i = nextIdx++;
+      return downloadChunk(f, metas[i], i, metas.length).then(function (bytes) {
+        chunks[i] = bytes; // חלק שאומת נשמר — כישלון בחלק אחר לא מבטל אותו
+        if (onChunk) onChunk(bytes.length);
+        return worker();
+      }).catch(function (e) { if (!firstErr) firstErr = e; });
+    }
+    var lanes = [];
+    for (var w = 0; w < Math.min(CONCURRENCY, metas.length); w++) lanes.push(worker());
+    return Promise.all(lanes).then(function () {
+      if (firstErr) throw firstErr;
+      delete partSinks[f.h];
+      var total = 0, i;
+      for (i = 0; i < chunks.length; i++) total += chunks[i].length;
+      var out = new Uint8Array(total), off = 0;
+      for (i = 0; i < chunks.length; i++) { out.set(chunks[i], off); off += chunks[i].length; }
+      // f.x = מספר הבתים בתחילת הקובץ ששובשו באריזה (חתימת קובץ בינארי, למשל JPEG),
+      // כדי שמסנני תוכן לא יזהו "magic bytes" בתחילת החלק הראשון. משוחזרים כאן, פעם אחת,
+      // על הקובץ המלא — לפני אימות האורך/החתימה (שמחושבים על התוכן המקורי).
+      if (f.x) for (i = 0; i < f.x && i < out.length; i++) out[i] ^= 0x5a;
+      var buf = out.buffer;
+      if (buf.byteLength !== f.s || djb2(buf) !== f.c) {
+        var e2 = new Error("קובץ פגום (checksum)");
+        e2.detail = { stage: "אימות קובץ", url: ORIGIN + metas[0].u, file: f.p, expectedBytes: f.s, gotBytes: buf.byteLength, chunks: metas.length };
+        throw e2;
+      }
+      return buf;
+    }).catch(function (e) { delete partSinks[f.h]; throw e; });
+  }
+
+  /* ---------------- הורדת קבצים חסרים ---------------- */
+  function downloadMissing(db, manifest, onProgress) {
+    return keys(db, BLOBS).then(function (have) {
+      var haveSet = new Set(have);
+      var seen = new Set();
+      var need = manifest.files.filter(function (f) {
+        if (haveSet.has(f.h) || seen.has(f.h)) return false;
+        seen.add(f.h); return true;
+      });
+      var totalBytes = need.reduce(function (a, f) { return a + f.s; }, 0);
+      var doneBytes = 0, idx = 0, failed = null, doneFiles = 0;
+      logAdd("download-start", "files needed: " + need.length + ", bytes: " + totalBytes);
+      if (!need.length) { logAdd("download-done", "0 files needed (all hashes already stored)"); return { need: 0 }; }
+
+      function next() {
+        if (failed || idx >= need.length) return Promise.resolve();
+        var f = need[idx++];
+        var fileDone = 0;
+        return downloadFile(f, function (n) {
+          fileDone += n;
+          if (onProgress) onProgress(Math.min(doneBytes + fileDone, totalBytes), totalBytes);
+        })
+          .then(function (buf) {
+            logAdd("validated", f.p + " (" + buf.byteLength + " bytes)");
+            logAdd("store-start", f.p);
+            return put(db, BLOBS, f.h, buf);
+          })
+          .then(function () {
+            doneFiles++;
+            doneBytes += f.s;
+            logAdd("store-ok", f.p + " [" + doneFiles + "/" + need.length + "]");
+            if (onProgress) onProgress(doneBytes, totalBytes);
+            return next();
+          })
+          .catch(function (e) {
+            if (isQuotaError(e)) {
+              e.quota = true;
+              logAdd("QUOTA-EXCEEDED", "no room to store " + f.p + " — " + errInfo(e));
+            } else {
+              logAdd("file-failed", f.p + " — " + errInfo(e));
+            }
+            if (!e.detail) e.detail = { stage: "הורדת קובץ מהאתר", file: f.p, expectedBytes: f.s, error: String(e && e.message || e) };
+            failed = e;
+          });
+      }
+      // קבצים בזה אחר זה; החלקים בתוך כל קובץ יורדים במקביל (עד 4)
+      return next().then(function () {
+        if (failed) throw failed;
+        logAdd("download-done", doneFiles + "/" + need.length + " files stored");
+        return { need: need.length, bytes: totalBytes };
+      });
+    });
+  }
+
+
+  /* ---------------- ניקוי קבצים שכבר לא בשימוש ---------------- */
+  function gc(db, manifests) {
+    var keep = new Set();
+    manifests.forEach(function (m) { if (m && m.files) m.files.forEach(function (f) { keep.add(f.h); }); });
+    return keys(db, BLOBS).then(function (all) {
+      var drop = all.filter(function (k) { return !keep.has(k); });
+      return Promise.all(drop.map(function (k) { return del(db, BLOBS, k); }))
+        .then(function () { return drop; });
+    });
+  }
+
+  /** תיאור קצר של התוכן הפעיל בפועל (קובץ הכניסה וה-JS הראשי) */
+  function activeContent(manifest) {
+    if (!manifest || !manifest.files) return "?";
+    var mainJs = "", entryHash = "";
+    for (var i = 0; i < manifest.files.length; i++) {
+      var f = manifest.files[i];
+      if (/^assets\/index-.*\.js$/.test(f.p)) mainJs = f.p;
+      if (f.p === (manifest.entry || "index.html")) entryHash = String(f.h || "").slice(0, 8);
+    }
+    return (mainJs || "?") + " / index.html " + (entryHash || "?");
+  }
+
+  /* ---------------- הרכבת האתר מהקבצים המקומיים ---------------- */
+  var MIME = {
+    html: "text/html", js: "text/javascript", mjs: "text/javascript", css: "text/css",
+    json: "application/json", webmanifest: "application/manifest+json", svg: "image/svg+xml",
+    txt: "text/plain", md: "text/plain", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg",
+    gif: "image/gif", webp: "image/webp", ico: "image/x-icon", pdf: "application/pdf",
+    mp3: "audio/mpeg", m4a: "audio/mp4", wav: "audio/wav", mp4: "video/mp4",
+    woff: "font/woff", woff2: "font/woff2", ttf: "font/ttf", otf: "font/otf", zip: "application/zip"
+  };
+  var TEXT = { html: 1, js: 1, mjs: 1, css: 1, json: 1, webmanifest: 1, svg: 1, txt: 1, md: 1 };
+  function ext(p) { var i = p.lastIndexOf("."); return i < 0 ? "" : p.slice(i + 1).toLowerCase(); }
+  function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function buildApp(db, manifest) {
+    var entryPath = manifest.entry || "index.html";
+    var files = manifest.files;
+    return Promise.all(files.map(function (f) { return get(db, BLOBS, f.h); })).then(function (bufs) {
+      var byPath = {};
+      files.forEach(function (f, i) { byPath[f.p] = { e: f, buf: bufs[i] }; });
+      for (var p in byPath) if (!byPath[p].buf) throw new Error("missing " + p);
+
+      var urlMap = {};
+      function makeUrl(p, data) {
+        var u = URL.createObjectURL(new Blob([data], { type: MIME[ext(p)] || "application/octet-stream" }));
+        urlMap[p] = u; return u;
+      }
+      var paths = Object.keys(byPath);
+      var order = { svg: 1, css: 2, json: 3, webmanifest: 3, txt: 3, md: 3, js: 4, html: 5 };
+      var textPaths = paths.filter(function (p) { return TEXT[ext(p)]; })
+        .sort(function (a, b) { return (order[ext(a)] || 3) - (order[ext(b)] || 3); });
+
+      // 1. בינאריים
+      paths.forEach(function (p) { if (!TEXT[ext(p)]) makeUrl(p, byPath[p].buf); });
+
+      var dec = new TextDecoder("utf-8");
+      var sortedPaths = paths.slice().sort(function (a, b) { return b.length - a.length; });
+
+      // מדיה שעדיין לא הועברה לערוץ העדכונים (שלב ב') — מוחלפת בתמונה שקופה זמנית
+      var PLACEHOLDER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+      var MEDIA_RE = /(["'(])(?:\.\/|\/)?((?:assets|images|img|media|files|fonts)\/[^"')?#]+\.(?:jpe?g|png|webp|gif|avif|bmp|pdf|mp3|m4a|wav|ogg|mp4|webm|zip|woff2?|ttf|otf))(["')])/g;
+      function rewrite(text) {
+        sortedPaths.forEach(function (p) {
+          var u = urlMap[p];
+          if (!u) return;
+          var re = new RegExp("([\"'(])(?:\\./|/)?" + esc(p) + "([\"')])", "g");
+          text = text.replace(re, "$1" + u + "$2");
+        });
+        // כל מה שנשאר ולא קיים מקומית — כתובת חוקית שלא שוברת את האפליקציה
+        text = text.replace(MEDIA_RE, function (m, a, p, b) {
+          return byPath[p] ? m : a + PLACEHOLDER + b;
+        });
+        return text;
+      }
+
+
+      var entryHtml = null;
+      textPaths.forEach(function (p) {
+        var text = rewrite(dec.decode(byPath[p].buf));
+        if (p === entryPath) { entryHtml = text; return; }
+        makeUrl(p, text);
+      });
+      if (entryHtml === null) throw new Error("no entry");
+      return { html: entryHtml, urlMap: urlMap, byPath: byPath };
+    });
+  }
+
+  /* ---------------- פותר כתובות תמונות בזמן ריצה ---------------- */
+  /* החלפת הטקסט הסטטית מכסה רק כתובות שכתובות במפורש בקוד.
+     תמונות שנבנות דינמית (מהתוכן, מהמסד, מ-srcset או מרקע ב-CSS)
+     מתורגמות כאן בזמן אמת לקבצים ששמורים במחשב. */
+  function installResolver(app) {
+    var byName = {}, byPath = {};
+    Object.keys(app.urlMap).forEach(function (p) {
+      byPath[p] = app.urlMap[p];
+      byName[p.split("/").pop()] = app.urlMap[p];
+    });
+    var misses = window.ACHOTIKALA_MEDIA_MISSES = window.ACHOTIKALA_MEDIA_MISSES || [];
+    var hits = 0;
+
+    function resolve(v) {
+      if (!v || typeof v !== "string") return v;
+      if (/^(blob:|data:)/i.test(v)) return v;
+      var clean = v.split("?")[0].split("#")[0].replace(/^https?:\/\/[^/]+/i, "");
+      var rel = clean.replace(/^\.?\//, "");
+      var u = byPath[rel] || byName[rel.split("/").pop()];
+      if (u) { hits++; return u; }
+      if (/\.(jpe?g|png|webp|gif|avif|svg|ico|bmp|mp3|m4a|wav|ogg|mp4|webm|pdf|woff2?|ttf|otf)$/i.test(clean)) {
+        misses.push({ requested: v, normalized: rel, name: rel.split("/").pop(), inPackage: false, at: Date.now() });
+      }
+      return v;
+    }
+    window.ACHOTIKALA_RESOLVE_ASSET = resolve;
+    window.ACHOTIKALA_ASSET_STATS = function () {
+      return { packaged: Object.keys(byPath).length, resolved: hits, misses: misses.length };
+    };
+
+    function resolveSrcset(v) {
+      if (!v) return v;
+      return v.split(",").map(function (part) {
+        var bits = part.trim().split(/\s+/);
+        if (bits[0]) bits[0] = resolve(bits[0]);
+        return bits.join(" ");
+      }).join(", ");
+    }
+    function resolveStyle(v) {
+      if (!v || v.indexOf("url(") < 0) return v;
+      return v.replace(/url\((['"]?)([^'")]+)\1\)/g, function (m, q, u) { return "url(" + q + resolve(u) + q + ")"; });
+    }
+
+    ["HTMLImageElement", "HTMLSourceElement", "HTMLAudioElement", "HTMLVideoElement", "HTMLIFrameElement"].forEach(function (n) {
+      var C = window[n];
+      if (!C) return;
+      var d = Object.getOwnPropertyDescriptor(C.prototype, "src");
+      if (d && d.set) {
+        Object.defineProperty(C.prototype, "src", {
+          configurable: true, enumerable: d.enumerable,
+          get: function () { return d.get.call(this); },
+          set: function (v) { d.set.call(this, resolve(v)); }
+        });
+      }
+      var ss = Object.getOwnPropertyDescriptor(C.prototype, "srcset");
+      if (ss && ss.set) {
+        Object.defineProperty(C.prototype, "srcset", {
+          configurable: true, enumerable: ss.enumerable,
+          get: function () { return ss.get.call(this); },
+          set: function (v) { ss.set.call(this, resolveSrcset(v)); }
+        });
+      }
+    });
+
+    var origSet = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) {
+      var n = String(name).toLowerCase();
+      if (n === "src" || n === "poster") value = resolve(value);
+      else if (n === "srcset" || n === "imagesrcset") value = resolveSrcset(value);
+      else if (n === "style") value = resolveStyle(value);
+      else if (n === "href" && /^(link|image)$/i.test(this.tagName)) value = resolve(value);
+      return origSet.call(this, name, value);
+    };
+
+    function fixEl(el) {
+      if (!el || el.nodeType !== 1) return;
+      var tag = el.tagName.toLowerCase();
+      if (tag === "img" || tag === "source" || tag === "video" || tag === "audio" || tag === "iframe") {
+        var s = el.getAttribute("src");
+        if (s) { var r = resolve(s); if (r !== s) origSet.call(el, "src", r); }
+        var ss2 = el.getAttribute("srcset");
+        if (ss2) { var r2 = resolveSrcset(ss2); if (r2 !== ss2) origSet.call(el, "srcset", r2); }
+        var po = el.getAttribute("poster");
+        if (po) { var r3 = resolve(po); if (r3 !== po) origSet.call(el, "poster", r3); }
+      }
+      var st = el.getAttribute && el.getAttribute("style");
+      if (st && st.indexOf("url(") >= 0) { var r4 = resolveStyle(st); if (r4 !== st) origSet.call(el, "style", r4); }
+    }
+    function scan(root) {
+      fixEl(root);
+      if (root.querySelectorAll) Array.prototype.forEach.call(root.querySelectorAll("img,source,video,audio,iframe,[style*='url(']"), fixEl);
+    }
+    new MutationObserver(function (recs) {
+      recs.forEach(function (r) {
+        if (r.type === "attributes") fixEl(r.target);
+        else Array.prototype.forEach.call(r.addedNodes, function (n) { if (n.nodeType === 1) scan(n); });
+      });
+    }).observe(document.documentElement, {
+      childList: true, subtree: true, attributes: true,
+      attributeFilter: ["src", "srcset", "poster", "style"]
+    });
+    scan(document.documentElement);
+  }
+
+  /* ---------------- מסך אבחון (לחיצה ארוכה על הפינה או ?diag=1) ---------------- */
+  function installDiagnostics(manifest, app) {
+    function show() {
+      var misses = window.ACHOTIKALA_MEDIA_MISSES || [];
+      var uniq = {}, list = [];
+      misses.forEach(function (m) { if (!uniq[m.normalized]) { uniq[m.normalized] = 1; list.push(m); } });
+      var stats = window.ACHOTIKALA_ASSET_STATS ? window.ACHOTIKALA_ASSET_STATS() : {};
+      var d = document.createElement("div");
+      d.style.cssText = "position:fixed;inset:0;background:#fff;z-index:2147483600;overflow:auto;padding:16px;" +
+        "font:13px/1.6 monospace;direction:ltr;text-align:left";
+      var checkedAt = updateState.lastCheck ? new Date(updateState.lastCheck).toLocaleString() : "Not checked yet";
+      d.innerHTML = "<button data-close style='float:right;padding:6px 12px'>סגירה</button>" +
+        "<h3>Achoti Kalah offline diagnostics</h3>" +
+        "<div style='font-size:17px;margin:10px 0'><b>Local installed version: " + manifest.version + "</b></div>" +
+        "<div style='font-size:17px;margin:10px 0'><b>Remote server version: " +
+          (updateState.remoteVersion == null ? "—" : updateState.remoteVersion) + "</b></div>" +
+        "<div>Package stage: " + (manifest.stage || "?") + "</div>" +
+        "<div>Last update check: " + checkedAt + "</div>" +
+        "<div>Manifest source: <b>" + updateState.source + "</b></div>" +
+        "<div>Update result: <b>" + updateState.result + "</b></div>" +
+        (updateState.error ? "<div style='color:#a33;word-break:break-all'>Update error: " + updateState.error + "</div>" : "") +
+        "<button data-update style='margin:12px 0;padding:8px 14px'>בדיקה ועדכון עכשיו</button>" +
+        "<div>generated: " + (manifest.generated || "") + "</div>" +
+        "<div>active content: <b>" + activeContent(manifest) + "</b></div>" +
+        "<div>files in package: " + manifest.files.length + "</div>" +
+        "<div>assets resolved dynamically at runtime: " + (stats.resolved || 0) +
+          " <span style='color:#888'>(0 is normal — it only counts images built by code)</span></div>" +
+        "<div>missing assets: <b>" + list.length + "</b>" +
+          (list.length ? "" : " <span style='color:#888'>(no image or file is missing from the local package — this says nothing about the update)</span>") +
+          "</div>" +
+        "<div>update source: " + ORIGIN + "</div>" +
+        "<div>origins: " + ORIGINS.join(" , ") + "</div>" +
+        "<div>bootstrap rev: " + BOOT_REV + "</div><hr>" +
+        (list.length
+          ? list.map(function (m) {
+              return "<div style='margin-bottom:8px;word-break:break-all'>" +
+                "requested: " + m.requested + "<br>normalized: " + m.normalized +
+                "<br>filename: " + m.name + "<br>in package: NO (no stored blob)" +
+                "<br>rendered as: original URL (network)</div>";
+            }).join("")
+          : "") +
+        "<h4 style='margin:14px 0 6px'>Update log (survives reload and rollback)</h4>" +
+        "<button data-copy style='padding:6px 12px;margin-bottom:8px'>העתקת היומן</button>" +
+        "<pre data-log style='white-space:pre-wrap;word-break:break-all;background:#f7f5f6;padding:10px;border-radius:8px;font-size:12px'>" +
+          logText().replace(/[<&]/g, function (c) { return c === "<" ? "&lt;" : "&amp;"; }) + "</pre>";
+      d.querySelector("[data-close]").onclick = function () { d.remove(); };
+      d.querySelector("[data-update]").onclick = function () {
+        updateState.result = "Checking now…";
+        d.remove();
+        checkForUpdate(manifest, null, true);
+        setTimeout(show, 250);
+      };
+      var logEl = d.querySelector("[data-log]");
+      d.querySelector("[data-copy]").onclick = function (ev) {
+        var text = logEl.textContent;
+        var ok = function () { ev.target.textContent = "הועתק ✔"; };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok, function () { selectLog(); });
+        } else selectLog();
+        function selectLog() {
+          var r = document.createRange();
+          r.selectNodeContents(logEl);
+          var sel = window.getSelection();
+          sel.removeAllRanges(); sel.addRange(r);
+          ev.target.textContent = "סמני והעתיקי ידנית";
+        }
+      };
+      // רענון היומן בזמן שהמסך פתוח, כדי לראות את התקדמות העדכון
+      var tick = setInterval(function () {
+        if (!d.isConnected) { clearInterval(tick); return; }
+        logEl.textContent = logText();
+      }, 1000);
+      document.body.appendChild(d);
+    }
+    window.ACHOTIKALA_DIAGNOSTICS = show;
+    var hot = document.createElement("div");
+    hot.style.cssText = "position:fixed;bottom:0;inset-inline-start:0;width:38px;height:38px;z-index:2147483500";
+    hot.title = "אבחון";
+    var timer = null;
+    hot.addEventListener("pointerdown", function () { timer = setTimeout(show, 1500); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(function (e) {
+      hot.addEventListener(e, function () { clearTimeout(timer); });
+    });
+    document.body.appendChild(hot);
+    if (qs.get("diag") === "1") setTimeout(show, 1500);
+  }
+
+  function mount(app, version) {
+    var doc = new DOMParser().parseFromString(app.html, "text/html");
+    document.documentElement.setAttribute("lang", doc.documentElement.getAttribute("lang") || "he");
+    document.documentElement.setAttribute("dir", doc.documentElement.getAttribute("dir") || "rtl");
+    var t = doc.querySelector("title");
+    if (t) document.title = t.textContent;
+
+    window.ACHOTIKALA_OFFLINE_HOST = true;
+    window.ACHOTIKALA_OFFLINE = true;
+    window.ACHOTIKALA_APP_VERSION = version;
+
+    Array.prototype.forEach.call(doc.head.children, function (el) {
+      var tag = el.tagName.toLowerCase();
+      if (tag === "title" || tag === "script") return;
+      document.head.appendChild(document.importNode(el, true));
+    });
+
+    // גיליונות עיצוב שלא מקושרים ישירות מה-HTML (הטוען הישן של האפליקציה הזריק אותם)
+    var linked = {};
+    Array.prototype.slice.call(document.head.querySelectorAll('link[rel="stylesheet"]')).forEach(function (l) {
+      linked[l.getAttribute("href")] = 1;
+    });
+    Object.keys(app.urlMap).forEach(function (p) {
+      if (!/\.css$/i.test(p) || linked[app.urlMap[p]]) return;
+      var l = document.createElement("link");
+      l.rel = "stylesheet";
+      l.href = app.urlMap[p];
+      document.head.appendChild(l);
+    });
+
+    installResolver(app);
+
+    var scripts = [];
+    Array.prototype.slice.call(doc.body.children).forEach(function (el) {
+      if (el.tagName.toLowerCase() === "script") { scripts.push(el); return; }
+      document.body.appendChild(document.importNode(el, true));
+    });
+    Array.prototype.slice.call(doc.head.querySelectorAll("script")).forEach(function (el) { scripts.unshift(el); });
+
+    function runNext(i) {
+      if (i >= scripts.length) return Promise.resolve();
+      var src = scripts[i].getAttribute("src");
+      var s = document.createElement("script");
+      if (scripts[i].type) s.type = scripts[i].type;
+      if (!src) {
+        s.textContent = scripts[i].textContent;
+        document.body.appendChild(s);
+        return runNext(i + 1);
+      }
+      // המנגנון הישן של העדכונים בתוך האפליקציה אינו רץ יותר — הקובץ הזה אחראי לעדכונים.
+      var origPath = null;
+      for (var p in app.urlMap) if (app.urlMap[p] === src) origPath = p;
+      if (!origPath && src.indexOf("blob:") !== 0) origPath = src.replace(/^\.?\//, "").split("?")[0];
+      if (origPath === "bootstrap.js" || origPath === "boot-core.js") {
+        if (!app.urlMap["app.js"]) return runNext(i + 1);
+        src = app.urlMap["app.js"];
+      } else if (src.indexOf("blob:") !== 0) {
+        // קובץ שאינו חלק מהחבילה (למשל update-config.js הישן) — מדלגים
+        if (!app.urlMap[origPath]) return runNext(i + 1);
+        src = app.urlMap[origPath];
+      }
+      return new Promise(function (res) {
+        s.onload = s.onerror = function () { res(); };
+        s.src = src;
+        document.body.appendChild(s);
+      }).then(function () { return runNext(i + 1); });
+    }
+    return runNext(0).then(function () {
+      boxEl.parentNode && boxEl.parentNode.removeChild(boxEl);
+    });
+  }
+
+  /* ---------------- זרימה ראשית ---------------- */
+  var db;
+  function bootMain() {
+  return openDb().then(function (d) {
+    db = d;
+    return get(db, META, "updateLog").catch(function () { return null; });
+  }).then(function (saved) {
+    if (saved && saved.entries) updateLog = saved;
+    return get(db, META, "originOverride").catch(function () { return null; });
+  }).then(function (override) {
+    if (override && !qs.get("origin")) preferOrigin(override);
+    updateLog.rev = BOOT_REV;
+    logAdd("open", "bootstrap rev " + BOOT_REV);
+    return Promise.all([get(db, META, "current"), get(db, META, "previous"), get(db, META, "boot")]);
+  }).then(function (r) {
+    var current = r[0], previous = r[1], boot = r[2] || {};
+    logAdd("local-state", "current: " + (current ? current.version : "none") +
+      ", previous: " + (previous ? previous.version : "none") +
+      ", boot: v" + boot.version + " attempts " + (boot.attempts || 0) + " verified " + !!boot.verified);
+
+    // גיבוי אוטומטי: אם הגרסה הנוכחית נכשלה פעמיים בפתיחה — חזרה לגרסה הקודמת
+    if (current && previous && boot.version === current.version && !boot.verified && (boot.attempts || 0) >= 2) {
+      logAdd("ROLLBACK", "version " + current.version + " failed to open " + (boot.attempts || 0) +
+        " times without being verified — returning to " + previous.version);
+      current = previous; previous = null;
+      return Promise.all([put(db, META, "current", current), del(db, META, "previous"),
+        put(db, META, "boot", { version: current.version, attempts: 1, verified: true })])
+        .then(function () { return start(current, null); });
+    }
+
+    if (current) {
+      var attempts = boot.version === current.version ? (boot.attempts || 0) + 1 : 1;
+      var verified = boot.version === current.version ? !!boot.verified : false;
+      return put(db, META, "boot", { version: current.version, attempts: attempts, verified: verified })
+        .then(function () { return start(current, previous); });
+    }
+    return firstRun();
+  }).catch(function (e) {
+    logAdd("BOOT-FAILED", errInfo(e));
+    say("לא הצלחנו לפתוח את האתר");
+    fail("שגיאה: " + errInfo(e) +
+      "<br>נסי לפתוח את הקובץ שוב, ואם זה חוזר — יש צורך בחיבור לאינטרנט לפתיחה הראשונה.");
+  });
+  }
+
+  // בקובץ התקנה עצמאי ה-seed נטען אחרי קובץ הפתיחה, ולכן ההרצה מחכה לו.
+  if (window.AK_SEED_PENDING) AK.seedReady = bootMain;
+  else bootMain();
+
+  function firstRun() {
+    say("מתקינה את האתר במחשב לפעם הראשונה…");
+    var seedManifest = window.AK_SEED_MANIFEST || null;
+    if (seedManifest) logAdd("seed", "installing from embedded package v" + seedManifest.version);
+    return (seedManifest ? Promise.resolve(seedManifest) : loadManifest(20000)).then(function (manifest) {
+      return downloadMissing(db, manifest, function (d, t) {
+        progress(d, t);
+        say("מורידה את תוכן האתר…");
+      }).then(function () {
+        return Promise.all([
+          put(db, META, "current", manifest),
+          put(db, META, "boot", { version: manifest.version, attempts: 1, verified: false })
+        ]);
+      }).then(function () {
+        say("כמעט מוכן…");
+        return start(manifest, null);
+      });
+    }).catch(function (e) {
+      say("ההתקנה הראשונה נכשלה");
+      var d = e && e.detail;
+      var rows = "";
+      if (d) {
+        rows =
+          "<div style='text-align:start;direction:ltr;background:#faf6f8;border-radius:10px;padding:12px;margin-top:12px;font-size:12px;word-break:break-all'>" +
+          "<div><b>stage:</b> " + (d.stage || "") + "</div>" +
+          "<div><b>url:</b> " + (d.url || "") + "</div>" +
+          "<div><b>file:</b> " + (d.file || "") + "</div>" +
+          "<div><b>status:</b> " + (d.status !== undefined ? d.status : "(no response)") + "</div>" +
+          "<div><b>content-type:</b> " + (d.contentType || "") + "</div>" +
+          "<div><b>expected bytes:</b> " + (d.expectedBytes !== undefined ? d.expectedBytes : "") + "</div>" +
+          (d.gotBytes !== undefined ? "<div><b>got bytes:</b> " + d.gotBytes + "</div>" : "") +
+          (d.contentLength ? "<div><b>content-length:</b> " + d.contentLength + "</div>" : "") +
+          (d.error ? "<div><b>error:</b> " + d.error + "</div>" : "") +
+          "</div>";
+      } else {
+        rows = "<div style='margin-top:10px;font-size:13px'>שלב: טעינת רשימת העדכונים (manifest.js) — " +
+          ORIGIN + "/updates/manifest.js</div>";
+      }
+      fail("לא הצלחנו להוריד את האתר כרגע (" + (e.message || e) + ")." + rows +
+        "<div style='margin-top:10px'>צלמי את המסך הזה ושלחי אותו.</div>");
+    });
+  }
+
+  function start(manifest, previous) {
+    updateState.localVersion = manifest.version;
+    setVer("local", manifest.version);
+    logAdd("render", "version " + manifest.version + " — " + activeContent(manifest));
+    return buildApp(db, manifest).then(function (app) {
+      return mount(app, manifest.version).then(function () { installDiagnostics(manifest, app); });
+    }).then(function () {
+      // הגרסה נחשבת תקינה ברגע שהאפליקציה עלתה — אחרת סגירה מהירה פעמיים
+      // אחרי עדכון הייתה מחזירה אוטומטית לגרסה הקודמת (59) ומבטלת את ההתקנה.
+      logAdd("health-ok", "version " + manifest.version + " opened successfully");
+      put(db, META, "boot", { version: manifest.version, attempts: 0, verified: true })
+        .catch(function (e) { logAdd("health-write-failed", errInfo(e)); });
+      setTimeout(function () { checkForUpdate(manifest, previous); }, 600);
+    }).catch(function (e) {
+      logAdd("render-failed", "version " + manifest.version + " — " + errInfo(e));
+      // הגרסה הנוכחית לא ניתנת להרכבה — ניסיון מיידי בגרסה הקודמת
+      if (previous) {
+        logAdd("ROLLBACK", "could not build version " + manifest.version + " — falling back to " + previous.version);
+        return Promise.all([put(db, META, "current", previous), del(db, META, "previous")])
+          .then(function () { return start(previous, null); });
+      }
+      say("לא הצלחנו לפתוח את האתר");
+      fail("שגיאה: " + errInfo(e));
+    });
+  }
+
+  /** פסק זמן כולל — עדכון לא יכול להישאר תלוי בלי שגיאה מתועדת */
+  var UPDATE_TIMEOUT_MS = 15 * 60 * 1000;
+  function withTimeout(p, ms, label) {
+    return new Promise(function (res, rej) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        var e = new Error(label + " timed out after " + Math.round(ms / 1000) + "s");
+        e.name = "UpdateTimeoutError";
+        rej(e);
+      }, ms);
+      p.then(function (v) { if (!done) { done = true; clearTimeout(timer); res(v); } },
+             function (e) { if (!done) { done = true; clearTimeout(timer); rej(e); } });
+    });
+  }
+
+  var updateCheckPromise = null;
+  function checkForUpdate(current, previous, manual) {
+    if (updateCheckPromise) return updateCheckPromise;
+    // התקנה ישנה ללא תמונות — מעדכנים מיד, עם התקדמות גלויה, ופותחים מחדש לבד
+    var stale = (current.stage || "core") !== MIN_STAGE;
+    updateState.localVersion = current.version;
+    setVer("local", current.version);
+    updateState.remoteVersion = null;
+    updateState.lastCheck = Date.now();
+    updateState.source = "NETWORK REQUEST IN PROGRESS";
+    updateState.result = "Checking for update…";
+    updateState.error = "";
+    logAdd("check-start", "local " + current.version + (manual ? " (manual)" : "") + (stale ? " [stale stage]" : ""));
+    var flow = loadManifest(20000).then(function (remote) {
+      if (!remote || remote.version == null) throw new Error("invalid-remote-manifest");
+      updateState.remoteVersion = remote.version;
+      logAdd("remote-version", String(remote.version) + " (NETWORK, cache-busted script)");
+      if (Number(remote.version) <= Number(current.version) && !stale) {
+        updateState.result = "Already current";
+        logAdd("already-current", "local " + current.version + " >= remote " + remote.version);
+        if (manual) toast("הגרסה במחשב מעודכנת");
+        return;
+      }
+      updateState.result = "Update " + current.version + " → " + remote.version + " found";
+      logAdd("update-detected", current.version + " -> " + remote.version + ", files in remote package: " + remote.files.length);
+      if (stale) toast("מורידה את התמונות של האתר… 0%");
+      // ניקוי מקדים: משחרר blobs יתומים מגרסאות ישנות לפני שממלאים אחסון
+      return gc(db, [current, previous, remote]).then(function (freed) {
+        logAdd("pre-download-gc", "orphan blobs removed: " + (freed && freed.length ? freed.length : 0));
+      }).catch(function (e) {
+        logAdd("pre-download-gc-failed", errInfo(e)); // לא חוסם את העדכון
+      }).then(function () {
+        return downloadMissing(db, remote, function (d, t) {
+          if (stale && t) toast("מורידה את התמונות של האתר… " + Math.round((d / t) * 100) + "%");
+        });
+      }).then(function () {
+        // This runs even when every remote file hash is already present locally.
+        // The active manifest version is switched in one IndexedDB transaction.
+        logAdd("activation-start", "active before: " + current.version + " (" + activeContent(current) + ")");
+        return switchManifest(db, current, remote);
+      }).then(function () {
+        logAdd("activation-ok", "active after: " + remote.version + " (" + activeContent(remote) + ")");
+        return gc(db, [remote, current]);
+      }).then(function () {
+        updateState.result = "Updated to version " + remote.version + "; reloading";
+        return put(db, META, "bootRev", BOOT_REV);
+      }).then(function () {
+        logAdd("reload", "restarting into version " + remote.version);
+        toast("העדכון הותקן — פותחת מחדש…");
+        setTimeout(function () { location.reload(); }, 900);
+      });
+    });
+    updateCheckPromise = withTimeout(flow, UPDATE_TIMEOUT_MS, "update").catch(function (e) {
+      var detail = e && (e.detail || e.message || String(e));
+      window.ACHOTIKALA_UPDATE_ERROR = detail;
+      updateState.source = updateState.remoteVersion == null ? "NETWORK ERROR" : updateState.source;
+      if (e && e.quota) {
+        updateState.result = "Update failed — no storage space";
+        toast("אין מספיק מקום פנוי במחשב להתקנת הגרסה החדשה");
+      } else {
+        updateState.result = "Update check failed";
+      }
+      updateState.error = errInfo(e);
+      logAdd("UPDATE-FAILED", errInfo(e));
+      if (stale) toast("לא הצלחנו להוריד את התמונות כרגע — ננסה שוב בפתיחה הבאה");
+      else if (manual && !(e && e.quota)) toast("בדיקת העדכון נכשלה — הפרטים מופיעים באבחון");
+    }).then(function () {
+      updateCheckPromise = null;
+    });
+    return updateCheckPromise;
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+UPDATE public.events_db SET cover_image='https://id-preview--c12601da-e7bc-4755-b90e-1d8045bdb684.lovable.app/__l5e/assets-v1/26651c0a-275e-48b9-8164-7c1b17b8bc26/save-the-date-yechefut-2.png' WHERE id='63d397fe-fd58-493f-b853-e532bbe1ed38';

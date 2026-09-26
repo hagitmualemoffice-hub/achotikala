@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.community_update_profile(text, text, text, text, boolean, boolean, jsonb, boolean) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.community_update_profile(text, text, text, text, boolean, boolean, jsonb, boolean) TO authenticated;

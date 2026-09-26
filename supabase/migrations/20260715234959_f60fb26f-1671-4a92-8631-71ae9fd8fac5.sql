@@ -1,0 +1,1 @@
+UPDATE public.events_db SET cover_image='https://fwwgvmkksdcrysddyiur.supabase.co/storage/v1/object/public/media/save-the-date-yechefut-2.png' WHERE id='63d397fe-fd58-493f-b853-e532bbe1ed38';

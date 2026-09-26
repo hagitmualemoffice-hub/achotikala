@@ -1,0 +1,2 @@
+ALTER TABLE public.events_db ADD COLUMN IF NOT EXISTS registration_status TEXT NOT NULL DEFAULT 'open';
+ALTER TABLE public.events_db ADD CONSTRAINT events_db_registration_status_check CHECK (registration_status IN ('not_open','open','closed_full','closed'));

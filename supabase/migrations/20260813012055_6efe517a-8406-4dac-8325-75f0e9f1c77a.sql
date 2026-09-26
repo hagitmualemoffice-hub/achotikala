@@ -1,0 +1,1 @@
+UPDATE public.offline_sync_state SET content_version = content_version + 1, updated_at = now() WHERE id = 1;

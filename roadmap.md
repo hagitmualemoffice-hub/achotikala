@@ -1,0 +1,70 @@
+# Roadmap
+
+- [x] Move all emoji choices into the reactions panel.
+- [x] Keep mobile feed titles on one line.
+- [x] Build the two-line mobile compact layout.
+- [x] Persist the selected feed layout.
+- [x] Keep phone back navigation inside Liba when closing a post.
+- [x] Standardize reactions on posts, comments, and nested replies with removable selections.
+- [x] Re-encode the 29 referenced oversized images according to the approved plan.
+- [x] Update local imports, hosted asset pointers, database cover references, and offline media mappings.
+- [x] Verify desktop/mobile visuals, final payload reduction, and a clean build without publishing.
+- [x] Build the dedicated בירורים space inside ליבה from the approved brief and visual reference.
+- [x] Add numbered pagination, stronger names, photo status, and colorful chips to the באר list.
+- [x] Add unified mobile bottom navigation across all Liba screens.
+- [x] Add fixed mobile create buttons for forum, Baar, Places, and inquiries.
+- [x] Simplify mobile search/view/filter controls and hide authorized intro copy.
+- [x] Align forum comment counts left on mobile.
+- [x] Verify all Liba mobile screens and clean build.
+- [x] Make the mobile inbox and conversation layout feel closer to WhatsApp.
+- [x] Restrict post and comment action menus to each woman’s own content on mobile.
+- [x] Show post creation time, using short Hebrew time labels without the word "לפני".
+- [x] Remove decorative space icons wherever the space name is already written.
+- [x] Add gentle WhatsApp-like transitions between the feed, posts, and mobile drawers.
+- [x] Finish mobile reply fields with auto-growth and compact arrow send buttons.
+- [x] Build a complete post footer with reactions, comment count, avatars, and a reply action.
+- [x] Move the live quick-look section below the mobile feed and link the top-bar shortcut to it.
+- [x] Stack two upcoming events and show two narrow inquiry cards with a link for more.
+- [x] Keep the post composer’s space selector inline and make drawer action bars sticky.
+- [x] Expand and reorganize the reactions panel into a wider multi-row picker.
+- [x] Allow a sender to delete her own private chat message securely.
+- [x] Make Enter add a new line in private chat; send only from the send button.
+- [x] Show notifications in a mobile drawer containing notifications only.
+- [x] Open messages without personal-area tabs; keep saved items in the personal area.
+- [x] Put chat immediately after the forum in mobile navigation, remove personal area there, and replace top chat with My Heart.
+- [x] Differentiate members with identical first names using stable colors and two initials when available.
+- [x] Keep the inquiry help button outlined until help was offered, then show it filled, on mobile and desktop.
+- [x] Make quick-look counters open their content and clear after viewing.
+- [x] Carry shared mobile behavior fixes into desktop views where applicable.
+- [x] Maintain four fixed public Google Drive install files and update all four together on every publish.
+- [x] Restore desktop chat links in the top bar and sidebar before community tools.
+- [x] Show persistent side alerts for unread private messages, including after returning to the site.
+- [x] Send private chat with Enter on desktop while keeping button-only sending on mobile.
+- [x] Compact the desktop chat layout and remove the pink outline from sent bubbles.
+- [x] Centralize and persist Liba authentication/access until explicit sign-out.
+- [x] Keep approved screens available during temporary network loss across mobile and desktop.
+- [x] Verify navigation, offline behavior, and explicit sign-out cache clearing.
+- [x] Allow email-code sign-in for manually approved Liba access requests.
+- [x] Make the offline build command reliable and complete a clean local package verification.
+- [x] Show desktop system notifications for new Liba chat messages while the site is in the background.
+- [x] Remove the unused white strip below mobile chat and let the conversation use all space above navigation.
+- [x] Make tapping Chat in the mobile navigation always return to the full conversations list.
+- [x] Keep the mobile post publish action visible in a WhatsApp-style sticky bottom bar.
+- [x] Keep Hey Liba only on the main community space.
+- [x] Preserve a separate unsent chat draft for every conversation.
+- [x] Standardize gentle popup motion and left-side close controls across mobile and desktop.
+- [x] Pin the mobile chat composer directly above navigation without page-scroll movement.
+- [x] Remove the post composer back action and keep its strong pink publish action at the bottom.
+- [x] Match the Baar add form to the unified composer drawer with a sticky pink action and no bottom cancel.
+- [x] Match the Places add form to the unified composer drawer with a sticky pink action and no bottom cancel.
+- [x] Match the Apartments add form to the unified composer drawer with a sticky pink action and no bottom cancel.
+- [x] Keep the Baar and Places mobile drawers open and fully interactive while typing.
+- [x] Make the offline Liba access-request form open reliably.
+- [x] Convert the existing Liba quiz into an inactive reusable managed template with scheduling controls.
+- [x] Add reusable managed announcement/event content with cover, title, body, scheduling, manual removal, and community comments.
+- [x] Show active announcements as temporary top feed tabs and create the Sukkot save-the-date for one day after the correct cover is supplied.
+- [x] Verify admin management, automatic expiry, member reading/comments, and mobile/desktop presentation; keep the offline release unpublished.
+- [x] Offline: events, blog and songs load live with last-known cache + baked fallback (unreleased).
+- [ ] Release offline v13 — waiting for owner's go-ahead.
+- [ ] Move offline updates to a dedicated repository (waiting on a GitHub connection).
+- [ ] Investigate "email not found" for NetFree users with evidence.

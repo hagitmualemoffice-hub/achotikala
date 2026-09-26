@@ -1,0 +1,17 @@
+{
+  "_comment": "מקור העדכונים של גרסת האופליין. jsDelivr מגיש רק ריפו GitHub ציבורי.",
+  "ghOwner": "hagitmualemoffice-hub",
+  "ghRepo": "achotikala-offline",
+  "branch": "main",
+  "cdnPath": "offline-cdn",
+  "exclude": [
+    "magazines/",
+    "downloads/"
+  ],
+  "_exclude_comment": "תיקיות שאינן חלק מהאפליקציה עצמה (חוברות PDF, קבצים להורדה) — לא נארזות לאופליין כדי לא לנפח את חבילת ההתקנה",
+  "legacy": {
+    "ghRepo": "achotikala",
+    "enabled": true,
+    "_comment": "ריפו ישן — ממשיך לשרת התקנות rev 13 ומטה (מתעדכן אוטומטית מ-offline-cdn/ בפרויקט)"
+  }
+}

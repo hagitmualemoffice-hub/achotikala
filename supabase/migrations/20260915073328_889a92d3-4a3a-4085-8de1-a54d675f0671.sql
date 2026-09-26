@@ -1,0 +1,21 @@
+REVOKE ALL ON FUNCTION public.community_inquiry_author_json(uuid,boolean,uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.community_inquiry_json(uuid,uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_author_json(uuid,boolean,uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_json(uuid,uuid) TO service_role;
+
+REVOKE ALL ON FUNCTION public.community_inquiry_feed(text,text,text,integer,integer) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_create(jsonb) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_offer(uuid,text,text,boolean) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_cancel_offer(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_threads(uuid) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_message(uuid,text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_set_status(uuid,text) FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION public.community_inquiry_admin_action(uuid,text,jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_feed(text,text,text,integer,integer) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_create(jsonb) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_offer(uuid,text,text,boolean) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_cancel_offer(uuid) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_threads(uuid) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_message(uuid,text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_set_status(uuid,text) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.community_inquiry_admin_action(uuid,text,jsonb) TO authenticated, service_role;

@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.has_apartment_access(uuid) TO authenticated;

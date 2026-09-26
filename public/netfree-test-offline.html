@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>בדיקת חיבור לעדכוני האופליין</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#fff7f9;color:#333;margin:0;padding:24px;line-height:1.5}
+  .box{max-width:680px;margin:0 auto;background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  h1{font-size:22px;margin:0 0 8px;color:#e0457b}
+  button{background:#fa6fba;color:#fff;border:0;border-radius:999px;padding:12px 28px;font-size:17px;cursor:pointer}
+  #res{margin-top:18px;font-size:22px;font-weight:bold}
+  pre{direction:ltr;text-align:left;background:#f4f4f4;border-radius:10px;padding:12px;font-size:12px;white-space:pre-wrap;max-height:380px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>בדיקת חיבור לעדכוני האופליין</h1>
+  <p>הבדיקה לוקחת כדקה. לחצי על הכפתור, חכי עד שתופיע תוצאה, ואז צלמי את כל המסך ושלחי לנו.</p>
+  <button id="go">התחילי בדיקה</button>
+  <div id="res"></div>
+  <pre id="log"></pre>
+</div>
+<script>
+(function(){
+  var REPO = "hagitmualemoffice-hub/achotikala-offline";
+  var BASE = "https://cdn.jsdelivr.net/gh/" + REPO + "@main/offline-cdn";
+  var logEl = document.getElementById("log"), resEl = document.getElementById("res");
+  function log(s){ logEl.textContent += s + "\n"; }
+  function djb2(v){ var h=5381; for(var i=0;i<v.length;i++) h=((h*33)^v[i])>>>0; return h.toString(16); }
+  function b64(b){ var s=atob(b),o=new Uint8Array(s.length); for(var i=0;i<s.length;i++) o[i]=s.charCodeAt(i); return o; }
+  var got = {};
+  window.AK = { part: function(h,i,t,b,m){ got[h+"."+i] = b; } };
+  function load(url){ return new Promise(function(res){
+    var s=document.createElement("script"), done=false, t0=Date.now();
+    function fin(ok,why){ if(done) return; done=true; s.remove(); res({ok:ok,why:why,ms:Date.now()-t0}); }
+    s.src = url + "?probe=" + Date.now();
+    s.onload=function(){fin(true)}; s.onerror=function(){fin(false,"blocked/error")};
+    setTimeout(function(){fin(false,"timeout")},30000);
+    document.head.appendChild(s);
+  });}
+  function run(){
+    document.getElementById("go").disabled = true;
+    logEl.textContent=""; resEl.textContent="בודקת…";
+    log("repo: "+REPO+"  time: "+new Date().toISOString()+"\nua: "+navigator.userAgent);
+    var manifest=null;
+    window.AKUPD_MANIFEST=function(m){manifest=m};
+    load(BASE+"/updates/manifest.js").then(function(r){
+      if(!r.ok||!manifest){ log("MANIFEST FAIL ("+(r.why||"no data")+")"); return finish(0,1); }
+      log("manifest OK  version="+manifest.version+"  files="+manifest.files.length+"  ("+r.ms+"ms)");
+      var jobs=[], files=manifest.files;
+      var big = files.filter(function(f){return f.k&&f.k.length>=30}).sort(function(a,b){return b.k.length-a.k.length})[0];
+      var imgs = files.filter(function(f){return /\.(jpe?g|webp|png)$/i.test(f.p)&&f.k}).slice(0,6);
+      var css = files.filter(function(f){return /\.css$/i.test(f.p)&&f.k})[0];
+      // 1) run of 35 sequential chunks from the biggest file (~1.1MB cumulative, the old block threshold)
+      if(big) for(var i=0;i<Math.min(35,big.k.length);i++) jobs.push({f:big,i:i,tag:"burst"});
+      // 2) first chunk of several images (contains the file signature)
+      imgs.forEach(function(f){ jobs.push({f:f,i:0,tag:"img-head"}); });
+      if(css) jobs.push({f:css,i:0,tag:"css"});
+      var pass=0, fail=0, bytes=0, n=0;
+      (function next(){
+        if(n>=jobs.length) return finish(pass,fail,bytes);
+        var j=jobs[n++], meta=j.f.k[j.i];
+        load(BASE+meta.u).then(function(r){
+          var key=j.f.h+"."+j.i, b=got[key], ok=false, note=r.why||"";
+          if(r.ok&&b){ var raw=b64(b); ok = raw.length===meta.l && (meta.c==null||djb2(raw)===meta.c); note = ok ? raw.length+"B" : "corrupt"; if(ok) bytes+=raw.length; }
+          else if(r.ok) note="no data";
+          ok?pass++:fail++;
+          log((ok?"OK   ":"FAIL ")+j.tag+"  "+j.f.p+" #"+j.i+"  "+note+"  "+r.ms+"ms");
+          resEl.textContent="בודקת… "+n+"/"+jobs.length;
+          next();
+        });
+      })();
+    });
+  }
+  function finish(pass,fail,bytes){
+    var ok = fail===0 && pass>0;
+    resEl.style.color = ok ? "#2a9d4b" : "#d33";
+    resEl.textContent = ok ? "✔ הבדיקה עברה ("+pass+" חלקים)" : "✘ הבדיקה נכשלה ("+fail+" נכשלו מתוך "+(pass+fail)+")";
+    log("\nRESULT: "+(ok?"PASS":"FAIL")+"  pass="+pass+" fail="+fail+" bytes="+(bytes||0));
+    document.getElementById("go").disabled = false;
+  }
+  document.getElementById("go").onclick = run;
+})();
+</script>
+</body>
+</html>

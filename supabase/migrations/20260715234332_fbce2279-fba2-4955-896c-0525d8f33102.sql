@@ -1,0 +1,1 @@
+UPDATE public.events_db SET event_type='save_the_date', end_date='2026-07-30', registration_status='not_open', cover_image='https://fwwgvmkksdcrysddyiur.supabase.co/storage/v1/object/public/media/save-the-date-yechefut.png' WHERE id='63d397fe-fd58-493f-b853-e532bbe1ed38';

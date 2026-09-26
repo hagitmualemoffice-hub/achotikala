@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>בדיקת חיבור – אחותי כלה</title>
+<style>
+body{font-family:Heebo,Arial,sans-serif;background:#fff7f9;color:#333;max-width:640px;margin:0 auto;padding:24px}
+h1{font-size:20px;color:#c2185b}button{background:#c2185b;color:#fff;border:0;border-radius:12px;padding:12px 20px;font-size:16px;cursor:pointer}
+li{margin:8px 0;padding:10px;border-radius:10px;background:#fff;border:1px solid #eee}
+.ok{border-color:#4caf50}.fail{border-color:#e53935}
+pre{direction:ltr;text-align:left;background:#fff;border:1px solid #ddd;padding:10px;white-space:pre-wrap;font-size:12px}
+</style>
+</head>
+<body>
+<h1>בדיקת חיבור קצרה</h1>
+<p>לוחצים על הכפתור, מחכים כחצי דקה, ואז לוחצים "העתקה" ושולחים את התוצאה.</p>
+<button id="go">התחלת בדיקה</button>
+<ul id="list"></ul>
+<pre id="log"></pre>
+<button id="copy" style="display:none">העתקה</button>
+<script>
+var U="https://fwwgvmkksdcrysddyiur.supabase.co";
+var K="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3d2d2bWtrc2RjcnlzZGR5aXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNzI4MDksImV4cCI6MjA5Mjk0ODgwOX0.o8V1qAhrB-_nXSpKi4Kpq0LIEq8hGOxfb71gxB-17zA";
+var id="probe-"+Date.now().toString(36);
+var BODY=JSON.stringify({email:"netfree-probe",client:id});
+var tests=[
+ ["A. קריאה פשוטה (GET, בלי בדיקה מקדימה)",function(){return fetch(U+"/functions/v1/offline-app?manifest=1&probe="+id)}],
+ ["B. קריאה עם כותרות (GET + בדיקה מקדימה)",function(){return fetch(U+"/auth/v1/settings?probe="+id,{headers:{apikey:K}})}],
+ ["C. שליחה פשוטה (POST text/plain, בלי בדיקה מקדימה)",function(){return fetch(U+"/functions/v1/ensure-member-account?probe="+id,{method:"POST",headers:{"Content-Type":"text/plain"},body:BODY})}],
+ ["D. שליחה רגילה כמו בהתחברות (POST JSON + בדיקה מקדימה)",function(){return fetch(U+"/functions/v1/ensure-member-account?probe="+id,{method:"POST",headers:{"Content-Type":"application/json",apikey:K,Authorization:"Bearer "+K,"x-client-info":"supabase-js-web/2.104.0"},body:BODY})}],
+ ["E. שליחה לשרת ההתחברות (POST JSON + בדיקה מקדימה)",function(){return fetch(U+"/auth/v1/token?grant_type=password&probe="+id,{method:"POST",headers:{"Content-Type":"application/json",apikey:K},body:JSON.stringify({email:"netfree-probe@example.invalid",password:"x"})})}]
+];
+var lines=[];
+function log(s){lines.push(s);document.getElementById("log").textContent=lines.join("\n")}
+async function run(){
+ document.getElementById("go").disabled=true;
+ log("id="+id+" ua="+navigator.userAgent+" origin="+location.origin);
+ for(var i=0;i<tests.length;i++){
+  var t=tests[i],li=document.createElement("li");li.textContent=t[0]+" … ";document.getElementById("list").appendChild(li);
+  var t0=Date.now(),r;
+  try{
+   var ctl=new Promise(function(_,rej){setTimeout(function(){rej(new Error("timeout 15s"))},15000)});
+   var res=await Promise.race([t[1](),ctl]);
+   var txt=(await res.text()).slice(0,80).replace(/\s+/g," ");
+   // תשובה אמיתית מהשרת שלנו מתחילה ב-{ ; דף חסימה נראה אחרת
+   var real=/^\s*[\[{]/.test(txt);
+   r=(real?"OK":"FOREIGN")+" status="+res.status+" "+(Date.now()-t0)+"ms body="+txt;
+   li.className=real?"ok":"fail";li.textContent=t[0]+" — "+(real?"עבר":"תשובה זרה");
+  }catch(e){
+   r="FAIL "+(e&&e.message)+" "+(Date.now()-t0)+"ms";
+   li.className="fail";li.textContent=t[0]+" — נכשל";
+  }
+  log(t[0].slice(0,1)+": "+r);
+ }
+ log("done");
+ document.getElementById("copy").style.display="inline-block";
+}
+document.getElementById("go").onclick=run;
+document.getElementById("copy").onclick=function(){navigator.clipboard&&navigator.clipboard.writeText(lines.join("\n"));this.textContent="הועתק ✓"};
+</script>
+</body>
+</html>

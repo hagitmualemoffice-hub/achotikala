@@ -1,0 +1,1 @@
+update public.offline_sync_state set content_version = content_version + 1, last_status = 'ok', last_synced_at = now(), updated_at = now() where id = 1;

@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@200;300;400;500;600;700&family=Noto+Sans:wght@200;300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 211 31% 30%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 211 31% 30%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 211 31% 30%;
+
+    --primary: 343 58% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 343 65% 70%;
+    --primary-dark: 343 55% 48%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 25%;
+
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 340 50% 95%;
+    --accent-foreground: 340 50% 35%;
+
+    --shadow-soft: 0 10px 40px -10px hsl(0 0% 0% / 0.08);
+    --shadow-card: 0 8px 30px -8px hsl(0 0% 0% / 0.12);
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 340 60% 65%;
+
+    --radius: 0.75rem;
+
+    /* Community space accents — Achoti Kalah palette family */
+    --space-writing: 343 52% 60%;
+    --space-car: 24 62% 55%;
+    --space-finance: 268 34% 58%;
+    --space-discussions: 330 62% 62%;
+    --space-shabbat: 42 58% 50%;
+    --space-spiritual: 198 42% 52%;
+    --space-fertility: 168 38% 46%;
+    --space-inquiries: 343 58% 58%;
+    --space-system: 215 30% 45%;
+
+    /* Soft inquiry info chips */
+    --chip-info: 268 34% 58%;
+    --chip-info-bg: 268 34% 94%;
+    --chip-quality: 343 52% 58%;
+    --chip-quality-bg: 343 52% 95%;
+    --chip-photo: 24 62% 55%;
+    --chip-photo-bg: 24 62% 93%;
+
+    /* Baar attribute tags — consistent semantic hues */
+    --tag-neutral: 220 8% 26%;
+    --tag-neutral-bg: 220 12% 87%;
+    --tag-sky: 198 100% 34%;
+    --tag-sky-bg: 198 82% 87%;
+    --tag-violet: 273 64% 42%;
+    --tag-violet-bg: 273 64% 87%;
+    --tag-teal: 177 55% 34%;
+    --tag-teal-bg: 177 60% 87%;
+    --tag-amber: 34 92% 38%;
+    --tag-amber-bg: 34 88% 87%;
+    --tag-rose: 330 88% 44%;
+    --tag-rose-bg: 330 84% 87%;
+    --tag-indigo: 260 74% 36%;
+    --tag-indigo-bg: 260 70% 87%;
+    --tag-olive: 155 85% 24%;
+    --tag-olive-bg: 155 55% 87%;
+    --tag-plum: 291 44% 36%;
+    --tag-plum-bg: 291 44% 87%;
+    --tag-lime: 79 66% 32%;
+    --tag-lime-bg: 79 70% 87%;
+    --tag-cyan: 200 42% 38%;
+    --tag-cyan-bg: 200 48% 87%;
+    --tag-steel: 215 62% 34%;
+    --tag-steel-bg: 215 62% 87%;
+    --tag-coral: 16 88% 42%;
+    --tag-coral-bg: 16 90% 87%;
+    --tag-mint: 155 88% 30%;
+    --tag-mint-bg: 155 70% 87%;
+    --tag-clay: 13 36% 36%;
+    --tag-clay-bg: 13 42% 87%;
+    --tag-lilac: 260 60% 46%;
+    --tag-lilac-bg: 260 62% 87%;
+    --tag-sand: 51 58% 32%;
+    --tag-sand-bg: 51 66% 87%;
+    --tag-brick: 345 60% 40%;
+    --tag-brick-bg: 345 62% 87%;
+    --tag-aqua: 207 32% 38%;
+    --tag-aqua-bg: 207 40% 87%;
+
+    /* Places — transit & crowd */
+    --transit-yes: 142 70% 38%;
+    --transit-no: 220 8% 55%;
+    --crowd-empty: 220 12% 90%;
+    --crowd-fill: 343 58% 58%;
+    --crowd-separator: 340 18% 88%;
+
+    /* Community avatar palette — lively, warm and clear */
+    --avatar-rose: 350 66% 62%;
+    --avatar-coral: 17 82% 62%;
+    --avatar-gold: 40 88% 58%;
+    --avatar-olive: 78 48% 52%;
+    --avatar-sage: 165 46% 47%;
+    --avatar-blue: 196 62% 55%;
+    --avatar-lavender: 256 48% 63%;
+    --avatar-orchid: 322 52% 60%;
+    --avatar-blush: 5 62% 66%;
+    --avatar-taupe: 22 32% 55%;
+    --avatar-pink: 336 68% 68%;
+    --avatar-mist: 210 38% 62%;
+    --presence-online: 145 56% 43%;
+
+    /* Messaging — ליבה pink for emphasis, very light gray for quiet surfaces */
+    --chat-surface: 0 0% 98%;
+    --chat-sage: 343 58% 58%;
+    --chat-sage-soft: 0 0% 94%;
+    --chat-sage-foreground: 343 55% 48%;
+
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  section[id] {
+    scroll-margin-top: 80px;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
+    font-weight: 300;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .animate-pulse-soft {
+    animation: pulse-soft 2.5s ease-in-out infinite;
+  }
+  .chat-wallpaper {
+    background-color: hsl(var(--chat-surface));
+    background-image:
+      radial-gradient(circle at 10px 10px, hsl(var(--chat-sage) / 0.075) 1px, transparent 1.5px),
+      radial-gradient(circle at 27px 27px, hsl(var(--chat-sage) / 0.045) 1px, transparent 1.5px);
+    background-size: 36px 36px;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 15px -3px hsl(var(--primary) / 0.25); }
+  50% { transform: scale(1.05); box-shadow: 0 15px 25px -5px hsl(var(--primary) / 0.35); }
+}
+
+/* the page never gets wider when a popup opens — the scrollbar space stays */
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+}

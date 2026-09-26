@@ -1,0 +1,1 @@
+ALTER TABLE public.events_db ADD COLUMN IF NOT EXISTS poster_style jsonb;

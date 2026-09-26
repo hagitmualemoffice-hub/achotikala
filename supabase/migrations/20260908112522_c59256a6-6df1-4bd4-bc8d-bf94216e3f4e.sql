@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.community_accept_agreement(boolean, boolean) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.community_accept_agreement(boolean, boolean) TO authenticated, service_role;
