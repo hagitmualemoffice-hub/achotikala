@@ -45,8 +45,12 @@ const ListingDetail = ({
   const legacy = !phone && !email ? listing.contact?.trim() : null;
 
   return (
-    <ResponsiveDialog open={!!listing} onOpenChange={(o) => !o && onClose()}>
-      <div className="flex flex-col h-full" dir="rtl">
+    <ResponsiveDialog
+      open={!!listing}
+      onOpenChange={(o) => !o && onClose()}
+      mobileContentClassName="h-[92dvh] max-h-[92dvh]"
+    >
+      <div className="flex flex-col h-full min-h-0" dir="rtl">
         <div className="flex-1 overflow-y-auto">
           <div className="relative bg-white px-7 md:px-9 pt-8 pb-7">
             <button
