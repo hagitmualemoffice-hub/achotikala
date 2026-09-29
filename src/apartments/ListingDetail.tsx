@@ -45,8 +45,12 @@ const ListingDetail = ({
   const legacy = !phone && !email ? listing.contact?.trim() : null;
 
   return (
-    <ResponsiveDialog open={!!listing} onOpenChange={(o) => !o && onClose()}>
-      <div className="flex flex-col h-full" dir="rtl">
+    <ResponsiveDialog
+      open={!!listing}
+      onOpenChange={(o) => !o && onClose()}
+      mobileContentClassName="h-[92dvh] max-h-[92dvh]"
+    >
+      <div className="flex flex-col h-full min-h-0" dir="rtl">
         <div className="flex-1 overflow-y-auto">
           <div className="relative bg-white px-7 md:px-9 pt-8 pb-7">
             <button
@@ -148,7 +152,7 @@ const ListingDetail = ({
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-border/70 bg-card px-7 md:px-9 py-5 md:py-6">
+        <div className="shrink-0 border-t border-border/70 bg-card px-7 md:px-9 pt-5 md:pt-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:pb-6">
           <div className="text-sm font-medium mb-3">יצירת קשר</div>
           <div className="flex flex-wrap items-center gap-2.5">
             {phone && (
