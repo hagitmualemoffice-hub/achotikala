@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone, SlidersHorizontal, Building2, MessagesSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInquiries, isInquiryNew, type Inquiry } from "./inquiries";
 import { HelpDialog } from "./InquiriesPage";
@@ -104,6 +104,10 @@ export default function LibaPulsePanel({
   onOpenSince,
   onOpenDaily,
   onOpenDailySettings,
+  actionableMode = false,
+  newPostsCount = 0,
+  onOpenPosts,
+  onOpenApartments,
 }: {
   events?: CommunityEvent[];
   since?: { key: string; text: string }[];
@@ -116,12 +120,17 @@ export default function LibaPulsePanel({
   onOpenSince?: (key: string) => void;
   onOpenDaily?: () => void;
   onOpenDailySettings?: () => void;
+  actionableMode?: boolean;
+  newPostsCount?: number;
+  onOpenPosts?: () => void;
+  onOpenApartments?: () => void;
 }) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [helpInquiry, setHelpInquiry] = useState<Inquiry | null>(null);
   const [dbEvents, setDbEvents] = useState<CommunityEvent[]>([]);
   const events = dbEvents.length > 0 ? dbEvents : propEvents;
   const [notices, setNotices] = useState<SidebarNotice[]>([]);
+  const [newApartmentCount, setNewApartmentCount] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -130,6 +139,19 @@ export default function LibaPulsePanel({
       .catch(() => undefined);
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!actionableMode) return;
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    supabase
+      .from("apartment_listings")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active")
+      .gte("created_at", since)
+      .then(({ count, error }) => setNewApartmentCount(error ? null : (count ?? 0)));
+  }, [actionableMode]);
+
+  const waitingInquiryCount = inquiries.filter((item) => item.needs_help || item.help_count === 0).length;
 
   useEffect(() => {
     let cancelled = false;
@@ -266,8 +288,39 @@ export default function LibaPulsePanel({
         </section>
       )}
 
-      {/* ---------------------------- מדברים עכשיו ---------------------------- */}
-      {talking.length > 0 && (
+      {/* ---------------------------- קורה עכשיו ---------------------------- */}
+      {actionableMode && (waitingInquiryCount > 0 || newPostsCount > 0 || (newApartmentCount ?? 0) > 0) && (
+        <section className="py-5">
+          <SectionTitle icon={<Flame className="h-4 w-4 text-primary" />} title="🔥 קורה עכשיו" />
+          <ul className="space-y-1">
+            {waitingInquiryCount > 0 && (
+              <li>
+                <button onClick={() => onOpenInquiries()} className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-right text-[13px] font-light text-foreground transition-colors hover:bg-muted hover:text-primary">
+                  <HandHeart className="h-4 w-4 shrink-0 text-primary" />
+                  {waitingInquiryCount} בירורים מחכים לעזרה
+                </button>
+              </li>
+            )}
+            {newPostsCount > 0 && onOpenPosts && (
+              <li>
+                <button onClick={onOpenPosts} className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-right text-[13px] font-light text-foreground transition-colors hover:bg-muted hover:text-primary">
+                  <MessagesSquare className="h-4 w-4 shrink-0 text-primary" />
+                  {newPostsCount} פוסטים חדשים שמחכים שתקראי אותם
+                </button>
+              </li>
+            )}
+            {(newApartmentCount ?? 0) > 0 && onOpenApartments && (
+              <li>
+                <button onClick={onOpenApartments} className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-right text-[13px] font-light text-foreground transition-colors hover:bg-muted hover:text-primary">
+                  <Building2 className="h-4 w-4 shrink-0 text-primary" />
+                  {newApartmentCount} מודעות חדשות בלוח הדירות
+                </button>
+              </li>
+            )}
+          </ul>
+        </section>
+      )}
+      {!actionableMode && talking.length > 0 && (
         <section className="py-5">
           <SectionTitle
             icon={<Flame className="h-4 w-4 text-primary" />}
