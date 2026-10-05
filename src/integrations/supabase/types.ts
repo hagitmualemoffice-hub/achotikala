@@ -651,6 +651,9 @@ export type Database = {
           photo_storage_path: string | null
           photo_url: string | null
           positives: string | null
+          proposal_contact_email: string | null
+          proposal_contact_name: string | null
+          proposal_contact_phone: string | null
           source: string
           status: string | null
           updated_at: string
@@ -674,6 +677,9 @@ export type Database = {
           photo_storage_path?: string | null
           photo_url?: string | null
           positives?: string | null
+          proposal_contact_email?: string | null
+          proposal_contact_name?: string | null
+          proposal_contact_phone?: string | null
           source?: string
           status?: string | null
           updated_at?: string
@@ -697,6 +703,9 @@ export type Database = {
           photo_storage_path?: string | null
           photo_url?: string | null
           positives?: string | null
+          proposal_contact_email?: string | null
+          proposal_contact_name?: string | null
+          proposal_contact_phone?: string | null
           source?: string
           status?: string | null
           updated_at?: string
@@ -3121,6 +3130,15 @@ export type Database = {
         Returns: undefined
       }
       baar_saved_list: { Args: never; Returns: Json }
+      baar_set_proposal_contact: {
+        Args: {
+          _boy_id: string
+          _contact_email: string
+          _contact_name: string
+          _contact_phone: string
+        }
+        Returns: undefined
+      }
       baar_suggest: {
         Args: { _boy_id: string; _details: string; _kind: string }
         Returns: undefined
