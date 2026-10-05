@@ -2359,6 +2359,9 @@ const BaarPage = () => {
         }}
       />
 
+      {/* ההשתדלות היומית — כרטיס אחד ביום, שנבחר במיוחד בשבילה */}
+      <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} onAddBoy={() => setCreateOpen(true)} />
+
       <ProfileDialog
         boyId={openBoyId}
         onClose={() => setOpenBoyId(null)}
