@@ -1,16 +1,10 @@
 import LibaHeartIcon from "@/community/v1/LibaHeartIcon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
-  Pin,
   Bookmark,
-  Wrench,
   MessageSquareQuote,
-  FileSpreadsheet,
-  FileText,
-  Link2,
-  File,
   ChevronLeft,
   ChevronRight,
   LayoutList,
@@ -24,7 +18,6 @@ import {
   Activity,
   Users,
   Plus,
-  MessageCircle,
   
 } from "lucide-react";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
@@ -50,11 +43,9 @@ import { SPACES, setLibaAdmin, accentBg, accentColor, spaceById, type SpaceId } 
 import {
   bootstrap,
   fetchFeed,
-  openAttachment,
   recommendTool,
   isOffline,
   touchPresence,
-  fileUrl,
   type ApiPost,
   type Bootstrap,
   type SinceLastVisit,
@@ -92,9 +83,6 @@ const VIEW_KEY = "achotikala.community.view";
 const PAGE = 20;
 const PROFILE_CACHE = "achotikala.community.profile";
 
-
-const toolIcon = (kind: string) =>
-  kind === "excel" ? FileSpreadsheet : kind === "pdf" ? FileText : kind === "link" ? Link2 : File;
 
 /** "מאז שהיית כאן" — turns the server counters into human lines. */
 const sinceLines = (s: SinceLastVisit | undefined) => {
@@ -272,7 +260,6 @@ const CommunityBody = () => {
       return null;
     }
   });
-  const [showAllTools, setShowAllTools] = useState(false);
   const feedTop = useRef<HTMLDivElement>(null);
   const reinforce = useReinforce();
 
@@ -556,9 +543,7 @@ const CommunityBody = () => {
     void markActivitySeen().catch(() => undefined);
     setSeenSinceKeys((current) => new Set(current).add(key));
   };
-  const notices = boot?.notices ?? [];
   const events = boot?.events ?? [];
-  const tools = boot?.tools ?? [];
   const talking = boot?.talking_now ?? [];
   const pending = (boot?.admin_pending?.tools ?? 0) + (boot?.admin_pending?.reports ?? 0);
 
