@@ -1076,8 +1076,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
-            onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
+            onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
+            onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
           />
         </div>
 
@@ -1104,8 +1104,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
-            onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
+            onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
+            onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
           />
 
 
