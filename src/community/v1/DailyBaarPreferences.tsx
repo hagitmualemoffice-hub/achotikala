@@ -10,6 +10,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cadence, setCadence] = useState<DailyCadence>("every_other_day");
+  const [hidden, setHidden] = useState(false);
   const [kind, setKind] = useState<DailyFilterKind>("age");
   const [value, setValue] = useState("");
   const [minAge, setMinAge] = useState("");
@@ -23,6 +24,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
       if (cancelled) return;
       if (!state.authorized) { onOpenChange(false); return; }
       setCadence(state.cadence ?? "every_other_day");
+      setHidden(!!state.hidden);
       const savedKind = state.filter_kind;
       setKind(savedKind === "ethnicity" || savedKind === "dress_style" ? savedKind : "age");
       setValue(savedKind === "ethnicity" || savedKind === "dress_style" ? state.filter_value ?? "" : "");
@@ -50,8 +52,9 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
         kind === "age" ? null : value || null,
         kind === "age" ? min : null,
         kind === "age" ? max : null,
+        hidden,
       );
-      toast.success("ההעדפות נשמרו 💗");
+      toast.success(hidden ? "ההשתדלות היומית הוסתרה. תמיד אפשר להחזיר אותה מההגדרות 💗" : "ההעדפות נשמרו 💗");
       onOpenChange(false);
     } catch {
       toast.error("לא הצלחנו לשמור כרגע");
