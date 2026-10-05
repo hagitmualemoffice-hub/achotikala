@@ -205,7 +205,7 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 );
 
 const FormCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <div className={`rounded-2xl border border-border/70 bg-card p-6 shadow-sm md:p-8 ${className}`}>{children}</div>
+  <div className={`px-1 py-5 md:px-0 md:py-6 ${className}`}>{children}</div>
 );
 
 const QuickChip = ({
