@@ -30,13 +30,13 @@ const linkClass = (on: boolean) =>
   `hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors md:inline-flex ${
     on
       ? "bg-[hsl(var(--primary)/0.12)] font-normal text-primary"
-      : "font-light text-primary hover:bg-primary/[0.08] hover:text-[hsl(var(--primary-dark))]"
+      : "font-light text-foreground hover:bg-primary/[0.08] hover:text-primary"
   }`;
 
 /** the same links, phone size */
 const mobileClass = (on: boolean) =>
   `inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-colors ${
-    on ? "bg-[hsl(var(--primary)/0.12)] font-medium text-primary" : "font-light text-primary/85"
+    on ? "bg-[hsl(var(--primary)/0.12)] font-medium text-primary" : "font-light text-foreground/85"
   }`;
 
 const LibaTopBar = ({
@@ -60,7 +60,7 @@ const LibaTopBar = ({
   const badge = (area: LibaArea) => (active === area ? 0 : counts[area]);
   return (
   <header
-    className={`border-b-2 border-primary/35 ${
+    className={`border-b border-border/70 ${
       sticky ? "sticky top-0 z-40 bg-background/90 backdrop-blur-md" : ""
     }`}
   >
