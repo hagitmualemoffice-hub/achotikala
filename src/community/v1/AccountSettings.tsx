@@ -8,7 +8,7 @@
  *  - a personal photo is never shown behind a nickname unless she said yes
  */
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Camera, Loader2, Trash2, X } from "lucide-react";
+import { AlertCircle, Camera, Flower2, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { MemberAvatar } from "./Avatar";
 import { avatarFromFile } from "./avatarFile";
@@ -16,6 +16,13 @@ import { updateProfile, type AboutInput, type CommunityProfile, type NotifyPrefs
 import { emptyHearts, MASTERY_TAGS } from "./hearts";
 import { AboutInvitation, MyHeartCard } from "./MyHeart";
 import SpaceUpdates from "./SpaceUpdates";
+import { ETHNICITY_OPTIONS, ORIENTATION_OPTIONS, STATUS_OPTIONS } from "./baar";
+import {
+  fetchDailyState,
+  setDailySettings,
+  type DailyFilterKind,
+  type DailyState,
+} from "./dailyBaar";
 
 /** A multi-line, conversational field for the "תכירו אותי" answers. */
 const AreaField = ({
