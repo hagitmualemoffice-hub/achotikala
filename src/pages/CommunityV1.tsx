@@ -819,7 +819,7 @@ const CommunityBody = () => {
           </div>
 
           {/* filters */}
-          <div className="sticky top-12 z-30 mb-1 flex items-center justify-between gap-2 border-b border-border/70 bg-background/95 py-2 backdrop-blur md:top-16 md:gap-4 md:py-3">
+          <div className="sticky top-12 z-30 mb-1 flex items-center justify-between gap-2 border-b border-border/70 bg-background/95 py-2 backdrop-blur md:hidden">
             {/* mobile: single chip opening a bottom drawer with all spaces */}
             <div className="flex min-w-0 items-center gap-2 md:hidden">
               <button
@@ -841,55 +841,6 @@ const CommunityBody = () => {
               {pulseChip}
               {rotatingChips}
             </div>
-            {/* desktop: full scrollable chips row */}
-            <div className="no-scrollbar -mb-px hidden items-center gap-1.5 overflow-x-auto md:flex">
-              <button
-                onClick={() => {
-                  setInquiriesOnly(false);
-                  setPulseOnly(false);
-                  setActiveRotatingId(null);
-                  setFilter("all");
-                }}
-                className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] transition-colors ${
-                  filter === "all" && !pulseOnly && !activeRotatingId
-                    ? "bg-primary text-primary-foreground"
-                    : "font-light text-muted-foreground hover:bg-primary/[0.07] hover:text-primary"
-                }`}
-              >
-                הכול
-              </button>
-              {pulseChip}
-              {rotatingChips}
-              {SPACES.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    setInquiriesOnly(false);
-                    setPulseOnly(false);
-                    setActiveRotatingId(null);
-                    setFilter(s.id);
-                  }}
-                  style={{
-                    color: filter === s.id ? accentColor(s) : undefined,
-                    backgroundColor: filter === s.id ? accentBg(s, 0.14) : undefined,
-                    boxShadow:
-                      filter === s.id ? `inset 0 0 0 1px ${accentBg(s, 0.45)}` : undefined,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (filter !== s.id) e.currentTarget.style.color = accentColor(s);
-                  }}
-                  onMouseLeave={(e) => {
-                    if (filter !== s.id) e.currentTarget.style.color = "";
-                  }}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12.5px] transition-colors ${
-                    filter === s.id ? "font-medium" : "font-light text-muted-foreground"
-                  }`}
-                >
-                  {s.shortName}
-                </button>
-              ))}
-            </div>
-
             <div className="flex shrink-0 items-center gap-3 text-[12.5px] md:hidden">
               <span className="flex items-center gap-0.5 rounded-full bg-muted/60 p-0.5">
                 {([
