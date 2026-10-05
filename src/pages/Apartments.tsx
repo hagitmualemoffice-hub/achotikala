@@ -345,7 +345,7 @@ const Apartments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0" dir="rtl">
+    <div className="min-h-screen bg-background pb-20 md:pb-0 lg:pl-[250px]" dir="rtl">
       <LibaTopBar
         active="dirot"
         actions={
