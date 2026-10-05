@@ -14,7 +14,7 @@ import { useLibaChat } from "@/community/v1/LibaMessages";
 import { fetchThreads } from "@/community/v1/messages";
 import { fetchInquiries } from "@/community/v1/inquiries";
 import dailyBaarEntryArt from "@/assets/daily-baar-entry.webp";
-import dailyBaarSuccessArt from "@/assets/daily-baar-success.webp";
+import dailyBaarSuccessArt from "@/assets/daily-baar-success-medal.webp";
 import {
   ORIENTATION_OPTIONS,
   STATUS_OPTIONS,
@@ -785,8 +785,8 @@ export default function DailyBaarDialog({
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
-                  width={512}
-                  height={384}
+                  width={1024}
+                  height={640}
                   className="mb-3 h-28 w-auto object-contain md:h-32"
                 />
                 <ScreenTitle>מדהימה 💗</ScreenTitle>
