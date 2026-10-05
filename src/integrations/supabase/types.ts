@@ -294,6 +294,130 @@ export type Database = {
         }
         Relationships: []
       }
+      baar_daily_config: {
+        Row: {
+          id: number
+          max_daily_exposures_per_boy: number
+          max_sends_per_boy: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          max_daily_exposures_per_boy?: number
+          max_sends_per_boy?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          max_daily_exposures_per_boy?: number
+          max_sends_per_boy?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      baar_daily_exposures: {
+        Row: {
+          boy_id: string
+          id: string
+          israeli_date: string
+          responded_at: string | null
+          response: string | null
+          shown_at: string
+          user_id: string
+        }
+        Insert: {
+          boy_id: string
+          id?: string
+          israeli_date?: string
+          responded_at?: string | null
+          response?: string | null
+          shown_at?: string
+          user_id: string
+        }
+        Update: {
+          boy_id?: string
+          id?: string
+          israeli_date?: string
+          responded_at?: string | null
+          response?: string | null
+          shown_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baar_daily_exposures_boy_id_fkey"
+            columns: ["boy_id"]
+            isOneToOne: false
+            referencedRelation: "community_baar_boys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baar_daily_sends: {
+        Row: {
+          boy_id: string
+          channel: string
+          created_at: string
+          id: string
+          invite_code: string
+          recipient_email: string | null
+          recipient_user_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          boy_id: string
+          channel: string
+          created_at?: string
+          id?: string
+          invite_code?: string
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          boy_id?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          invite_code?: string
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baar_daily_sends_boy_id_fkey"
+            columns: ["boy_id"]
+            isOneToOne: false
+            referencedRelation: "community_baar_boys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baar_daily_settings: {
+        Row: {
+          active: boolean
+          filter_kind: string | null
+          filter_value: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          filter_kind?: string | null
+          filter_value?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          filter_kind?: string | null
+          filter_value?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       baar_legacy_emails: {
         Row: {
           created_at: string
@@ -2887,6 +3011,24 @@ export type Database = {
             }
             Returns: string
           }
+      baar_daily_pick: { Args: { _ignore_filter?: boolean }; Returns: Json }
+      baar_daily_respond: {
+        Args: { _exposure_id: string; _response: string }
+        Returns: undefined
+      }
+      baar_daily_send_chat: {
+        Args: { _body: string; _boy_id: string; _to_user: string }
+        Returns: Json
+      }
+      baar_daily_settings_set: {
+        Args: {
+          _active: boolean
+          _filter_kind?: string
+          _filter_value?: string
+        }
+        Returns: undefined
+      }
+      baar_daily_state: { Args: never; Returns: Json }
       baar_find_similar: {
         Args: { _exclude_id: string; _name: string }
         Returns: Json
