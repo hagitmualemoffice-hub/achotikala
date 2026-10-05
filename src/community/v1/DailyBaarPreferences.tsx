@@ -3,14 +3,14 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
-import { ETHNICITY_OPTIONS, ORIENTATION_OPTIONS, STATUS_OPTIONS } from "./baar";
+import { DRESS_STYLE_OPTIONS, ETHNICITY_OPTIONS } from "./baar";
 import { fetchDailyState, setDailyPreferences, type DailyCadence, type DailyFilterKind } from "./dailyBaar";
 
 export default function DailyBaarPreferences({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cadence, setCadence] = useState<DailyCadence>("every_other_day");
-  const [kind, setKind] = useState<DailyFilterKind>("status");
+  const [kind, setKind] = useState<DailyFilterKind>("age");
   const [value, setValue] = useState("");
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
@@ -23,10 +23,11 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
       if (cancelled) return;
       if (!state.authorized) { onOpenChange(false); return; }
       setCadence(state.cadence ?? "every_other_day");
-      setKind(state.filter_kind ?? "status");
-      setValue(state.filter_value ?? "");
-      setMinAge(state.min_age?.toString() ?? "");
-      setMaxAge(state.max_age?.toString() ?? "");
+      const savedKind = state.filter_kind;
+      setKind(savedKind === "ethnicity" || savedKind === "dress_style" ? savedKind : "age");
+      setValue(savedKind === "ethnicity" || savedKind === "dress_style" ? state.filter_value ?? "" : "");
+      setMinAge(savedKind === "ethnicity" || savedKind === "dress_style" ? "" : state.min_age?.toString() ?? "");
+      setMaxAge(savedKind === "ethnicity" || savedKind === "dress_style" ? "" : state.max_age?.toString() ?? "");
     }).catch(() => { if (!cancelled) toast.error("לא הצלחנו לטעון את ההעדפות"); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
@@ -43,7 +44,13 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
     }
     setSaving(true);
     try {
-      await setDailyPreferences(cadence, value ? kind : null, value || null, min, max);
+      await setDailyPreferences(
+        cadence,
+        kind === "age" ? null : value ? kind : null,
+        kind === "age" ? null : value || null,
+        kind === "age" ? min : null,
+        kind === "age" ? max : null,
+      );
       toast.success("ההעדפות נשמרו 💗");
       onOpenChange(false);
     } catch {
@@ -51,7 +58,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
     } finally { setSaving(false); }
   };
 
-  const options = kind === "status" ? STATUS_OPTIONS : kind === "orientation" ? ORIENTATION_OPTIONS : ETHNICITY_OPTIONS;
+  const options = kind === "ethnicity" ? ETHNICITY_OPTIONS : DRESS_STYLE_OPTIONS;
   const inputClass = "min-w-0 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-[14px] text-foreground outline-none focus:border-primary";
 
   return (
@@ -69,23 +76,26 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
             ))}
             <p className="text-[12px] text-muted-foreground">גם בלי התראה, הכרטיס שלך זמין תמיד בטור הצד.</p>
           </fieldset>
-          <div className="space-y-2">
-            <p className="text-[14px] text-foreground">העדפה אישית</p>
-            <div className="grid grid-cols-2 gap-2">
-              <select aria-label="סוג העדפה" value={kind} onChange={(e) => { setKind(e.target.value as DailyFilterKind); setValue(""); }} className={inputClass}>
-                <option value="status">סטטוס</option><option value="orientation">אוריינטציה</option><option value="ethnicity">עדה</option>
-              </select>
-              <select aria-label="ערך העדפה" value={value} onChange={(e) => setValue(e.target.value)} className={inputClass}>
-                <option value="">ללא העדפה</option>{options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+          <fieldset className="space-y-3">
+            <legend className="mb-2 text-[14px] text-foreground">לפי מה תרצי לסנן?</legend>
+            <div className="grid grid-cols-3 gap-2">
+              {([ ["age", "גיל"], ["ethnicity", "עדה"], ["dress_style", "סגנון"] ] as const).map(([key, label]) => (
+                <label key={key} className={`cursor-pointer rounded-xl border px-3 py-3 text-center text-[13px] transition-colors ${kind === key ? "border-primary bg-primary/[0.07] text-primary" : "border-border bg-background text-foreground"}`}>
+                  <input type="radio" name="daily-filter-kind" checked={kind === key} onChange={() => { setKind(key); setValue(""); setMinAge(""); setMaxAge(""); }} className="sr-only" />{label}
+                </label>
+              ))}
             </div>
-          </div>
-          <fieldset className="space-y-2">
-            <legend className="text-[14px] text-foreground">טווח גילאים</legend>
-            <div className="grid grid-cols-2 gap-2">
-              <label className="space-y-1 text-[12px] text-muted-foreground">מגיל<input type="number" inputMode="numeric" min="18" max="100" value={minAge} onChange={(e) => setMinAge(e.target.value)} placeholder="ללא הגבלה" className={inputClass} /></label>
-              <label className="space-y-1 text-[12px] text-muted-foreground">עד גיל<input type="number" inputMode="numeric" min="18" max="100" value={maxAge} onChange={(e) => setMaxAge(e.target.value)} placeholder="ללא הגבלה" className={inputClass} /></label>
-            </div>
+            {kind === "age" ? (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <label className="space-y-1 text-[12px] text-muted-foreground">מגיל<input type="number" inputMode="numeric" min="18" max="100" value={minAge} onChange={(e) => setMinAge(e.target.value)} placeholder="ללא הגבלה" className={inputClass} /></label>
+                <label className="space-y-1 text-[12px] text-muted-foreground">עד גיל<input type="number" inputMode="numeric" min="18" max="100" value={maxAge} onChange={(e) => setMaxAge(e.target.value)} placeholder="ללא הגבלה" className={inputClass} /></label>
+              </div>
+            ) : (
+              <select aria-label={kind === "ethnicity" ? "בחירת עדה" : "בחירת סגנון"} value={value} onChange={(e) => setValue(e.target.value)} className={inputClass}>
+                <option value="">ללא סינון</option>{options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            )}
+            <p className="text-[12px] text-muted-foreground">אפשר לבחור סוג סינון אחד ולשנות אותו בכל עת.</p>
           </fieldset>
           </>}
         </div>

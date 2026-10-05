@@ -12,7 +12,7 @@ const rpc = async <T>(fn: string, args?: Record<string, unknown>): Promise<T> =>
   return data as T;
 };
 
-export type DailyFilterKind = "status" | "orientation" | "ethnicity";
+export type DailyFilterKind = "age" | "ethnicity" | "dress_style";
 export type DailyCadence = "daily" | "every_other_day" | "muted";
 
 export type DailyState = {

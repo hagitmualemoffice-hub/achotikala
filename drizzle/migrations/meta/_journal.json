@@ -134,6 +134,13 @@
       "when": 1791195712560,
       "tag": "0018_add_baar_proposal_contacts",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791200333343,
+      "tag": "0019_daily_baar_single_filter_and_dress_style",
+      "breakpoints": true
     }
   ]
 }

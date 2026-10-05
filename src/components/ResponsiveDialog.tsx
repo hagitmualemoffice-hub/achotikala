@@ -85,7 +85,7 @@ export const ResponsiveDialog = ({
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-scroll]:overscroll-contain [&_.popup-footer]:sticky [&_.popup-footer]:bottom-0 [&_.popup-footer]:z-10 [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card/95 [&_.popup-footer]:pb-[max(1rem,env(safe-area-inset-bottom))] [&_.popup-footer]:backdrop-blur-md">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-scroll]:overscroll-contain [&_.popup-footer]:sticky [&_.popup-footer]:bottom-0 [&_.popup-footer]:z-10 [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card/95 [&_.popup-footer]:pb-[max(1.5rem,env(safe-area-inset-bottom))] [&_.popup-footer]:backdrop-blur-md">
               {children}
             </div>
         </div>
@@ -99,7 +99,7 @@ export const ResponsiveDialog = ({
       <DialogContent
         dir="rtl"
         className={cn(
-          "max-w-[820px] p-0 overflow-hidden rounded-[24px] border border-border/60 bg-card shadow-[0_32px_64px_-16px_hsl(var(--foreground)_/_0.18)] max-h-[92vh] flex flex-col gap-0 [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card",
+          "max-w-[820px] p-0 overflow-hidden rounded-[24px] border border-border/60 bg-card shadow-[0_32px_64px_-16px_hsl(var(--foreground)_/_0.18)] max-h-[92vh] flex flex-col gap-0 [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card [&_.popup-footer]:pb-6",
           hideCloseButton && "[&>button]:hidden",
           contentClassName,
           desktopContentClassName,
