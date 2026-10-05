@@ -70,4 +70,4 @@
 - [ ] Release offline v13 — waiting for owner's go-ahead.
 - [ ] Move offline updates to a dedicated repository (waiting on a GitHub connection).
 - [ ] Investigate "email not found" for NetFree users with evidence.
-- [ ] Baar "ההשתדלות היומית" — plan approved (card incl. recommendations); waiting for owner to pick a visual direction before building UI.
+- [x] Baar "ההשתדלות היומית" — card including recommendations, settings and sidebar access built.

@@ -241,7 +241,9 @@ const CommunityBody = () => {
         if (cancelled || !st.authorized || !st.active || st.cadence === "muted" || st.today) return;
         const { data: { user } } = await supabase.auth.getUser();
         if (cancelled || !user) return;
-        const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+        const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+        const part = (name: string) => dateParts.find((p) => p.type === name)?.value ?? "";
+        const today = `${part("year")}-${part("month")}-${part("day")}`;
         const key = `liba:daily-baar-prompt:${user.id}`;
         const previous = localStorage.getItem(key);
         const last = [previous, st.last_shown_date].filter((v): v is string => !!v).sort().at(-1);

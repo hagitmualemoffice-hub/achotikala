@@ -400,7 +400,7 @@ export default function DailyBaarDialog({
       .then((res) => {
         const list = res.items
           .filter((t) => t.other?.user_id)
-          .map((t) => ({ userId: t.other!.user_id!, name: t.other!.name, seed: t.other!.seed, avatarUrl: t.other!.avatar_url }));
+          .flatMap((t) => t.other?.user_id ? [{ userId: t.other.user_id, name: t.other.name, seed: t.other.seed, avatarUrl: t.other.avatar_url }] : []);
         const seen = new Set<string>();
         setFriends(list.filter((f) => (seen.has(f.userId) ? false : (seen.add(f.userId), true))));
       })
@@ -628,7 +628,7 @@ export default function DailyBaarDialog({
                               )}
                               {rec.user_id && ["liba", "both"].includes((rec.contact_mode as string) || "liba") && (
                                 <button
-                                  onClick={() => chatWith(rec.user_id!)}
+                                  onClick={() => { if (rec.user_id) chatWith(rec.user_id); }}
                                   className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-primary/30 px-2.5 py-1 text-[11.5px] text-primary transition-colors hover:bg-primary/[0.08]"
                                 >
                                   <MessageCircle className="h-3 w-3" />
