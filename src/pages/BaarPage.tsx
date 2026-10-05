@@ -2123,10 +2123,20 @@ const BaarPage = () => {
                   ואצלה תוכלי לקבל מידע שחשוב לך. מזמינות אותך להיעזר בבאר - וגם להיות שם בשביל אחרות. 💗
                 </p>
               </div>
-              <Button onClick={() => setCreateOpen(true)} className="rounded-full px-6">
-                <Plus className="h-4 w-4" />
-                הוספת בחור
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDailyOpen(true)}
+                  className="rounded-full border-primary/40 px-5 text-[14px] text-primary hover:bg-primary/[0.06]"
+                >
+                  <Flower2 className="h-4 w-4" />
+                  ההשתדלות היומית
+                </Button>
+                <Button onClick={() => setCreateOpen(true)} className="rounded-full px-6">
+                  <Plus className="h-4 w-4" />
+                  הוספת בחור
+                </Button>
+              </div>
             </div>
 
             <div className="mb-5 flex items-center gap-2">
