@@ -1245,9 +1245,9 @@ const ProfileDialog = ({
                   </p>
                 </div>
               ) : (
-                <button type="button" onClick={() => onEdit(boy)} className="mt-2 text-[12.5px] text-primary hover:opacity-70">
+                <Button type="button" variant="link" onClick={() => onEdit(boy)} className="mt-2 h-auto p-0 text-[12.5px] text-primary">
                   עדיין חסרים פרטים — להוספת איש קשר
-                </button>
+                </Button>
               )}
             </div>
 

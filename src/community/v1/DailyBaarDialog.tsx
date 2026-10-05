@@ -12,7 +12,6 @@ import {
   Loader2,
   Mail,
   MessageCircle,
-  Phone,
   Send,
   UserCircle,
 } from "lucide-react";
@@ -266,7 +265,6 @@ type Phase =
   | "maybe"
   | "friend"
   | "info"
-  | "contact"
   | "done"
   | "empty"
   | "filterEmpty"
@@ -521,7 +519,7 @@ export default function DailyBaarDialog({
         )}
 
         {/* 2 — the card and her five answers */}
-        {(phase === "card" || phase === "maybe" || phase === "friend" || phase === "info" || phase === "contact") && (
+        {(phase === "card" || phase === "maybe" || phase === "friend" || phase === "info") && (
           <div className="flex min-h-0 flex-1 flex-col">
             {phase === "card" && (
               <>
