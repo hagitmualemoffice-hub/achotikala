@@ -39,7 +39,7 @@ import {
   type DailyResponse,
 } from "@/community/v1/dailyBaar";
 
-const DEFAULT_MESSAGE = "ראיתי אותו וחשבתי עלייך 💛";
+const DEFAULT_MESSAGE = "ראיתי אותו וחשבתי עלייך 💗";
 
 /* ------------------------------ little touches ------------------------------ */
 
@@ -323,10 +323,6 @@ export default function DailyBaarDialog({
           setPhase("unavailable");
           return;
         }
-        if (st.today.response) {
-          setPhase("done");
-          return;
-        }
         if (st.today.boy) {
           setPick({ status: "ok", exposure_id: st.today.exposure_id, boy: st.today.boy });
           setPhase("entry");
@@ -404,7 +400,7 @@ export default function DailyBaarDialog({
       .then((res) => {
         const list = res.items
           .filter((t) => t.other?.user_id)
-          .map((t) => ({ userId: t.other!.user_id!, name: t.other!.name, seed: t.other!.seed, avatarUrl: t.other!.avatar_url }));
+          .flatMap((t) => t.other?.user_id ? [{ userId: t.other.user_id, name: t.other.name, seed: t.other.seed, avatarUrl: t.other.avatar_url }] : []);
         const seen = new Set<string>();
         setFriends(list.filter((f) => (seen.has(f.userId) ? false : (seen.add(f.userId), true))));
       })
@@ -424,7 +420,7 @@ export default function DailyBaarDialog({
         }
         const res = await sendDailyCardChat(pick.boy.id, friendId, text);
         if (res?.thread_id) openExisting(res.thread_id);
-        toast.success("הכרטיס נשלח בצ׳אט 💛");
+        toast.success("הכרטיס נשלח בצ׳אט 💗");
         setPhase("done");
       } else {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(friendEmail.trim())) {
@@ -433,7 +429,7 @@ export default function DailyBaarDialog({
           return;
         }
         await sendDailyCardEmail(pick.boy.id, friendEmail.trim(), text);
-        toast.success("המייל יצא לדרך 💛");
+        toast.success("המייל יצא לדרך 💗");
         setPhase("done");
       }
     } catch (e: unknown) {
@@ -452,7 +448,7 @@ export default function DailyBaarDialog({
     setWorking(true);
     try {
       await suggestBaarUpdate(pick.boy.id, "info", infoText.trim());
-      toast.success("המידע נשמר וממתין למנהלת — תודה 💛");
+      toast.success("המידע נשמר וממתין למנהלת — תודה 💗");
       setPhase("done");
     } catch {
       toast.error("לא הצלחנו לשמור כרגע");
@@ -478,7 +474,7 @@ export default function DailyBaarDialog({
         .filter(Boolean)
         .join(" · ");
       await suggestBaarUpdate(pick.boy.id, "contact", details);
-      toast.success("הפרטים נשמרו וממתינים למנהלת — תודה 💛");
+      toast.success("הפרטים נשמרו וממתינים למנהלת — תודה 💗");
       setPhase("done");
     } catch {
       toast.error("לא הצלחנו לשמור כרגע");
@@ -509,10 +505,10 @@ export default function DailyBaarDialog({
             <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
               <PetalsRow />
             </div>
-            <ScreenTitle>ההשתדלות שלך להיום 💛</ScreenTitle>
+            <ScreenTitle>ההשתדלות שלך להיום 💗</ScreenTitle>
             <div className="mt-4 max-w-sm space-y-2">
               <ScreenHint>
-                כל יום מחכה לך כאן כרטיס אחד — בחור אחד, שנבחר בזהירות ובכוונה. אפשר להסתכל בנחת, לעשות עליו חשבון,
+                 מחכה לך כאן כרטיס אחד — בחור אחד, שנבחר בזהירות ובכוונה. אפשר להסתכל בנחת, לעשות עליו חשבון,
                 ולבחור מה לעשות עם זה.
               </ScreenHint>
               <p className="text-[12px] font-light leading-relaxed text-muted-foreground/80">
@@ -544,7 +540,7 @@ export default function DailyBaarDialog({
                 <div className="mb-5 flex items-center justify-between">
                   <div>
                     <p className="text-[11px] text-primary">ההשתדלות שלך להיום</p>
-                    <p className="mt-0.5 text-[15px] font-light text-foreground">כרטיס אחד, שנבחר במיוחד בשבילך 💛</p>
+                    <p className="mt-0.5 text-[15px] font-light text-foreground">כרטיס אחד, שנבחר במיוחד בשבילך 💗</p>
                   </div>
                   <Flower2 className="h-5 w-5 text-primary/50" aria-hidden />
                 </div>
@@ -557,7 +553,7 @@ export default function DailyBaarDialog({
                     onClick={() => void answer("maybe", "maybe")}
                     disabled={working}
                     icon={<Heart className="h-4 w-4 fill-primary/30" />}
-                    title="אולי בשבילי 💛"
+                    title="אולי בשבילי 💗"
                     note="אפשר לפנות ישר למי שהמליצה עליו"
                   />
                   <ChoiceButton
@@ -588,6 +584,9 @@ export default function DailyBaarDialog({
                     icon={<Flower2 className="h-4 w-4" />}
                     title="לא הפעם"
                   />
+                  <Button variant="ghost" onClick={() => onOpenChange(false)} className="w-full text-muted-foreground">
+                    רוצה לחשוב עוד
+                  </Button>
                 </div>
               </>
             )}
@@ -597,7 +596,7 @@ export default function DailyBaarDialog({
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
                   <p className="text-[11px] text-primary">אולי בשבילי</p>
-                  <ScreenTitle>שמחים שהכרטיס נגע בלב 💛</ScreenTitle>
+                  <ScreenTitle>שמחים שהכרטיס נגע בלב 💗</ScreenTitle>
                   <div className="mt-2">
                     <ScreenHint>
                       אפשר לפנות ישר למי שהמליצה עליו — היא מכירה אותו ותשמח לספר. אפשר גם להישאר עם זה רגע.
@@ -629,7 +628,7 @@ export default function DailyBaarDialog({
                               )}
                               {rec.user_id && ["liba", "both"].includes((rec.contact_mode as string) || "liba") && (
                                 <button
-                                  onClick={() => chatWith(rec.user_id!)}
+                                  onClick={() => { if (rec.user_id) chatWith(rec.user_id); }}
                                   className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-primary/30 px-2.5 py-1 text-[11.5px] text-primary transition-colors hover:bg-primary/[0.08]"
                                 >
                                   <MessageCircle className="h-3 w-3" />
@@ -755,7 +754,7 @@ export default function DailyBaarDialog({
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
                   <p className="text-[11px] text-primary">יש לי מידע עליו</p>
-                  <ScreenTitle>כמה טוב שיש לך מה לעדכן 💛</ScreenTitle>
+                  <ScreenTitle>כמה טוב שיש לך מה לעדכן 💗</ScreenTitle>
                   <div className="mt-2">
                     <ScreenHint>מה שתכתבי יישמר אצל המנהלת ולא מתפרסם אוטומטית בכרטיס.</ScreenHint>
                   </div>
@@ -788,7 +787,7 @@ export default function DailyBaarDialog({
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
                   <p className="text-[11px] text-primary">יש לי איש קשר לבירורים</p>
-                  <ScreenTitle>שנחבר בין הכרטיס לאנשים 💛</ScreenTitle>
+                  <ScreenTitle>שנחבר בין הכרטיס לאנשים 💗</ScreenTitle>
                   <div className="mt-2">
                     <ScreenHint>הפרטים יישמרו אצל המנהלת ולא מתפרסמים בכרטיס.</ScreenHint>
                   </div>
@@ -834,13 +833,13 @@ export default function DailyBaarDialog({
                 <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
                   <PetalsRow />
                 </div>
-                <ScreenTitle>תודה על הרגע הזה 💛</ScreenTitle>
+                <ScreenTitle>מדהימה 💗</ScreenTitle>
                 <div className="mt-3 max-w-sm">
-                  <ScreenHint>התשובה שלך נשמרה. נתראה מחר עם כרטיס חדש, בשעה טובה.</ScreenHint>
+                  <ScreenHint>עשית את ההשתדלות שלך להיום</ScreenHint>
                 </div>
-                <p className="mt-7 text-[13.5px] text-foreground">יש לך עוד דרך לעזור?</p>
+                <p className="mt-7 text-[13.5px] text-foreground">מכאן, לא הכול בידיים שלנו.<br />רוצה לעזור בעוד דרך?</p>
                 <p className="mt-1 max-w-xs text-[12.5px] font-light leading-relaxed text-muted-foreground">
-                  כל בחור שמוסיפים לבאר פותח אותה לעוד מישהי.
+                  כל בחור שמוסיפים לבאר יכול להיות משמעותי מאוד למישהי אחרת.
                 </p>
                 <Button
                   onClick={() => {
@@ -864,7 +863,7 @@ export default function DailyBaarDialog({
                 <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
                   <PetalsRow />
                 </div>
-                <ScreenTitle>אין היום כרטיס חדש 💛</ScreenTitle>
+                <ScreenTitle>אין היום כרטיס חדש 💗</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>כבר הכרנו את כל מי שיש כרגע בבאר. בקרוב יגיעו חדשים — נתראה אז.</ScreenHint>
                 </div>
@@ -880,7 +879,7 @@ export default function DailyBaarDialog({
                 </div>
                 <ScreenTitle>אין כרטיס שמתאים למסנן שלך</ScreenTitle>
                 <div className="mt-3 max-w-sm">
-                  <ScreenHint>אפשר להציג היום גם בחור מחוץ למסנן שבחרת בהגדרות — או לחכות למחר.</ScreenHint>
+                  <ScreenHint>אפשר להציג גם בחור מחוץ למסנן שבחרת בהגדרות — או לחכות לפעם הבאה.</ScreenHint>
                 </div>
                 <Button onClick={() => void openCard(true)} disabled={working} className="mt-7 rounded-full px-8">
                   {working ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -890,7 +889,7 @@ export default function DailyBaarDialog({
                   onClick={() => onOpenChange(false)}
                   className="mt-4 text-[12.5px] font-light text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  אולי מחר
+                   אולי בפעם הבאה
                 </button>
               </>
             )}
@@ -901,7 +900,7 @@ export default function DailyBaarDialog({
                 </div>
                 <ScreenTitle>הכרטיס של היום כבר לא זמין</ScreenTitle>
                 <div className="mt-3 max-w-sm">
-                  <ScreenHint>נראה שהכרטיס הזה ירד מהבאר. מחר יחכה לך כרטיס חדש 💛</ScreenHint>
+                  <ScreenHint>נראה שהכרטיס הזה ירד מהבאר. בפעם הבאה יחכה לך כרטיס חדש 💗</ScreenHint>
                 </div>
                 <Button variant="outline" onClick={() => onOpenChange(false)} className="mt-7 rounded-full px-8">
                   סגירה

@@ -13,10 +13,15 @@ const rpc = async <T>(fn: string, args?: Record<string, unknown>): Promise<T> =>
 };
 
 export type DailyFilterKind = "status" | "orientation" | "ethnicity";
+export type DailyCadence = "daily" | "every_other_day" | "muted";
 
 export type DailyState = {
   authorized: boolean;
   active: boolean;
+  cadence: DailyCadence;
+  min_age: number | null;
+  max_age: number | null;
+  last_shown_date: string | null;
   filter_kind: DailyFilterKind | null;
   filter_value: string | null;
   today: {
@@ -55,6 +60,12 @@ export const setDailySettings = (
     _filter_value: filterValue,
   });
 
+export const setDailyPreferences = (cadence: DailyCadence, filterKind: DailyFilterKind | null, filterValue: string | null, minAge: number | null, maxAge: number | null) =>
+  rpc<void>("baar_daily_preferences_set", {
+    _cadence: cadence, _filter_kind: filterKind, _filter_value: filterValue,
+    _min_age: minAge, _max_age: maxAge,
+  });
+
 export const sendDailyCardChat = (boyId: string, toUser: string, body: string) =>
   rpc<{ ok: boolean; thread_id: string }>("baar_daily_send_chat", {
     _boy_id: boyId,
@@ -91,7 +102,7 @@ export const dailyErrorText = (raw: string) =>
   /paused/i.test(raw)
     ? "ההשתדלות היומית מושהית אצלך. אפשר להפעיל אותה מחדש בהגדרות."
     : /limit_reached/i.test(raw)
-      ? "כבר שלחת את הכרטיס הזה כמה פעמים — נגביל את זה כדי שהפרטיות תישמר 💛"
+      ? "כבר שלחת את הכרטיס הזה כמה פעמים — נגביל את זה כדי שהפרטיות תישמר 💗"
       : /self_send/i.test(raw)
         ? "כתובת המייל הזאת היא שלך — אפשר לשלוח רק לחברה אחרת."
         : /bad_email|invalid/i.test(raw)

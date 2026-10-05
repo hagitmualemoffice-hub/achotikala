@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Refine Daily Baar: pink hearts, replayable card and thinking option, dedicated settings, age range, and every-other-day default popup.
+
 - [x] Move all emoji choices into the reactions panel.
 - [x] Keep mobile feed titles on one line.
 - [x] Build the two-line mobile compact layout.
@@ -68,4 +70,4 @@
 - [ ] Release offline v13 — waiting for owner's go-ahead.
 - [ ] Move offline updates to a dedicated repository (waiting on a GitHub connection).
 - [ ] Investigate "email not found" for NetFree users with evidence.
-- [ ] Baar "ההשתדלות היומית" — plan approved (card incl. recommendations); waiting for owner to pick a visual direction before building UI.
+- [x] Baar "ההשתדלות היומית" — card including recommendations, settings and sidebar access built.

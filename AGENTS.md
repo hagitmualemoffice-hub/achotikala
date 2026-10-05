@@ -1,0 +1,2 @@
+- Keep Daily Baar selection and personal filters in authenticated database functions; this protects access and makes the same assigned card consistent across devices.
+- Keep automatic popup cadence separate from manual card access; muting reminders must never hide an already assigned card.

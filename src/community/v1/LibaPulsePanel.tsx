@@ -166,26 +166,26 @@ export default function LibaPulsePanel({
           <SectionTitle
             icon={<Flower2 className="h-4 w-4 text-primary" />}
             title="ההשתדלות היומית"
-            sub="רגע קטן ואישי שמחכה לך בכל יום"
+            sub="הרגע האישי שלך בבאר"
           />
           <div className="space-y-2">
             {onOpenDaily && (
-              <button
+              <Button variant="outline"
                 onClick={onOpenDaily}
-                className="flex w-full items-center gap-2.5 rounded-xl border border-primary/20 bg-primary/[0.04] p-3 text-right transition-colors hover:bg-primary/[0.08]"
+                className="flex h-auto w-full justify-start gap-2.5 rounded-lg border-primary/20 bg-primary/[0.04] p-3 text-right hover:bg-primary/[0.08]"
               >
                 <Flower2 className="h-4 w-4 shrink-0 text-primary" />
-                <span className="text-[13.5px] font-medium text-foreground">לבחור היומי שלי</span>
-              </button>
+                <span className="text-[13.5px] font-medium text-foreground">להשתדלות היומית שלי</span>
+              </Button>
             )}
             {onOpenDailySettings && (
-              <button
+              <Button variant="outline"
                 onClick={onOpenDailySettings}
-                className="flex w-full items-center gap-2.5 rounded-xl border border-border/60 p-3 text-right transition-colors hover:bg-muted/60"
+                className="flex h-auto w-full justify-start gap-2.5 rounded-lg border-border/60 p-3 text-right hover:bg-muted/60"
               >
                 <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <span className="text-[13px] font-light text-foreground">ניהול ההעדפות שלי</span>
-              </button>
+              </Button>
             )}
           </div>
         </section>

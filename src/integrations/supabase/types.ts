@@ -397,22 +397,31 @@ export type Database = {
       baar_daily_settings: {
         Row: {
           active: boolean
+          cadence: string
           filter_kind: string | null
           filter_value: string | null
+          max_age: number | null
+          min_age: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           active?: boolean
+          cadence?: string
           filter_kind?: string | null
           filter_value?: string | null
+          max_age?: number | null
+          min_age?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           active?: boolean
+          cadence?: string
           filter_kind?: string | null
           filter_value?: string | null
+          max_age?: number | null
+          min_age?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -3012,6 +3021,16 @@ export type Database = {
             Returns: string
           }
       baar_daily_pick: { Args: { _ignore_filter?: boolean }; Returns: Json }
+      baar_daily_preferences_set: {
+        Args: {
+          _cadence: string
+          _filter_kind?: string
+          _filter_value?: string
+          _max_age?: number
+          _min_age?: number
+        }
+        Returns: undefined
+      }
       baar_daily_respond: {
         Args: { _exposure_id: string; _response: string }
         Returns: undefined

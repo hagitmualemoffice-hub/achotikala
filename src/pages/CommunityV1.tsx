@@ -44,6 +44,7 @@ import PostCard from "@/community/v1/PostCard";
 import NewEventPopup from "@/community/v1/NewEventPopup";
 import DailyBaarPromoPopup from "@/community/v1/DailyBaarPromoPopup";
 import DailyBaarDialog from "@/community/v1/DailyBaarDialog";
+import DailyBaarPreferences from "@/community/v1/DailyBaarPreferences";
 import { fetchDailyState } from "@/community/v1/dailyBaar";
 import { SPACES, setLibaAdmin, accentBg, accentColor, spaceById, type SpaceId } from "@/community/v1/spaces";
 import {
@@ -231,21 +232,29 @@ const CommunityBody = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   /* ההשתדלות היומית — נפתחת מעצמה פעם ביום כשהכרטיס מחכה */
   const [dailyOpen, setDailyOpen] = useState(false);
+  const [dailyPreferencesOpen, setDailyPreferencesOpen] = useState(false);
   useEffect(() => {
-    const t = window.setTimeout(() => {
-      fetchDailyState()
-        .then((st) => {
-          if (
-            st.authorized &&
-            st.active &&
-            (!st.today || (!st.today.response && !st.today.unavailable))
-          ) {
-            setDailyOpen(true);
-          }
-        })
-        .catch(() => undefined);
+    let cancelled = false;
+    const t = window.setTimeout(async () => {
+      try {
+        const st = await fetchDailyState();
+        if (cancelled || !st.authorized || !st.active || st.cadence === "muted" || st.today) return;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (cancelled || !user) return;
+        const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+        const part = (name: string) => dateParts.find((p) => p.type === name)?.value ?? "";
+        const today = `${part("year")}-${part("month")}-${part("day")}`;
+        const key = `liba:daily-baar-prompt:${user.id}`;
+        const previous = localStorage.getItem(key);
+        const last = [previous, st.last_shown_date].filter((v): v is string => !!v).sort().at(-1);
+        const days = last ? Math.round((Date.parse(`${today}T12:00:00Z`) - Date.parse(`${last}T12:00:00Z`)) / 86400000) : Infinity;
+        if (days >= (st.cadence === "daily" ? 1 : 2)) {
+          localStorage.setItem(key, today);
+          setDailyOpen(true);
+        }
+      } catch { /* the side entry remains available when offline */ }
     }, 2500);
-    return () => window.clearTimeout(t);
+    return () => { cancelled = true; window.clearTimeout(t); };
   }, []);
   const [settingsTab, setSettingsTab] = useState<
     "profile" | "about" | "heart" | "updates" | undefined
@@ -1064,7 +1073,7 @@ const CommunityBody = () => {
             }}
             onOpenSince={openSinceItem}
             onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setSettingsOpen(true)}
+            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
           />
         </div>
 
@@ -1092,7 +1101,7 @@ const CommunityBody = () => {
             }}
             onOpenSince={openSinceItem}
             onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setSettingsOpen(true)}
+            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
           />
 
 
@@ -1199,6 +1208,7 @@ const CommunityBody = () => {
       <NewEventPopup />
       <DailyBaarPromoPopup />
       <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />
+      <DailyBaarPreferences open={dailyPreferencesOpen} onOpenChange={setDailyPreferencesOpen} />
       <Composer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
