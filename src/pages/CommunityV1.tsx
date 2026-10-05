@@ -42,6 +42,8 @@ import AuthDialog from "@/apartments/AuthDialog";
 import { signInWithGoogle } from "@/apartments/googleSignIn";
 import PostCard from "@/community/v1/PostCard";
 import NewEventPopup from "@/community/v1/NewEventPopup";
+import DailyBaarDialog from "@/community/v1/DailyBaarDialog";
+import { fetchDailyState } from "@/community/v1/dailyBaar";
 import { SPACES, setLibaAdmin, accentBg, accentColor, spaceById, type SpaceId } from "@/community/v1/spaces";
 import {
   bootstrap,
