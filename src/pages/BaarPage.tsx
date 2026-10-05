@@ -24,6 +24,7 @@ import {
   Trash2,
   UserCircle,
   X,
+  Flower2,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as SliderPrimitive from "@radix-ui/react-slider";
