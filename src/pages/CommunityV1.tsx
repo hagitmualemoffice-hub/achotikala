@@ -227,7 +227,9 @@ const CommunityBody = () => {
   const [recSending, setRecSending] = useState(false);
   const [sinceOpen, setSinceOpen] = useState(false);
   const [seenSinceKeys, setSeenSinceKeys] = useState<Set<string>>(() => new Set());
-  const [settingsOpen, setSettingsOpen] = useState(false辟]
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  /* ההשתדלות היומית — נפתחת מעצמה פעם ביום כשהכרטיס מחכה */
+  const [dailyOpen, setDailyOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<
     "profile" | "about" | "heart" | "updates" | undefined
   >();
