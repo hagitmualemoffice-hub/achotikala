@@ -20,7 +20,7 @@ const LibaMessagesPage = () => {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background lg:pl-[250px]">
+    <div dir="rtl" className="min-h-screen bg-background lg:pl-[325px]">
       <LibaTopBar
         active="messages"
         actions={
