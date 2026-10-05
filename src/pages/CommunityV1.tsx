@@ -230,6 +230,22 @@ const CommunityBody = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   /* ההשתדלות היומית — נפתחת מעצמה פעם ביום כשהכרטיס מחכה */
   const [dailyOpen, setDailyOpen] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      fetchDailyState()
+        .then((st) => {
+          if (
+            st.authorized &&
+            st.active &&
+            (!st.today || (!st.today.response && !st.today.unavailable))
+          ) {
+            setDailyOpen(true);
+          }
+        })
+        .catch(() => undefined);
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, []);
   const [settingsTab, setSettingsTab] = useState<
     "profile" | "about" | "heart" | "updates" | undefined
   >();
