@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { MemberAvatar } from "@/community/v1/Avatar";
 import { useLibaChat } from "@/community/v1/LibaMessages";
 import { fetchThreads } from "@/community/v1/messages";
+import { fetchInquiries } from "@/community/v1/inquiries";
 import dailyBaarEntryArt from "@/assets/daily-baar-entry.webp";
 import dailyBaarSuccessArt from "@/assets/daily-baar-success.webp";
 import {
@@ -266,6 +267,7 @@ export default function DailyBaarDialog({
   const [phase, setPhase] = useState<Phase>("loading");
   const [pick, setPick] = useState<DailyPick | null>(null);
   const [working, setWorking] = useState(false);
+  const [waitingInquiryCount, setWaitingInquiryCount] = useState<number | null>(null);
 
   /* friend-share state */
   const [friends, setFriends] = useState<{ userId: string; name: string; seed?: string; avatarUrl?: string | null }[]>([]);
@@ -287,6 +289,7 @@ export default function DailyBaarDialog({
     setMessage(DEFAULT_MESSAGE);
     setInfoText("");
     setContact({ name: "", phone: "", email: "" });
+    setWaitingInquiryCount(null);
   };
 
   const load = useCallback(async () => {
@@ -388,6 +391,24 @@ export default function DailyBaarDialog({
         setFriends(list.filter((f) => (seen.has(f.userId) ? false : (seen.add(f.userId), true))));
       })
       .catch(() => setFriends([]));
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "done") return;
+    let active = true;
+    fetchInquiries({ helpStatus: "waiting", limit: 100 })
+      .then((items) => {
+        if (!active) return;
+        setWaitingInquiryCount(
+          items.filter((inquiry) => inquiry.status === "open" && !inquiry.mine && !inquiry.my_offer).length,
+        );
+      })
+      .catch(() => {
+        if (active) setWaitingInquiryCount(0);
+      });
+    return () => {
+      active = false;
+    };
   }, [phase]);
 
   const sendToFriend = async () => {
@@ -772,24 +793,50 @@ export default function DailyBaarDialog({
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>עשית את ההשתדלות שלך להיום</ScreenHint>
                 </div>
-                <p className="mt-7 text-[13.5px] text-foreground">מכאן, לא הכול בידיים שלנו.<br />רוצה לעזור בעוד דרך?</p>
-                <p className="mt-1 max-w-xs text-[12.5px] font-light leading-relaxed text-muted-foreground">
-                  כל בחור שמוסיפים לבאר יכול להיות משמעותי מאוד למישהי אחרת.
-                </p>
-                <Button
-                  onClick={() => {
-                    onOpenChange(false);
-                    (onAddBoy ?? (() => window.location.assign("/liba/baar?add=1")))();
-                  }}
-                  className="mt-4 h-12 w-full max-w-xs rounded-full text-[15px]"
-                >
-                  הוספת בחור לבאר
-                </Button>
+                <p className="mt-5 text-[13.5px] text-foreground">מכאן, לא הכול בידיים שלנו.</p>
+                <p className="mt-4 text-[14px] font-medium text-foreground">יש לך עוד רגע? אפשר לעזור לעוד מישהי.</p>
+
+                {waitingInquiryCount !== null && waitingInquiryCount > 0 && (
+                  <div className="mt-4 w-full max-w-sm rounded-2xl border border-primary/25 bg-primary/[0.06] px-5 py-5 text-center">
+                    <p className="text-[15px] font-medium text-foreground">
+                      יש כרגע {waitingInquiryCount} {waitingInquiryCount === 1 ? "בירור שמחכה" : "בירורים שמחכים"} לעזרה
+                    </p>
+                    <p className="mt-1 text-[12.5px] font-light leading-relaxed text-muted-foreground">
+                      אולי על אחד מהם דווקא יש לך מה לספר.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        onOpenChange(false);
+                        window.location.assign("/liba?birurim=1&waiting=1");
+                      }}
+                      className="mt-4 h-11 w-full rounded-full text-[14px]"
+                    >
+                      לעזור בבירור
+                    </Button>
+                  </div>
+                )}
+
+                <div className="mt-4 w-full max-w-sm px-3 py-3 text-center">
+                  <p className="text-[14px] font-medium text-foreground">💗 מכירה בחור טוב שעוד לא נמצא בבאר?</p>
+                  <p className="mt-1 text-[12.5px] font-light leading-relaxed text-muted-foreground">
+                    המלצה אחת שלך יכולה להיות משמעותית מאוד למישהי אחרת.
+                  </p>
+                  <Button
+                    variant={waitingInquiryCount && waitingInquiryCount > 0 ? "outline" : "default"}
+                    onClick={() => {
+                      onOpenChange(false);
+                      (onAddBoy ?? (() => window.location.assign("/liba/baar?add=1")))();
+                    }}
+                    className="mt-4 h-11 w-full rounded-full text-[14px]"
+                  >
+                    להוסיף בחור לבאר
+                  </Button>
+                </div>
                 <button
                   onClick={() => onOpenChange(false)}
                   className="mt-4 text-[12.5px] font-light text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  סיום
+                  סיימתי להיום
                 </button>
               </>
             )}
