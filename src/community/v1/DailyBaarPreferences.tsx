@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Flower2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-md">
       <div dir="rtl" className="space-y-6 px-6 pb-8 pt-7 md:px-8">
-        <h2 className="flex items-center gap-2 text-[20px] text-foreground"><Flower2 className="h-5 w-5 text-primary" />העדפות ההשתדלות היומית</h2>
+        <h2 className="text-[20px] text-foreground">העדפות ההשתדלות היומית</h2>
         {loading ? <div className="grid h-40 place-items-center"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div> : <>
           <fieldset className="space-y-2">
             <legend className="mb-2 text-[14px] text-foreground">מתי להציג לי כרטיס באופן אוטומטי?</legend>
