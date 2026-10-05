@@ -3,7 +3,7 @@
 - [x] Unify Liba popups as Wolt-style mobile drawers with stable top/content/bottom regions and preserve every popup's text.
 - [x] Add custom floral illustration accents to the Daily Baar entry, sidebar card, and completion/share state only.
 - [x] Prioritize relevant open inquiries on the Daily Baar completion screen and reuse the existing filtered inquiries flow.
-- [ ] Keep every Liba popup action area fixed with balanced bottom spacing, and limit Daily Baar preferences to one filter type.
+- [x] Keep every Liba popup action area fixed with balanced bottom spacing, and limit Daily Baar preferences to one filter type.
 - [x] Emphasize the Daily Baar boy card, place four actions in one bottom row, and add a shared proposal contact to every boy card.
 
 - [x] Refine Daily Baar: pink hearts, replayable card and thinking option, dedicated settings, age range, and every-other-day default popup.
