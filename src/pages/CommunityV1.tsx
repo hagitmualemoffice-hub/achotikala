@@ -159,11 +159,11 @@ const CommunityBody = () => {
   const [more, setMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [view, setView] = useState<ViewMode>(() => {
-    if (typeof window === "undefined") return "compact";
+    if (typeof window === "undefined") return "feed";
     try {
-      return localStorage.getItem(VIEW_KEY) === "feed" ? "feed" : "compact";
+      return localStorage.getItem(VIEW_KEY) === "compact" ? "compact" : "feed";
     } catch {
-      return "compact";
+      return "feed";
     }
   });
   const [openPostId, setOpenPostId] = useState<string | null>(null);
@@ -773,7 +773,7 @@ const CommunityBody = () => {
         </aside>
 
         {/* CENTER — feed */}
-        <main className="order-1 min-w-0 lg:order-2 xl:me-4" ref={feedTop}>
+        <main className="order-1 min-w-0 lg:order-2 xl:me-10" ref={feedTop}>
           {inquiriesOnly ? (
             <InquiriesPage
               key={inquiryFocus || "all"}
@@ -961,7 +961,7 @@ const CommunityBody = () => {
 
 
           <div
-            className={`${view === "compact" ? "overflow-hidden border-y border-border/50 bg-card" : "divide-y divide-border/50"} animate-fade-in motion-reduce:animate-none ${
+            className={`${view === "compact" ? "divide-y divide-border/40" : "divide-y divide-border/50"} animate-fade-in motion-reduce:animate-none ${
               (pulseOnly && !openPost) || (!!activeRotating && !openPost) || inquiriesOnly ? "hidden" : ""
             }`}
           >
