@@ -17,7 +17,9 @@ import dailyBaarEntryArt from "@/assets/daily-baar-entry.webp";
 import dailyBaarSuccessArt from "@/assets/daily-baar-success-medal-refined.webp";
 import {
   ORIENTATION_OPTIONS,
+  RELATIONSHIP_OPTIONS,
   STATUS_OPTIONS,
+  recommendBaarBoy,
   suggestBaarUpdate,
   setBaarProposalContact,
   type BaarBoyProfile,
@@ -279,6 +281,8 @@ export default function DailyBaarDialog({
   /* info / contact forms */
   const [infoText, setInfoText] = useState("");
   const [contact, setContact] = useState({ name: "", phone: "", email: "" });
+  const [recommendToo, setRecommendToo] = useState(false);
+  const [recommendation, setRecommendation] = useState({ relationshipType: "", note: "" });
 
   const reset = () => {
     setPhase("loading");
@@ -289,6 +293,8 @@ export default function DailyBaarDialog({
     setMessage(DEFAULT_MESSAGE);
     setInfoText("");
     setContact({ name: "", phone: "", email: "" });
+    setRecommendToo(false);
+    setRecommendation({ relationshipType: "", note: "" });
     setWaitingInquiryCount(null);
   };
 
@@ -447,12 +453,16 @@ export default function DailyBaarDialog({
     if (!pick || pick.status !== "ok") return;
     const hasContactDraft = contact.name.trim() || contact.phone.trim() || contact.email.trim();
     const contactValid = contact.name.trim().length >= 2 && contact.phone.replace(/[^\d]/g, "").length >= 9 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email.trim());
-    if (!hasContactDraft && infoText.trim().length < 5) {
-      toast.error("כתבי מה יש לך להוסיף, או מלאי איש קשר להצעה");
+    if (!hasContactDraft && infoText.trim().length < 5 && !recommendToo) {
+      toast.error("כתבי מה יש לך להוסיף, מלאי איש קשר או בחרי להמליץ עליו");
       return;
     }
     if (hasContactDraft && !contactValid) {
       toast.error("לאיש הקשר צריך למלא שם מלא, טלפון ומייל");
+      return;
+    }
+    if (recommendToo && !recommendation.relationshipType) {
+      toast.error("בחרי איך את מכירה אותו");
       return;
     }
     setWorking(true);
@@ -462,6 +472,9 @@ export default function DailyBaarDialog({
       }
       if (infoText.trim().length >= 5) {
         await suggestBaarUpdate(pick.boy.id, "info", infoText.trim());
+      }
+      if (recommendToo) {
+        await recommendBaarBoy(pick.boy.id, recommendation.relationshipType, recommendation.note.trim(), "liba");
       }
       toast.success("הפרטים נשמרו בכרטיס — תודה 💗");
       setPhase("done");
@@ -755,6 +768,42 @@ export default function DailyBaarDialog({
                     <span className="mb-1.5 block text-[13px] text-foreground">פרטים נוספים על הבחור</span>
                     <textarea rows={4} value={infoText} onChange={(e) => setInfoText(e.target.value)} placeholder="מידע נוסף שחשוב לעדכן בכרטיס" className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-primary" />
                   </label>
+                  <div className="border-t border-border/70 pt-4">
+                    <Button
+                      type="button"
+                      variant={recommendToo ? "default" : "outline"}
+                      onClick={() => setRecommendToo((value) => !value)}
+                      className="h-11 w-full rounded-full"
+                    >
+                      {recommendToo ? "בחרתי להמליץ עליו" : "להמליץ עליו גם"}
+                    </Button>
+                    {recommendToo && (
+                      <div className="mt-4 space-y-3">
+                        <label className="block">
+                          <span className="mb-1.5 block text-[13px] text-foreground">איך את מכירה אותו?</span>
+                          <select
+                            value={recommendation.relationshipType}
+                            onChange={(e) => setRecommendation((value) => ({ ...value, relationshipType: e.target.value }))}
+                            className="h-11 w-full rounded-2xl border border-border bg-background px-4 text-[14px] outline-none focus:border-primary"
+                          >
+                            <option value="">בחרי סוג היכרות</option>
+                            {RELATIONSHIP_OPTIONS.map((option) => (
+                              <option key={option.value} value={option.value}>{option.label}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="mb-1.5 block text-[13px] text-foreground">מה חשוב לך לומר עליו?</span>
+                          <textarea
+                            rows={3}
+                            value={recommendation.note}
+                            onChange={(e) => setRecommendation((value) => ({ ...value, note: e.target.value }))}
+                            className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-primary"
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="popup-footer -mx-6 mt-4 flex gap-2 px-6 pt-4 md:-mx-10 md:px-10">
                   <Button variant="ghost" onClick={() => setPhase("card")} className="rounded-full">

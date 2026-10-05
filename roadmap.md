@@ -5,6 +5,7 @@
 - [x] Prioritize relevant open inquiries on the Daily Baar completion screen and reuse the existing filtered inquiries flow.
 - [x] Keep every Liba popup action area fixed with balanced bottom spacing, and limit Daily Baar preferences to one filter type.
 - [x] Emphasize the Daily Baar boy card, place four actions in one bottom row, and add a shared proposal contact to every boy card.
+- [x] Allow a Daily Baar member adding boy details to recommend him in the same form.
 
 - [x] Refine Daily Baar: pink hearts, replayable card and thinking option, dedicated settings, age range, and every-other-day default popup.
 
