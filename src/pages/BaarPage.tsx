@@ -555,7 +555,9 @@ const BoyDialog = ({
           ? "אין לך כרגע הרשאה להוסיף בחורים לבאר"
           : raw.includes("duplicate")
             ? "נראה שהבחור הזה כבר קיים בבאר"
-            : raw;
+            : /Unexpected token|not valid JSON|Failed to fetch|NetworkError|Load failed/i.test(raw)
+              ? "נראה שהחיבור נחסם או נקטע באמצע. נסי שוב — ואם זה חוזר, נסי מחיבור אחר או דרי את הדף"
+              : raw;
       toast.error(
         (editing ? "לא הצלחנו לעדכן" : "לא הצלחנו להוסיף את הבחור") + (nice ? ` — ${nice}` : ""),
       );
