@@ -227,7 +227,7 @@ const CommunityBody = () => {
   const [recSending, setRecSending] = useState(false);
   const [sinceOpen, setSinceOpen] = useState(false);
   const [seenSinceKeys, setSeenSinceKeys] = useState<Set<string>>(() => new Set());
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false辟]
   const [settingsTab, setSettingsTab] = useState<
     "profile" | "about" | "heart" | "updates" | undefined
   >();
