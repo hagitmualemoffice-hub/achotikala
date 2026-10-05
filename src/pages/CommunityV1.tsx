@@ -777,6 +777,7 @@ const CommunityBody = () => {
               profile={profile}
               isAdmin={!!boot?.is_admin}
               initialQuery={inquiryFocus}
+              initialHelpStatus={searchParams.get("waiting") === "1" ? "waiting" : "all"}
             />
           ) : !openPost && (
           <>
