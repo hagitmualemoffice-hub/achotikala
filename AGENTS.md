@@ -3,4 +3,3 @@
 - Keep automatic popup cadence separate from manual card access; muting reminders must never hide an already assigned card.
 - Route Liba modal experiences through the shared responsive dialog shell so mobile drawers keep one stable top, scrolling body, and sticky action region.
 - Keep Daily Baar working screens text-led; use custom floral artwork only at entry, the sidebar card, and successful completion/share.
-- Render the authenticated desktop Liba dashboard from the shared top-bar shell so every Liba page uses one live-data implementation.
