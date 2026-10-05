@@ -652,7 +652,7 @@ const CommunityBody = () => {
 
             <div>
               <p className="mb-2.5 whitespace-nowrap px-3 text-[11px] tracking-[0.18em] text-muted-foreground">
-                המרחבים שלנו
+                המרחבים בפורום
               </p>
               <ul className="space-y-1">
                 <li>
