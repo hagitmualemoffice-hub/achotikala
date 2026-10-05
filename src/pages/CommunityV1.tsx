@@ -89,6 +89,39 @@ type Filter = "all" | SpaceId;
 type ViewMode = "feed" | "compact";
 
 const VIEW_KEY = "achotikala.community.view";
+
+/** The feed / compact switch — one control, reused in the title row and on phones. */
+const ViewToggle = ({
+  view,
+  setView,
+}: {
+  view: ViewMode;
+  setView: (v: ViewMode) => void;
+}) => (
+  <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-muted/60 p-0.5">
+    {([
+      { id: "feed" as ViewMode, label: "פיד", Icon: LayoutList },
+      { id: "compact" as ViewMode, label: "מרוכז", Icon: Rows3 },
+    ]).map(({ id, label, Icon: VIcon }) => (
+      <button
+        key={id}
+        onClick={() => setView(id)}
+        aria-pressed={view === id}
+        aria-label={label}
+        title={label}
+        className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1.5 transition-colors md:px-2.5 md:py-1 ${
+          view === id
+            ? "bg-background text-foreground shadow-sm"
+            : "font-light text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <VIcon className="h-4 w-4 md:h-3.5 md:w-3.5" />
+        {/* on phones the icons speak for themselves, as in הבאר */}
+        <span className="hidden md:inline">{label}</span>
+      </button>
+    ))}
+  </span>
+);
 const PAGE = 20;
 const PROFILE_CACHE = "achotikala.community.profile";
 
@@ -785,18 +818,22 @@ const CommunityBody = () => {
           ) : !openPost && (
           <>
           <div className="mb-5 hidden md:block">
-            <h1 className="flex items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
-              {savedOnly
-                ? "השמורים שלי"
-                : activeSpace
-                  ? activeSpace.name
-                  : (
-                    <>
-                      <span>{`כמה טוב שאת איתנו ${me.displayName.trim().split(/\s+/)[0]}`}</span>
-                      <Heart className="h-5 w-5 shrink-0 text-primary md:h-6 md:w-6" fill="currentColor" />
-                    </>
-                  )}
-            </h1>
+            {/* the view switch lives at the top, on the left of the title */}
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="flex items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
+                {savedOnly
+                  ? "השמורים שלי"
+                  : activeSpace
+                    ? activeSpace.name
+                    : (
+                      <>
+                        <span>{`כמה טוב שאת איתנו ${me.displayName.trim().split(/\s+/)[0]}`}</span>
+                        <Heart className="h-5 w-5 shrink-0 text-primary md:h-6 md:w-6" fill="currentColor" />
+                      </>
+                    )}
+              </h1>
+              <ViewToggle view={view} setView={setView} />
+            </div>
             {query.trim() && (
               <button
                 onClick={() => setQuery("")}
@@ -908,30 +945,9 @@ const CommunityBody = () => {
               ))}
             </div>
 
-            <div className="flex shrink-0 items-center gap-3 text-[12.5px]">
-              <span className="flex items-center gap-0.5 rounded-full bg-muted/60 p-0.5">
-                {([
-                  { id: "feed" as ViewMode, label: "פיד", Icon: LayoutList },
-                  { id: "compact" as ViewMode, label: "מרוכז", Icon: Rows3 },
-                ]).map(({ id, label, Icon: VIcon }) => (
-                  <button
-                    key={id}
-                    onClick={() => setView(id)}
-                    aria-pressed={view === id}
-                    aria-label={label}
-                    title={label}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1.5 transition-colors md:px-2.5 md:py-1 ${
-                      view === id
-                        ? "bg-background text-foreground shadow-sm"
-                        : "font-light text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <VIcon className="h-4 w-4 md:h-3.5 md:w-3.5" />
-                    {/* on phones the icons speak for themselves, as in הבאר */}
-                    <span className="hidden md:inline">{label}</span>
-                  </button>
-                ))}
-              </span>
+            {/* on phones there is no title row, so the switch stays in the filter bar */}
+            <div className="flex shrink-0 items-center gap-3 text-[12.5px] md:hidden">
+              <ViewToggle view={view} setView={setView} />
             </div>
           </div>
 
