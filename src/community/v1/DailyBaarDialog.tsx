@@ -48,10 +48,12 @@ const ScreenHint = ({ children }: { children: React.ReactNode }) => (
 const ChoiceButton = ({
   onClick,
   title,
+  note,
   disabled,
 }: {
   onClick: () => void;
   title: string;
+  note?: string;
   disabled?: boolean;
 }) => (
   <Button
@@ -59,9 +61,10 @@ const ChoiceButton = ({
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="h-auto min-h-[92px] w-full items-center justify-center whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center leading-snug hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
+    className="h-auto min-h-[92px] w-full flex-col items-center justify-center gap-1 whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center leading-snug hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
   >
-    {title}
+    <span>{title}</span>
+    {note && <span className="text-[11px] font-light text-muted-foreground">{note}</span>}
   </Button>
 );
 
@@ -494,17 +497,11 @@ export default function DailyBaarDialog({
           <div className="flex min-h-0 flex-1 flex-col">
             {phase === "card" && (
               <>
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] text-primary">ההשתדלות שלך להיום</p>
-                    <p className="mt-0.5 text-[15px] font-light text-foreground">כרטיס אחד, שנבחר במיוחד בשבילך 💗</p>
-                  </div>
-                </div>
                 <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
                 </div>
                 <div className="sticky bottom-0 mt-4 border-t border-border/60 bg-background pt-3">
-                  <p className="mb-1 text-[12.5px] font-light text-muted-foreground">מה תרצי לעשות?</p>
+                  <p className="mb-1 text-[12.5px] font-light text-muted-foreground">על מה את חושבת?</p>
                   <div className="grid grid-cols-4 gap-2">
                     <ChoiceButton
                     onClick={() => void answer("maybe", "maybe")}
@@ -538,11 +535,10 @@ export default function DailyBaarDialog({
             {phase === "maybe" && boy && (
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
-                  <p className="text-[11px] text-primary">אולי בשבילי</p>
-                  <ScreenTitle>שמחים שהכרטיס נגע בלב 💗</ScreenTitle>
+                  <ScreenTitle>אולי שווה לבדוק 💗</ScreenTitle>
                   <div className="mt-2">
                     <ScreenHint>
-                      אפשר לפנות ישר למי שהמליצה עליו — היא מכירה אותו ותשמח לספר. אפשר גם להישאר עם זה רגע.
+                      לא צריך לדעת עכשיו. אם נראה לך שיכול להיות כאן משהו, אפשר פשוט לברר קצת יותר.
                     </ScreenHint>
                   </div>
                 </div>
@@ -595,7 +591,14 @@ export default function DailyBaarDialog({
                   onClick={() => setPhase("done")}
                   className="mt-5 h-12 w-full rounded-full text-[15px]"
                 >
-                  לסיום
+                  לבירור על הבחור
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setPhase("done")}
+                  className="mt-1 w-full text-muted-foreground"
+                >
+                  לשמור אותו להמשך
                 </Button>
               </div>
             )}
@@ -604,27 +607,29 @@ export default function DailyBaarDialog({
             {phase === "friend" && boy && (
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
-                  <p className="text-[11px] text-primary">חשבתי על מישהי</p>
-                  <ScreenTitle>לשתף את {boy.full_name}?</ScreenTitle>
+                  <ScreenTitle>חשבת על מישהי? 💗</ScreenTitle>
                   <div className="mt-2">
-                    <ScreenHint>
-                      במייל לא יופיע שום פרט על הבחור — רק הכפתור שמוביל לכרטיס שלו בליבה. גם החברה לא תדע מי שלחה,
-                      אלא אם שלחת בצ׳אט.
-                    </ScreenHint>
+                    <ScreenHint>איזה כיף. אולי הוא בדיוק יכול להתאים לה.</ScreenHint>
                   </div>
+                  <p className="mt-3 text-[13.5px] text-foreground">איך תרצי להעביר לה את הכרטיס?</p>
                 </div>
 
                 <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pe-1">
                   <div className="flex gap-2">
                     <ChoiceButton
                       onClick={() => setFriendChannel("chat")}
-                      title="בצ׳אט של ליבה"
+                      title="לשלוח לה בליבי"
+                      note="אפשר גם לצרף כמה מילים משלך"
                     />
                     <ChoiceButton
                       onClick={() => setFriendChannel("email")}
-                      title="במייל"
+                      title="לשלוח לה במייל"
+                      note="היא תקבל הזמנה אישית להיכנס ולראות את הכרטיס"
                     />
                   </div>
+                  {friendChannel === "email" && (
+                    <p className="text-[11.5px] font-light text-muted-foreground">הפרטים של הבחור לא יופיעו במייל.</p>
+                  )}
 
                   {friendChannel === "chat" ? (
                     <div>
@@ -661,6 +666,14 @@ export default function DailyBaarDialog({
                     />
                   )}
 
+                  {friendChannel === "email" && (
+                    <div>
+                      <p className="text-[13px] text-foreground">רוצה להוסיף לה משהו?</p>
+                      <p className="mt-0.5 text-[11.5px] font-light text-muted-foreground">
+                        ההודעה תישלח מליבי, בלי לחשוף את הפרטים שלך.
+                      </p>
+                    </div>
+                  )}
                   <label className="block">
                     <span className="mb-1.5 block text-[13px] text-foreground">ההודעה שתישלח</span>
                     <textarea
