@@ -69,6 +69,116 @@ const NOTIFY_OPTIONS: { key: keyof NotifyPrefs & string; label: string }[] = [
   { key: "new_apartment", label: "כשמתפרסמת דירה חדשה בלוח הדירות" },
 ];
 
+/** ההשתדלות היומית — pause/resume and the one personal filter. Saves on the spot. */
+const DailyBaarSettings = () => {
+  const [state, setState] = useState<DailyState | null>(null);
+  const [active, setActive] = useState(true);
+  const [kind, setKind] = useState<DailyFilterKind>("status");
+  const [value, setValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    fetchDailyState()
+      .then((st) => {
+        if (!st.authorized) return;
+        setState(st);
+        setActive(st.active);
+        if (st.filter_kind) setKind(st.filter_kind);
+        setValue(st.filter_value ?? "");
+      })
+      .catch(() => undefined);
+  }, []);
+
+  if (!state) return null;
+
+  const toggleActive = async (v: boolean) => {
+    setActive(v);
+    try {
+      await setDailySettings(v, kind, value || null);
+      toast.success(v ? "ההשתדלות היומית פועלת 💛" : "ההשתדלות היומית מושהית");
+    } catch {
+      setActive(!v);
+      toast.error("לא הצלחנו לשמור כרגע");
+    }
+  };
+
+  const saveFilter = async () => {
+    setSaving(true);
+    try {
+      await setDailySettings(active, kind, value || null);
+      setDirty(false);
+      toast.success("ההעדפה נשמרה 💛");
+    } catch {
+      toast.error("לא הצלחנו לשמור כרגע");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const options = kind === "status" ? STATUS_OPTIONS : kind === "orientation" ? ORIENTATION_OPTIONS : ETHNICITY_OPTIONS;
+
+  return (
+    <div className="space-y-2 rounded-3xl border border-primary/15 bg-primary/[0.03] p-4">
+      <h3 className="flex items-center gap-2 text-[13px] tracking-[0.12em] text-muted-foreground">
+        <Flower2 className="h-3.5 w-3.5 text-primary/70" />
+        ההשתדלות היומית
+      </h3>
+      <Toggle
+        on={active}
+        onChange={(v) => void toggleActive(v)}
+        label="כרטיס אחד ליום מהבאר"
+        note="כל יום כרטיס אחד נבחר במיוחד בשבילך. אפשר להפסיק בכל רגע, והכרטיסים לא יוצגו שוב."
+      />
+      <div className="rounded-2xl bg-background/70 p-3">
+        <p className="mb-2 text-[12.5px] text-foreground">העדפה אישית — מה להציג לך</p>
+        <div className="flex gap-2">
+          <select
+            value={kind}
+            onChange={(e) => {
+              setKind(e.target.value as DailyFilterKind);
+              setValue("");
+              setDirty(true);
+            }}
+            className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-[13px] outline-none focus:border-primary"
+          >
+            <option value="status">סטטוס</option>
+            <option value="orientation">אוריינטציה</option>
+            <option value="ethnicity">עדה</option>
+          </select>
+          <select
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              setDirty(true);
+            }}
+            className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-[13px] outline-none focus:border-primary"
+          >
+            <option value="">בלי העדפה</option>
+            {options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        {dirty && (
+          <button
+            onClick={() => void saveFilter()}
+            disabled={saving}
+            className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-1.5 text-[12px] text-primary-foreground transition-all hover:bg-[hsl(var(--primary-glow))] disabled:opacity-70"
+          >
+            {saving && <Loader2 className="h-3 w-3 animate-spin" />}
+            שמירת ההעדפה
+          </button>
+        )}
+        {!dirty && value && <p className="mt-2 text-[11.5px] font-light text-muted-foreground">מוצג לך רק לפי ההעדפה שבחרת.</p>}
+      </div>
+    </div>
+  );
+};
+
+
 const Field = ({
   label,
   value,
