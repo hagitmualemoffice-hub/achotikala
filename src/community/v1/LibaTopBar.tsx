@@ -48,7 +48,7 @@ const BarLink = ({
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors ${
         on
-          ? "bg-muted/70 font-normal text-primary"
+          ? "font-normal text-primary"
           : "font-light text-foreground group-hover:text-primary"
       }`}
     >
