@@ -5,6 +5,7 @@ import { template as inquiryThankYouTemplate } from './inquiry-thank-you.tsx'
 import { template as spacePostNewTemplate } from './space-post-new.tsx'
 import { template as spaceDigestTemplate } from './space-digest.tsx'
 import { template as apartmentNewTemplate } from './apartment-new.tsx'
+import { template as dailyBaarShareTemplate } from './daily-baar-share.tsx'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -30,4 +31,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'space-post-new': spacePostNewTemplate,
   'space-digest': spaceDigestTemplate,
   'apartment-new': apartmentNewTemplate,
+  'daily-baar-share': dailyBaarShareTemplate,
 }
