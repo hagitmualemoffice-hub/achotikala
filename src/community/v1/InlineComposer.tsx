@@ -225,10 +225,10 @@ export default function InlineComposer({
             requestAnimationFrame(() => bodyRef.current?.focus());
           }
         }}
-        className={`rounded-[24px] p-3.5 transition-all duration-300 md:p-4 ${
-          open ? "bg-primary/[0.03]" : "cursor-text bg-accent/25 hover:bg-accent/35"
+        className={`rounded-2xl p-3.5 transition-all duration-300 md:p-4 ${
+          open ? "bg-primary/[0.03]" : "cursor-text bg-primary/[0.025] hover:bg-primary/[0.045]"
         }`}
-        style={open ? { boxShadow: `inset 0 0 0 1px hsl(var(--border) / 0.7)` } : undefined}
+        style={{ boxShadow: `inset 0 0 0 1px hsl(var(--border) / ${open ? "0.7" : "0.35"})` }}
       >
         <div className="flex items-start gap-3">
           <MemberAvatar
@@ -241,7 +241,7 @@ export default function InlineComposer({
           />
 
           <div className="min-w-0 flex-1">
-            <p className="mb-1.5 text-[13.5px] font-light text-foreground">
+            <p className="mb-1.5 text-[13.5px] font-light text-foreground/80">
               כאן אפשר לשאול, לכתוב, לדבר
             </p>
             {open && (
