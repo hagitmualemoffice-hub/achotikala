@@ -645,9 +645,9 @@ const CommunityBody = () => {
         }
       />
 
-      <div className="mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:px-6 lg:py-8 xl:px-10 lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_260px] xl:gap-10">
+      <div className={`mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:ms-[250px] lg:px-6 lg:py-8 xl:px-10 ${inquiriesOnly ? "lg:grid-cols-1" : "lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)]"} xl:gap-10`}>
         {/* RIGHT — community spaces */}
-        <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
+        {!inquiriesOnly && <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
           <nav className="space-y-5">
 
             <div>
@@ -750,27 +750,8 @@ const CommunityBody = () => {
               </ul>
             </div>
 
-            <div className="space-y-0.5 border-t border-border/60 pt-4">
-              <Link
-                to="/liba/messages"
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-start text-[13px] font-light text-foreground/75 transition-colors hover:bg-primary/[0.11] hover:text-primary"
-              >
-                <span className="flex items-center gap-2">
-                  <MessageCircle className="h-3.5 w-3.5" />
-                  צ׳אט
-                </span>
-                <ChevronLeft className="h-3 w-3" />
-              </Link>
-              <button
-                onClick={() => setShowAllTools(true)}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-start text-[13px] font-light text-foreground/75 transition-colors hover:bg-primary/[0.11] hover:text-primary"
-              >
-                כלים מהקהילה
-                <ChevronLeft className="h-3 w-3" />
-              </button>
-            </div>
           </nav>
-        </aside>
+        </aside>}
 
         {/* CENTER — feed */}
         <main className="order-1 min-w-0 lg:order-2 xl:me-10" ref={feedTop}>
@@ -784,8 +765,8 @@ const CommunityBody = () => {
             />
           ) : !openPost && (
           <>
-          <div className="mb-5 hidden md:block">
-            <h1 className="flex items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
+          <div className="mb-5 hidden items-center justify-between gap-5 md:flex">
+            <h1 className="flex min-w-0 items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
               {savedOnly
                 ? "השמורים שלי"
                 : activeSpace
@@ -797,6 +778,22 @@ const CommunityBody = () => {
                     </>
                   )}
             </h1>
+            <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-muted/60 p-0.5">
+              {([
+                { id: "feed" as ViewMode, label: "פיד", Icon: LayoutList },
+                { id: "compact" as ViewMode, label: "מרוכז", Icon: Rows3 },
+              ]).map(({ id, label, Icon: VIcon }) => (
+                <button
+                  key={id}
+                  onClick={() => setView(id)}
+                  aria-pressed={view === id}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] transition-colors ${view === id ? "bg-background text-foreground shadow-sm" : "font-light text-muted-foreground hover:text-foreground"}`}
+                >
+                  <VIcon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              ))}
+            </span>
             {query.trim() && (
               <button
                 onClick={() => setQuery("")}
@@ -908,7 +905,7 @@ const CommunityBody = () => {
               ))}
             </div>
 
-            <div className="flex shrink-0 items-center gap-3 text-[12.5px]">
+            <div className="flex shrink-0 items-center gap-3 text-[12.5px] md:hidden">
               <span className="flex items-center gap-0.5 rounded-full bg-muted/60 p-0.5">
                 {([
                   { id: "feed" as ViewMode, label: "פיד", Icon: LayoutList },
@@ -1081,113 +1078,6 @@ const CommunityBody = () => {
           />
         </div>
 
-        {/* LEFT — modular panel */}
-        <aside className="order-3 hidden space-y-5 lg:block lg:space-y-7 xl:sticky xl:top-24 xl:self-start">
-          {/* מה קורה עכשיו בליבה: מאז שהיית כאן + אירועים קרובים + אולי את מכירה? */}
-          <LibaPulsePanel
-            events={events}
-            since={since}
-            sinceOpen={sinceOpen}
-            talking={talking}
-            onToggleSince={() => setSinceOpen((v) => !v)}
-            onAllEvents={() => navigate("/events")}
-            onOpenInquiries={(name) => {
-              setInquiryFocus(name ?? "");
-              setInquiriesOnly(true);
-              setOpenPostId(null);
-              setPulseOnly(false);
-              feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-            onOpenTalking={(space, title) => {
-              setFilter(space);
-              setQuery(title);
-              feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}
-            onOpenSince={openSinceItem}
-            onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
-            onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
-          />
-
-
-
-
-          {/* tools */}
-          {tools.length > 0 && (
-            <section id="community-tools" className="scroll-mt-24">
-              <p className="mb-3.5 flex items-center gap-2 text-[10.5px] tracking-[0.2em] text-muted-foreground">
-                <Wrench className="h-3.5 w-3.5" /> כלים מהקהילה
-              </p>
-              <ul className="space-y-1">
-                {(showAllTools ? tools : tools.slice(0, 3)).map((t) => {
-                  const Icon = toolIcon(t.kind);
-                  return (
-                    <li
-                      key={t.id}
-                      onClick={async () => {
-                        try {
-                          if (t.url) window.open(t.url, "_blank", "noopener,noreferrer");
-                          else if (t.has_file)
-                            window.open(
-                              await fileUrl({ toolId: t.id }),
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                        } catch {
-                          toast.error("לא הצלחנו לפתוח את הקובץ");
-                        }
-                      }}
-                      className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-muted"
-                    >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-[13px] text-foreground">{t.title}</span>
-                        <span className="block text-[11px] font-light text-muted-foreground">
-                          {[t.by, t.space ? `מתוך ${spaceById(t.space).shortName}` : null]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-              {tools.length > 3 && (
-                <button
-                  onClick={() => setShowAllTools((v) => !v)}
-                  className="mt-3 px-3 text-[12.5px] text-primary transition-opacity hover:opacity-70"
-                >
-                  {showAllTools ? "פחות" : "לכל הכלים ←"}
-                </button>
-              )}
-            </section>
-          )}
-
-          {/* important now */}
-          {notices.length > 0 && (
-            <section className="rounded-3xl bg-accent/45 p-5">
-              <p className="mb-3.5 flex items-center gap-2 text-[10.5px] tracking-[0.2em] text-accent-foreground/70">
-                <Pin className="h-3.5 w-3.5" /> חשוב עכשיו
-              </p>
-              <ul className="space-y-3.5">
-                {notices.map((i) => (
-                  <li
-                    key={i.id}
-                    className="border-t border-foreground/[0.06] pt-3.5 first:border-0 first:pt-0"
-                  >
-                    <p className="text-[13.5px] leading-snug text-foreground">{i.title}</p>
-                    {i.note && (
-                      <p className="mt-1 text-[12px] font-light leading-relaxed text-muted-foreground">
-                        {i.note}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </aside>
       </div>
 
       {/* Her own account: name, nickname, photo, privacy, notifications */}
