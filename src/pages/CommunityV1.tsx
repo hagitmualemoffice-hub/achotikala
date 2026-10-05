@@ -818,18 +818,22 @@ const CommunityBody = () => {
           ) : !openPost && (
           <>
           <div className="mb-5 hidden md:block">
-            <h1 className="flex items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
-              {savedOnly
-                ? "השמורים שלי"
-                : activeSpace
-                  ? activeSpace.name
-                  : (
-                    <>
-                      <span>{`כמה טוב שאת איתנו ${me.displayName.trim().split(/\s+/)[0]}`}</span>
-                      <Heart className="h-5 w-5 shrink-0 text-primary md:h-6 md:w-6" fill="currentColor" />
-                    </>
-                  )}
-            </h1>
+            {/* the view switch lives at the top, on the left of the title */}
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="flex items-center gap-2 text-[26px] font-light leading-[1.2] tracking-[-0.02em] text-foreground md:text-[32px]">
+                {savedOnly
+                  ? "השמורים שלי"
+                  : activeSpace
+                    ? activeSpace.name
+                    : (
+                      <>
+                        <span>{`כמה טוב שאת איתנו ${me.displayName.trim().split(/\s+/)[0]}`}</span>
+                        <Heart className="h-5 w-5 shrink-0 text-primary md:h-6 md:w-6" fill="currentColor" />
+                      </>
+                    )}
+              </h1>
+              <ViewToggle view={view} setView={setView} />
+            </div>
             {query.trim() && (
               <button
                 onClick={() => setQuery("")}
