@@ -48,10 +48,12 @@ const ScreenHint = ({ children }: { children: React.ReactNode }) => (
 const ChoiceButton = ({
   onClick,
   title,
+  note,
   disabled,
 }: {
   onClick: () => void;
   title: string;
+  note?: string;
   disabled?: boolean;
 }) => (
   <Button
@@ -59,9 +61,10 @@ const ChoiceButton = ({
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="h-auto min-h-[92px] w-full items-center justify-center whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center leading-snug hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
+    className="h-auto min-h-[92px] w-full flex-col items-center justify-center gap-1 whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center leading-snug hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
   >
-    {title}
+    <span>{title}</span>
+    {note && <span className="text-[11px] font-light text-muted-foreground">{note}</span>}
   </Button>
 );
 
@@ -663,6 +666,14 @@ export default function DailyBaarDialog({
                     />
                   )}
 
+                  {friendChannel === "email" && (
+                    <div>
+                      <p className="text-[13px] text-foreground">רוצה להוסיף לה משהו?</p>
+                      <p className="mt-0.5 text-[11.5px] font-light text-muted-foreground">
+                        ההודעה תישלח מליבי, בלי לחשוף את הפרטים שלך.
+                      </p>
+                    </div>
+                  )}
                   <label className="block">
                     <span className="mb-1.5 block text-[13px] text-foreground">ההודעה שתישלח</span>
                     <textarea
