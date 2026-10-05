@@ -78,3 +78,4 @@
 - [ ] Move offline updates to a dedicated repository (waiting on a GitHub connection).
 - [ ] Investigate "email not found" for NetFree users with evidence.
 - [x] Baar "ההשתדלות היומית" — card including recommendations, settings and sidebar access built.
+- [ ] Purge legacy jsDelivr to v17 (manifest + parts) and release offline v18 full chain.
