@@ -5,16 +5,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Flower2,
-  Heart,
-  Info,
-  Loader2,
-  Mail,
-  MessageCircle,
-  Send,
-  UserCircle,
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
@@ -44,16 +35,7 @@ const DEFAULT_MESSAGE = "ראיתי אותו וחשבתי עלייך 💗";
 
 /* ------------------------------ little touches ------------------------------ */
 
-/** a soft row of flowers and hearts — the quiet signature of this moment */
-const PetalsRow = () => (
-  <div className="flex items-center justify-center gap-2 text-primary/70" aria-hidden>
-    <Flower2 className="h-4 w-4" />
-    <Heart className="h-3 w-3 fill-primary/40 text-primary/40" />
-    <Flower2 className="h-3 w-3 rotate-12" />
-    <Heart className="h-4 w-4 fill-primary/25 text-primary/25" />
-    <Flower2 className="h-4 w-4 -rotate-6" />
-  </div>
-);
+
 
 const ScreenTitle = ({ children }: { children: React.ReactNode }) => (
   <h2 className="text-[21px] font-light leading-snug text-foreground md:text-[24px]">{children}</h2>
@@ -65,12 +47,10 @@ const ScreenHint = ({ children }: { children: React.ReactNode }) => (
 
 const ChoiceButton = ({
   onClick,
-  icon,
   title,
   disabled,
 }: {
   onClick: () => void;
-  icon: React.ReactNode;
   title: string;
   disabled?: boolean;
 }) => (
@@ -79,12 +59,9 @@ const ChoiceButton = ({
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="h-auto min-h-[112px] w-full flex-col justify-start gap-2 whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
+    className="h-auto min-h-[92px] w-full items-center justify-center whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center leading-snug hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
   >
-    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-      {icon}
-    </span>
-    <span className="block text-[12px] font-normal leading-snug text-foreground md:text-[13px]">{title}</span>
+    {title}
   </Button>
 );
 
