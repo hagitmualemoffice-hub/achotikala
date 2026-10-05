@@ -494,17 +494,11 @@ export default function DailyBaarDialog({
           <div className="flex min-h-0 flex-1 flex-col">
             {phase === "card" && (
               <>
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] text-primary">ההשתדלות שלך להיום</p>
-                    <p className="mt-0.5 text-[15px] font-light text-foreground">כרטיס אחד, שנבחר במיוחד בשבילך 💗</p>
-                  </div>
-                </div>
                 <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
                 </div>
                 <div className="sticky bottom-0 mt-4 border-t border-border/60 bg-background pt-3">
-                  <p className="mb-1 text-[12.5px] font-light text-muted-foreground">מה תרצי לעשות?</p>
+                  <p className="mb-1 text-[12.5px] font-light text-muted-foreground">על מה את חושבת?</p>
                   <div className="grid grid-cols-4 gap-2">
                     <ChoiceButton
                     onClick={() => void answer("maybe", "maybe")}
