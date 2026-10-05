@@ -8,7 +8,7 @@
  *  - a personal photo is never shown behind a nickname unless she said yes
  */
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Camera, Trash2, X } from "lucide-react";
+import { AlertCircle, Camera, Loader2, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { MemberAvatar } from "./Avatar";
 import { avatarFromFile } from "./avatarFile";
