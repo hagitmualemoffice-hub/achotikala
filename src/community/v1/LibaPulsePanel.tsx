@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone, Flower2, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInquiries, isInquiryNew, type Inquiry } from "./inquiries";
 import { HelpDialog } from "./InquiriesPage";
 import { Button } from "@/components/ui/button";
 import { fetchSidebarNotices, type CommunityEvent, type SidebarNotice, type TalkingNow } from "./api";
 import { spaceById, accentColor, type SpaceId } from "./spaces";
+import dailyBaarCardArt from "@/assets/daily-baar-card.webp";
 
 /** the real events live in the site's events system — the panel shows the next few */
 const fetchUpcomingEvents = async (): Promise<CommunityEvent[]> => {
@@ -163,19 +164,25 @@ export default function LibaPulsePanel({
       {/* ---------------------------- ההשתדלות היומית ---------------------------- */}
       {(onOpenDaily || onOpenDailySettings) && (
         <section className="py-5">
-          <SectionTitle
-            icon={<Flower2 className="h-4 w-4 text-primary" />}
-            title="ההשתדלות היומית"
-            sub="הרגע האישי שלך בבאר"
-          />
           <div className="space-y-2">
             {onOpenDaily && (
               <Button variant="outline"
                 onClick={onOpenDaily}
-                className="flex h-auto w-full justify-start gap-2.5 rounded-lg border-primary/20 bg-primary/[0.04] p-3 text-right hover:bg-primary/[0.08]"
+                className="group relative flex h-auto min-h-[112px] w-full items-center justify-between overflow-hidden rounded-xl border-primary/20 bg-primary/[0.04] px-4 py-3 text-right shadow-[0_8px_24px_-18px_hsl(var(--primary)/0.55)] hover:bg-primary/[0.08]"
               >
-                <Flower2 className="h-4 w-4 shrink-0 text-primary" />
-                <span className="text-[13.5px] font-medium text-foreground">להשתדלות היומית שלי</span>
+                <span className="relative z-10 min-w-0 flex-1">
+                  <span className="block text-[15px] font-medium text-foreground">ההשתדלות היומית</span>
+                  <span className="mt-1 block text-[11.5px] font-light text-muted-foreground">כרטיס אחד שמחכה לך היום</span>
+                </span>
+                <img
+                  src={dailyBaarCardArt}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  width={512}
+                  height={384}
+                  className="-ms-2 h-24 w-28 shrink-0 object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                />
               </Button>
             )}
             {onOpenDailySettings && (

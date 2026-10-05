@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { MemberAvatar } from "@/community/v1/Avatar";
 import { useLibaChat } from "@/community/v1/LibaMessages";
 import { fetchThreads } from "@/community/v1/messages";
+import dailyBaarEntryArt from "@/assets/daily-baar-entry.webp";
+import dailyBaarSuccessArt from "@/assets/daily-baar-success.webp";
 import {
   ORIENTATION_OPTIONS,
   STATUS_OPTIONS,
@@ -468,6 +470,14 @@ export default function DailyBaarDialog({
         {/* 1 — the greeting */}
         {phase === "entry" && (
           <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+            <img
+              src={dailyBaarEntryArt}
+              alt=""
+              aria-hidden="true"
+              width={512}
+              height={384}
+              className="mb-3 h-32 w-auto object-contain md:h-36"
+            />
             <ScreenTitle>ההשתדלות שלך להיום 💗</ScreenTitle>
             <div className="mt-4 max-w-sm space-y-3">
               <ScreenHint>אולי בשבילך. אולי בשביל מישהי שאת מכירה.</ScreenHint>
@@ -749,6 +759,15 @@ export default function DailyBaarDialog({
           <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
             {phase === "done" && (
               <>
+                <img
+                  src={dailyBaarSuccessArt}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  width={512}
+                  height={384}
+                  className="mb-3 h-28 w-auto object-contain md:h-32"
+                />
                 <ScreenTitle>מדהימה 💗</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>עשית את ההשתדלות שלך להיום</ScreenHint>
