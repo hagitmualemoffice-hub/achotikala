@@ -14,7 +14,7 @@ import { useLibaChat } from "@/community/v1/LibaMessages";
 import { fetchThreads } from "@/community/v1/messages";
 import { fetchInquiries } from "@/community/v1/inquiries";
 import dailyBaarEntryArt from "@/assets/daily-baar-entry.webp";
-import dailyBaarSuccessArt from "@/assets/daily-baar-success-medal.webp";
+import dailyBaarSuccessArt from "@/assets/daily-baar-success-medal-refined.webp";
 import {
   ORIENTATION_OPTIONS,
   STATUS_OPTIONS,
