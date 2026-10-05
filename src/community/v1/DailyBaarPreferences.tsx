@@ -108,6 +108,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
             )}
             <p className="text-[12px] text-muted-foreground">אפשר לבחור סוג סינון אחד ולשנות אותו בכל עת.</p>
           </fieldset>
+          )}
           </>}
         </div>
         {!loading && <div className="popup-footer px-6 pt-4 md:px-8">
