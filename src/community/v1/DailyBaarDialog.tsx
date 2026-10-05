@@ -141,8 +141,8 @@ const DailyBoyCard = ({
       {boy.photo_url ? (
         <img src={boy.photo_url} alt="" className="h-14 w-14 rounded-2xl object-cover" />
       ) : (
-        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
-          <UserCircle className="h-7 w-7" />
+        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/[0.08] text-[17px] font-light text-primary">
+          {boy.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("")}
         </div>
       )}
       <div className="min-w-0">
@@ -465,9 +465,6 @@ export default function DailyBaarDialog({
         {/* 1 — the greeting */}
         {phase === "entry" && (
           <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
-            <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-              <PetalsRow />
-            </div>
             <ScreenTitle>ההשתדלות שלך להיום 💗</ScreenTitle>
             <div className="mt-4 max-w-sm space-y-3">
               <ScreenHint>אולי בשבילך. אולי בשביל מישהי שאת מכירה.</ScreenHint>
@@ -480,7 +477,7 @@ export default function DailyBaarDialog({
               disabled={working}
               className="mt-8 h-12 w-full max-w-xs rounded-full bg-primary text-[15px] text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))]"
             >
-              {working ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className="h-4 w-4 fill-primary-foreground/30" />}
+              {working && <Loader2 className="h-4 w-4 animate-spin" />}
               בואי נראה מי מחכה לך
             </Button>
             <button
@@ -502,7 +499,6 @@ export default function DailyBaarDialog({
                     <p className="text-[11px] text-primary">ההשתדלות שלך להיום</p>
                     <p className="mt-0.5 text-[15px] font-light text-foreground">כרטיס אחד, שנבחר במיוחד בשבילך 💗</p>
                   </div>
-                  <Flower2 className="h-5 w-5 text-primary/50" aria-hidden />
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
@@ -513,25 +509,21 @@ export default function DailyBaarDialog({
                     <ChoiceButton
                     onClick={() => void answer("maybe", "maybe")}
                     disabled={working}
-                    icon={<Heart className="h-4 w-4 fill-primary/30" />}
                     title="אולי בשבילי 💗"
                   />
                   <ChoiceButton
                     onClick={() => void answer("friend", "friend")}
                     disabled={working}
-                    icon={<Send className="h-4 w-4" />}
                     title="חשבתי על חברה שלי"
                   />
                   <ChoiceButton
                     onClick={() => void answer("info", "info")}
                     disabled={working}
-                    icon={<Info className="h-4 w-4" />}
                     title="יש לי פרטים להוסיף לכרטיס"
                   />
                   <ChoiceButton
                     onClick={() => void answer("not_now", "done")}
                     disabled={working}
-                    icon={<Flower2 className="h-4 w-4" />}
                     title="הפעם לא"
                   />
                   </div>
@@ -582,7 +574,6 @@ export default function DailyBaarDialog({
                                   onClick={() => { if (rec.user_id) chatWith(rec.user_id); }}
                                   className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-primary/30 px-2.5 py-1 text-[11.5px] text-primary transition-colors hover:bg-primary/[0.08]"
                                 >
-                                  <MessageCircle className="h-3 w-3" />
                                   פנייה דרך ליבה
                                 </button>
                               )}
@@ -627,12 +618,10 @@ export default function DailyBaarDialog({
                   <div className="flex gap-2">
                     <ChoiceButton
                       onClick={() => setFriendChannel("chat")}
-                      icon={<MessageCircle className="h-4 w-4" />}
                       title="בצ׳אט של ליבה"
                     />
                     <ChoiceButton
                       onClick={() => setFriendChannel("email")}
-                      icon={<Mail className="h-4 w-4" />}
                       title="במייל"
                     />
                   </div>
@@ -656,7 +645,6 @@ export default function DailyBaarDialog({
                               >
                                 <MemberAvatar name={f.name} seed={f.seed} imageUrl={f.avatarUrl ?? null} size="xs" userId={f.userId} />
                                 <span className="flex-1 truncate text-[13.5px] text-foreground">{f.name}</span>
-                                {friendId === f.userId && <Heart className="h-3.5 w-3.5 fill-primary/40 text-primary" />}
                               </button>
                             </li>
                           ))}
@@ -693,7 +681,7 @@ export default function DailyBaarDialog({
                     disabled={working || (friendChannel === "chat" ? !friendId : !friendEmail.trim())}
                     className="ms-auto h-12 flex-1 rounded-full bg-primary text-[15px] text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))]"
                   >
-                    {working ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    {working && <Loader2 className="h-4 w-4 animate-spin" />}
                     שליחה
                   </Button>
                 </div>
@@ -748,9 +736,6 @@ export default function DailyBaarDialog({
           <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
             {phase === "done" && (
               <>
-                <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-                  <PetalsRow />
-                </div>
                 <ScreenTitle>מדהימה 💗</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>עשית את ההשתדלות שלך להיום</ScreenHint>
@@ -778,9 +763,6 @@ export default function DailyBaarDialog({
             )}
             {phase === "empty" && (
               <>
-                <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-                  <PetalsRow />
-                </div>
                 <ScreenTitle>אין היום כרטיס חדש 💗</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>כבר הכרנו את כל מי שיש כרגע בבאר. בקרוב יגיעו חדשים — נתראה אז.</ScreenHint>
@@ -792,9 +774,6 @@ export default function DailyBaarDialog({
             )}
             {phase === "filterEmpty" && (
               <>
-                <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-                  <PetalsRow />
-                </div>
                 <ScreenTitle>אין כרטיס שמתאים למסנן שלך</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>אפשר להציג גם בחור מחוץ למסנן שבחרת בהגדרות — או לחכות לפעם הבאה.</ScreenHint>
@@ -813,9 +792,6 @@ export default function DailyBaarDialog({
             )}
             {phase === "unavailable" && (
               <>
-                <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-                  <PetalsRow />
-                </div>
                 <ScreenTitle>הכרטיס של היום כבר לא זמין</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>נראה שהכרטיס הזה ירד מהבאר. בפעם הבאה יחכה לך כרטיס חדש 💗</ScreenHint>
@@ -827,9 +803,6 @@ export default function DailyBaarDialog({
             )}
             {phase === "paused" && (
               <>
-                <div className="mb-5 rounded-full bg-primary/[0.07] px-5 py-4">
-                  <PetalsRow />
-                </div>
                 <ScreenTitle>ההשתדלות היומית מושהית</ScreenTitle>
                 <div className="mt-3 max-w-sm">
                   <ScreenHint>אפשר להפעיל אותה מחדש בהגדרות החשבון, מתי שתרצי.</ScreenHint>
