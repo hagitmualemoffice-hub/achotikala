@@ -24,6 +24,7 @@ import {
   Trash2,
   UserCircle,
   X,
+  Flower2,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as SliderPrimitive from "@radix-ui/react-slider";
@@ -38,6 +39,7 @@ import LibaHeaderActions from "@/community/v1/LibaHeaderActions";
 import LibaTopBar from "@/community/v1/LibaTopBar";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import LibaEmptyState from "@/components/EmptyState";
+import DailyBaarDialog from "@/community/v1/DailyBaarDialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -1897,6 +1899,7 @@ const BaarPage = () => {
   const [inquiryUnread, setInquiryUnread] = useState(0);
   const [editingBoy, setEditingBoy] = useState<BaarBoy | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [dailyOpen, setDailyOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -1906,6 +1909,13 @@ const BaarPage = () => {
       /* ignore */
     }
   }, [view]);
+
+  /* deep link from the daily card email — land straight on the add flow */
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("add") === "1") {
+      setCreateOpen(true);
+    }
+  }, []);
 
   const checkAccess = useCallback(async () => {
     if (sessionLoading) return;
@@ -2113,10 +2123,20 @@ const BaarPage = () => {
                   ואצלה תוכלי לקבל מידע שחשוב לך. מזמינות אותך להיעזר בבאר - וגם להיות שם בשביל אחרות. 💗
                 </p>
               </div>
-              <Button onClick={() => setCreateOpen(true)} className="rounded-full px-6">
-                <Plus className="h-4 w-4" />
-                הוספת בחור
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setDailyOpen(true)}
+                  className="rounded-full border-primary/40 px-5 text-[14px] text-primary hover:bg-primary/[0.06]"
+                >
+                  <Flower2 className="h-4 w-4" />
+                  ההשתדלות היומית
+                </Button>
+                <Button onClick={() => setCreateOpen(true)} className="rounded-full px-6">
+                  <Plus className="h-4 w-4" />
+                  הוספת בחור
+                </Button>
+              </div>
             </div>
 
             <div className="mb-5 flex items-center gap-2">
@@ -2191,6 +2211,15 @@ const BaarPage = () => {
                 </Button>
               </div>
             </div>
+
+            <Button
+              type="button"
+              onClick={() => setDailyOpen(true)}
+              aria-label="ההשתדלות היומית"
+              className="fixed bottom-36 left-4 z-40 h-12 w-12 rounded-full bg-card text-primary shadow-[var(--shadow-card)] md:hidden"
+            >
+              <Flower2 className="h-5 w-5" />
+            </Button>
 
             <Button
               type="button"
@@ -2329,6 +2358,9 @@ const BaarPage = () => {
           void loadList();
         }}
       />
+
+      {/* ההשתדלות היומית — כרטיס אחד ביום, שנבחר במיוחד בשבילה */}
+      <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} onAddBoy={() => setCreateOpen(true)} />
 
       <ProfileDialog
         boyId={openBoyId}

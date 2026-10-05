@@ -42,6 +42,8 @@ import AuthDialog from "@/apartments/AuthDialog";
 import { signInWithGoogle } from "@/apartments/googleSignIn";
 import PostCard from "@/community/v1/PostCard";
 import NewEventPopup from "@/community/v1/NewEventPopup";
+import DailyBaarDialog from "@/community/v1/DailyBaarDialog";
+import { fetchDailyState } from "@/community/v1/dailyBaar";
 import { SPACES, setLibaAdmin, accentBg, accentColor, spaceById, type SpaceId } from "@/community/v1/spaces";
 import {
   bootstrap,
@@ -226,6 +228,24 @@ const CommunityBody = () => {
   const [sinceOpen, setSinceOpen] = useState(false);
   const [seenSinceKeys, setSeenSinceKeys] = useState<Set<string>>(() => new Set());
   const [settingsOpen, setSettingsOpen] = useState(false);
+  /* ההשתדלות היומית — נפתחת מעצמה פעם ביום כשהכרטיס מחכה */
+  const [dailyOpen, setDailyOpen] = useState(false);
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      fetchDailyState()
+        .then((st) => {
+          if (
+            st.authorized &&
+            st.active &&
+            (!st.today || (!st.today.response && !st.today.unavailable))
+          ) {
+            setDailyOpen(true);
+          }
+        })
+        .catch(() => undefined);
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, []);
   const [settingsTab, setSettingsTab] = useState<
     "profile" | "about" | "heart" | "updates" | undefined
   >();
@@ -1172,6 +1192,7 @@ const CommunityBody = () => {
 
       {/* Composer — full "כתבי פוסט" flow */}
       <NewEventPopup />
+      <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />
       <Composer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
