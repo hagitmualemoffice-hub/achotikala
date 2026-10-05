@@ -604,27 +604,29 @@ export default function DailyBaarDialog({
             {phase === "friend" && boy && (
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
-                  <p className="text-[11px] text-primary">חשבתי על מישהי</p>
-                  <ScreenTitle>לשתף את {boy.full_name}?</ScreenTitle>
+                  <ScreenTitle>חשבת על מישהי? 💗</ScreenTitle>
                   <div className="mt-2">
-                    <ScreenHint>
-                      במייל לא יופיע שום פרט על הבחור — רק הכפתור שמוביל לכרטיס שלו בליבה. גם החברה לא תדע מי שלחה,
-                      אלא אם שלחת בצ׳אט.
-                    </ScreenHint>
+                    <ScreenHint>איזה כיף. אולי הוא בדיוק יכול להתאים לה.</ScreenHint>
                   </div>
+                  <p className="mt-3 text-[13.5px] text-foreground">איך תרצי להעביר לה את הכרטיס?</p>
                 </div>
 
                 <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pe-1">
                   <div className="flex gap-2">
                     <ChoiceButton
                       onClick={() => setFriendChannel("chat")}
-                      title="בצ׳אט של ליבה"
+                      title="לשלוח לה בליבי"
+                      note="אפשר גם לצרף כמה מילים משלך"
                     />
                     <ChoiceButton
                       onClick={() => setFriendChannel("email")}
-                      title="במייל"
+                      title="לשלוח לה במייל"
+                      note="היא תקבל הזמנה אישית להיכנס ולראות את הכרטיס"
                     />
                   </div>
+                  {friendChannel === "email" && (
+                    <p className="text-[11.5px] font-light text-muted-foreground">הפרטים של הבחור לא יופיעו במייל.</p>
+                  )}
 
                   {friendChannel === "chat" ? (
                     <div>
