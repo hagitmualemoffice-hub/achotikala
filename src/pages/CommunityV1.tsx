@@ -1192,6 +1192,7 @@ const CommunityBody = () => {
 
       {/* Composer — full "כתבי פוסט" flow */}
       <NewEventPopup />
+      <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />
       <Composer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
