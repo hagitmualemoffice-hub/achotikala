@@ -57,6 +57,9 @@ export type BaarBoy = {
   details: string | null;
   looking_for: string | null;
   positives: string | null;
+  proposal_contact_name: string | null;
+  proposal_contact_phone: string | null;
+  proposal_contact_email: string | null;
   photo_url: string | null;
   has_photo: boolean;
   saved?: boolean;
@@ -260,6 +263,16 @@ export const updateBaarBoy = (
   _looking_for: payload.looking_for ?? null,
   _positives: payload.positives ?? null,
   _photo_url: payload.photo_url ?? null,
+});
+
+export const setBaarProposalContact = (
+  boyId: string,
+  contact: { name: string; phone: string; email: string },
+) => rpc<void>("baar_set_proposal_contact", {
+  _boy_id: boyId,
+  _contact_name: contact.name.trim(),
+  _contact_phone: contact.phone.trim(),
+  _contact_email: contact.email.trim(),
 });
 
 export const archiveBaarBoy = (boyId: string) =>
