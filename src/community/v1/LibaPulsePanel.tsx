@@ -172,13 +172,13 @@ export default function LibaPulsePanel({
             rank(a) - rank(b) ||
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         );
-        setInquiries(open.slice(0, 5));
+        setInquiries(actionableMode ? open : open.slice(0, 5));
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [actionableMode]);
 
   return (
     <div id="quick-look" className="mt-8 scroll-mt-24 divide-y divide-border/40 lg:mt-0">
@@ -291,7 +291,7 @@ export default function LibaPulsePanel({
       {/* ---------------------------- קורה עכשיו ---------------------------- */}
       {actionableMode && (waitingInquiryCount > 0 || newPostsCount > 0 || (newApartmentCount ?? 0) > 0) && (
         <section className="py-5">
-          <SectionTitle icon={<Flame className="h-4 w-4 text-primary" />} title="🔥 קורה עכשיו" />
+          <SectionTitle icon={null} title="🔥 קורה עכשיו" />
           <ul className="space-y-1">
             {waitingInquiryCount > 0 && (
               <li>
