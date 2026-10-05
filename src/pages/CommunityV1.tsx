@@ -233,12 +233,15 @@ const CommunityBody = () => {
   /* ההשתדלות היומית — נפתחת מעצמה פעם ביום כשהכרטיס מחכה */
   const [dailyOpen, setDailyOpen] = useState(false);
   const [dailyPreferencesOpen, setDailyPreferencesOpen] = useState(false);
+  const [dailyHidden, setDailyHidden] = useState(false);
   useEffect(() => {
     let cancelled = false;
     const t = window.setTimeout(async () => {
       try {
         const st = await fetchDailyState();
-        if (cancelled || !st.authorized || !st.active || st.cadence === "muted" || st.today) return;
+        if (cancelled) return;
+        setDailyHidden(!!st.hidden);
+        if (!st.authorized || !st.active || st.hidden || st.cadence === "muted" || st.today) return;
         const { data: { user } } = await supabase.auth.getUser();
         if (cancelled || !user) return;
         const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jerusalem", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
@@ -1073,8 +1076,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
-            onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
+            onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
+            onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
           />
         </div>
 
@@ -1101,8 +1104,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
-            onOpenDaily={() => setDailyOpen(true)}
-            onOpenDailySettings={() => setDailyPreferencesOpen(true)}
+            onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
+            onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
           />
 
 
@@ -1209,7 +1212,13 @@ const CommunityBody = () => {
       <NewEventPopup />
       <DailyBaarPromoPopup />
       <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />
-      <DailyBaarPreferences open={dailyPreferencesOpen} onOpenChange={setDailyPreferencesOpen} />
+      <DailyBaarPreferences
+        open={dailyPreferencesOpen}
+        onOpenChange={(v) => {
+          setDailyPreferencesOpen(v);
+          if (!v) fetchDailyState().then((st) => setDailyHidden(!!st.hidden)).catch(() => undefined);
+        }}
+      />
       <Composer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}

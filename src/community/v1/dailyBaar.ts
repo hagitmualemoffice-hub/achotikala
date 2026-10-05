@@ -18,6 +18,7 @@ export type DailyCadence = "daily" | "every_other_day" | "muted";
 export type DailyState = {
   authorized: boolean;
   active: boolean;
+  hidden: boolean;
   cadence: DailyCadence;
   min_age: number | null;
   max_age: number | null;
@@ -60,10 +61,10 @@ export const setDailySettings = (
     _filter_value: filterValue,
   });
 
-export const setDailyPreferences = (cadence: DailyCadence, filterKind: DailyFilterKind | null, filterValue: string | null, minAge: number | null, maxAge: number | null) =>
+export const setDailyPreferences = (cadence: DailyCadence, filterKind: DailyFilterKind | null, filterValue: string | null, minAge: number | null, maxAge: number | null, hidden = false) =>
   rpc<void>("baar_daily_preferences_set", {
     _cadence: cadence, _filter_kind: filterKind, _filter_value: filterValue,
-    _min_age: minAge, _max_age: maxAge,
+    _min_age: minAge, _max_age: maxAge, _hidden: hidden,
   });
 
 export const sendDailyCardChat = (boyId: string, toUser: string, body: string) =>

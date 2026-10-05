@@ -10,6 +10,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cadence, setCadence] = useState<DailyCadence>("every_other_day");
+  const [hidden, setHidden] = useState(false);
   const [kind, setKind] = useState<DailyFilterKind>("age");
   const [value, setValue] = useState("");
   const [minAge, setMinAge] = useState("");
@@ -23,6 +24,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
       if (cancelled) return;
       if (!state.authorized) { onOpenChange(false); return; }
       setCadence(state.cadence ?? "every_other_day");
+      setHidden(!!state.hidden);
       const savedKind = state.filter_kind;
       setKind(savedKind === "ethnicity" || savedKind === "dress_style" ? savedKind : "age");
       setValue(savedKind === "ethnicity" || savedKind === "dress_style" ? state.filter_value ?? "" : "");
@@ -50,8 +52,9 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
         kind === "age" ? null : value || null,
         kind === "age" ? min : null,
         kind === "age" ? max : null,
+        hidden,
       );
-      toast.success("ההעדפות נשמרו 💗");
+      toast.success(hidden ? "ההשתדלות היומית הוסתרה. תמיד אפשר להחזיר אותה מההגדרות 💗" : "ההעדפות נשמרו 💗");
       onOpenChange(false);
     } catch {
       toast.error("לא הצלחנו לשמור כרגע");
@@ -71,11 +74,19 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
             <legend className="mb-2 text-[14px] text-foreground">מתי להציג לי כרטיס באופן אוטומטי?</legend>
             {([ ["every_other_day", "אחת ליומיים"], ["daily", "כל יום"], ["muted", "ללא התראה אוטומטית"] ] as const).map(([key, label]) => (
               <label key={key} className="flex cursor-pointer items-center gap-3 py-1.5 text-[14px] text-foreground">
-                <input type="radio" name="daily-cadence" checked={cadence === key} onChange={() => setCadence(key)} className="accent-primary" />{label}
+                <input type="radio" name="daily-cadence" checked={!hidden && cadence === key} onChange={() => { setCadence(key); setHidden(false); }} className="accent-primary" />{label}
               </label>
             ))}
-            <p className="text-[12px] text-muted-foreground">גם בלי התראה, הכרטיס שלך זמין תמיד בטור הצד.</p>
+            <label className="flex cursor-pointer items-center gap-3 py-1.5 text-[14px] text-foreground">
+              <input type="radio" name="daily-cadence" checked={hidden} onChange={() => setHidden(true)} className="accent-primary" />לא מעוניינת — להסתיר לגמרי
+            </label>
+            <p className="text-[12px] text-muted-foreground">
+              {hidden
+                ? "ההשתדלות היומית לא תוצג לך יותר — לא בטור הצד ולא בחלונות קופצים. תמיד אפשר להחזיר אותה כאן."
+                : "גם בלי התראה, הכרטיס שלך זמין תמיד בטור הצד."}
+            </p>
           </fieldset>
+          {!hidden && (
           <fieldset className="space-y-3">
             <legend className="mb-2 text-[14px] text-foreground">לפי מה תרצי לסנן?</legend>
             <div className="grid grid-cols-3 gap-2">
@@ -97,6 +108,7 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
             )}
             <p className="text-[12px] text-muted-foreground">אפשר לבחור סוג סינון אחד ולשנות אותו בכל עת.</p>
           </fieldset>
+          )}
           </>}
         </div>
         {!loading && <div className="popup-footer px-6 pt-4 md:px-8">
