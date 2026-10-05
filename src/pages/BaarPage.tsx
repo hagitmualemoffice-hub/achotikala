@@ -1899,6 +1899,7 @@ const BaarPage = () => {
   const [inquiryUnread, setInquiryUnread] = useState(0);
   const [editingBoy, setEditingBoy] = useState<BaarBoy | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [dailyOpen, setDailyOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
