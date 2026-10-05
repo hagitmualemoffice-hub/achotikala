@@ -532,11 +532,10 @@ export default function DailyBaarDialog({
             {phase === "maybe" && boy && (
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
-                  <p className="text-[11px] text-primary">אולי בשבילי</p>
-                  <ScreenTitle>שמחים שהכרטיס נגע בלב 💗</ScreenTitle>
+                  <ScreenTitle>אולי שווה לבדוק 💗</ScreenTitle>
                   <div className="mt-2">
                     <ScreenHint>
-                      אפשר לפנות ישר למי שהמליצה עליו — היא מכירה אותו ותשמח לספר. אפשר גם להישאר עם זה רגע.
+                      לא צריך לדעת עכשיו. אם נראה לך שיכול להיות כאן משהו, אפשר פשוט לברר קצת יותר.
                     </ScreenHint>
                   </div>
                 </div>
@@ -589,7 +588,14 @@ export default function DailyBaarDialog({
                   onClick={() => setPhase("done")}
                   className="mt-5 h-12 w-full rounded-full text-[15px]"
                 >
-                  לסיום
+                  לבירור על הבחור
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setPhase("done")}
+                  className="mt-1 w-full text-muted-foreground"
+                >
+                  לשמור אותו להמשך
                 </Button>
               </div>
             )}
