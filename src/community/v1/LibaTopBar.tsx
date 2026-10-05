@@ -118,7 +118,7 @@ const LibaTopBar = ({
       <span className="hidden h-5 w-px bg-border md:block" />
 
       <BarLink on={active === "forum"} to="/liba">
-        המרחב
+        הפורום
       </BarLink>
       <BarLink on={active === "baar"} to="/liba/baar">
         <Users className="h-3.5 w-3.5" />
