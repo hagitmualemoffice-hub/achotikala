@@ -1910,6 +1910,13 @@ const BaarPage = () => {
     }
   }, [view]);
 
+  /* deep link from the daily card email — land straight on the add flow */
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("add") === "1") {
+      setCreateOpen(true);
+    }
+  }, []);
+
   const checkAccess = useCallback(async () => {
     if (sessionLoading) return;
     if (!session) {
