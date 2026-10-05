@@ -1309,7 +1309,7 @@ const CommunityBody = () => {
         mobileContentClassName="max-h-[70vh]"
         desktopContentClassName="max-w-[420px]"
       >
-        <div dir="rtl" className="px-5 pb-8 pt-3">
+        <div dir="rtl" className="popup-scroll px-5 pb-8 pt-3">
           <p className="mb-3 text-[11px] tracking-[0.18em] text-muted-foreground">בחירת מרחב</p>
           <ul className="divide-y divide-border/50">
             <li>
@@ -1391,7 +1391,8 @@ const CommunityBody = () => {
         contentClassName="max-w-[560px]"
       >
         {popupRotating && (
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="popup-scroll">
             {popupRotating.cover_image && (
               <img
                 src={popupRotating.cover_image}
@@ -1406,8 +1407,11 @@ const CommunityBody = () => {
               <p className="mt-3 whitespace-pre-line text-[14.5px] font-light leading-[1.9] text-foreground/80 md:text-[15.5px]">
                 {popupRotating.body}
               </p>
+            </div>
+            </div>
+              <div className="popup-footer px-6 pt-4 md:px-10">
               <Button
-                className="mt-6 w-full rounded-full py-6 text-[15px]"
+                className="h-12 w-full rounded-xl text-[15px]"
                 onClick={() => {
                   setActiveRotatingId(popupRotating.id);
                   setPulseOnly(false);
@@ -1418,7 +1422,7 @@ const CommunityBody = () => {
               >
                 לצפייה ותגובות
               </Button>
-            </div>
+              </div>
           </div>
         )}
       </ResponsiveDialog>

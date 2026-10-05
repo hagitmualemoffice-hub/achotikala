@@ -188,7 +188,7 @@ export default function PulseCheckEditor({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-6 py-5">
+        <div className="popup-scroll space-y-5 px-6 py-5">
           <div className="space-y-1.5">
             <label className="text-[12px] font-light text-muted-foreground">השאלה</label>
             <input
@@ -340,7 +340,7 @@ export default function PulseCheckEditor({
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-border/60 px-6 py-4">
+        <div className="popup-footer flex items-center justify-between px-6 pt-4">
           <button
             onClick={onClose}
             className="text-[13px] font-light text-muted-foreground transition-colors hover:text-foreground"

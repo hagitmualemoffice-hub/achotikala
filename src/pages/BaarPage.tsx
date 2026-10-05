@@ -572,7 +572,7 @@ const BoyDialog = ({
       mobileContentClassName="h-[calc(100dvh-0.75rem)] max-h-[calc(100dvh-0.75rem)]"
       closeOnBackdrop={false}
     >
-      <div dir="rtl" className="space-y-3 overflow-y-auto px-5 pb-24 pt-4 md:px-12 md:pb-10 md:pt-8">
+      <div dir="rtl" className="popup-scroll space-y-3 px-5 pb-24 pt-4 md:px-12 md:pb-10 md:pt-8">
         <div className="pe-10 pt-1 md:pe-0 md:pt-2">
           <p className="text-[11px] text-primary">{editing ? "עריכת פרופיל" : "הוספת בחור לבאר"}</p>
           <SectionTitle>טופס פרטי בחור מומלץ 🥇💙</SectionTitle>
@@ -627,7 +627,7 @@ const BoyDialog = ({
               })}
             </div>
 
-            <FormCard className="fixed inset-x-0 bottom-0 z-[60] flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:shadow-sm">
+            <FormCard className="popup-footer fixed inset-x-0 bottom-0 z-[60] flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:shadow-sm">
               <Button onClick={goToForm} disabled={!allConfirmed} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
                 לשלב הבא
               </Button>
@@ -963,7 +963,7 @@ const BoyDialog = ({
               </FormCard>
             </fieldset>
 
-            <FormCard className="fixed inset-x-0 bottom-0 z-[60] space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
+            <FormCard className="popup-footer fixed inset-x-0 bottom-0 z-[60] space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
               {missing.length > 0 && (
                 <div className="rounded-2xl bg-primary/[0.07] p-3">
                   <p className="text-[12.5px] font-medium text-primary">כמה דברים עוד חסרים:</p>
@@ -1112,7 +1112,7 @@ const ProfileDialog = ({
 
   return (
     <ResponsiveDialog open={!!boyId} onOpenChange={(v) => !v && onClose()} desktopContentClassName="max-w-2xl">
-      <div dir="rtl" className="overflow-y-auto px-5 pb-12 pt-2 md:px-14 md:pt-12">
+      <div dir="rtl" className="popup-scroll px-5 pb-12 pt-2 md:px-14 md:pt-12">
         {loading || !boy ? (
           <div className="py-12 text-center">
             <Loader2 className="mx-auto h-5 w-5 animate-spin text-primary" />
@@ -1713,7 +1713,7 @@ const FilterDrawer = ({
             <SectionTitle>סינון</SectionTitle>
             <Button variant="ghost" size="sm" onClick={() => onChange({ query: filters.query, sort: filters.sort })}>ניקוי</Button>
           </div>
-          <div className="flex-1 space-y-0 overflow-y-auto px-10 md:space-y-6 md:px-14 md:py-8">
+          <div className="popup-scroll space-y-0 px-5 md:space-y-6 md:px-14 md:py-8">
             <div className="border-b border-border/70 py-5 md:border-0 md:py-0">
               <Label text="סטטוס" />
               <div className="flex flex-wrap gap-2">
@@ -1820,7 +1820,7 @@ const FilterDrawer = ({
               <span className="text-[13px] font-light text-foreground">השמורים שלי</span>
             </div>
           </div>
-          <div className="border-t border-border bg-muted/40 p-4 md:bg-background">
+          <div className="popup-footer p-4 pt-4 md:bg-background">
             <Button onClick={() => setOpen(false)} className="h-12 w-full rounded-md text-[15px] md:ms-auto md:h-10 md:w-auto md:rounded-full md:px-6">
               הצגת {" "}תוצאות
             </Button>

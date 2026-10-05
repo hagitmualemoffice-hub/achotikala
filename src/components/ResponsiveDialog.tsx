@@ -85,7 +85,7 @@ export const ResponsiveDialog = ({
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-scroll]:overscroll-contain [&_.popup-footer]:z-10 [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card/95 [&_.popup-footer]:pb-[max(1rem,env(safe-area-inset-bottom))] [&_.popup-footer]:backdrop-blur-md">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-scroll]:overscroll-contain [&_.popup-footer]:sticky [&_.popup-footer]:bottom-0 [&_.popup-footer]:z-10 [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card/95 [&_.popup-footer]:pb-[max(1rem,env(safe-area-inset-bottom))] [&_.popup-footer]:backdrop-blur-md">
               {children}
             </div>
         </div>
