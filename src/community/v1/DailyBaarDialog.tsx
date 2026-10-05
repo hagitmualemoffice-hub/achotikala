@@ -25,6 +25,7 @@ import {
   ORIENTATION_OPTIONS,
   STATUS_OPTIONS,
   suggestBaarUpdate,
+  setBaarProposalContact,
   type BaarBoyProfile,
   type BaarRecommendation,
 } from "@/community/v1/baar";
@@ -66,39 +67,25 @@ const ChoiceButton = ({
   onClick,
   icon,
   title,
-  note,
-  subtle,
   disabled,
 }: {
   onClick: () => void;
   icon: React.ReactNode;
   title: string;
-  note?: string;
-  subtle?: boolean;
   disabled?: boolean;
 }) => (
-  <button
+  <Button
+    variant="outline"
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-start transition-all disabled:opacity-50 ${
-      subtle
-        ? "border-transparent bg-transparent text-muted-foreground hover:bg-muted/50"
-        : "border-primary/25 bg-white hover:border-primary/50 hover:bg-primary/[0.04]"
-    }`}
+    className="h-auto min-h-[112px] w-full flex-col justify-start gap-2 whitespace-normal rounded-2xl border-primary/20 bg-card px-2 py-3 text-center hover:border-primary/50 hover:bg-primary/[0.04] disabled:opacity-50"
   >
-    <span
-      className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
-        subtle ? "bg-muted/70 text-muted-foreground" : "bg-primary/10 text-primary"
-      }`}
-    >
+    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
       {icon}
     </span>
-    <span className="min-w-0 flex-1">
-      <span className={`block text-[14.5px] ${subtle ? "font-light" : "font-normal text-foreground"}`}>{title}</span>
-      {note && <span className="mt-0.5 block text-[11.5px] font-light leading-relaxed text-muted-foreground">{note}</span>}
-    </span>
-  </button>
+    <span className="block text-[12px] font-normal leading-snug text-foreground md:text-[13px]">{title}</span>
+  </Button>
 );
 
 const Field = ({
@@ -237,6 +224,21 @@ const DailyBoyCard = ({
       </div>
     )}
 
+    <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
+      <p className="text-[14px] font-medium text-foreground">איש קשר להצעת ההצעה</p>
+      {boy.proposal_contact_name && boy.proposal_contact_phone && boy.proposal_contact_email ? (
+        <div className="mt-2 space-y-1 text-[13px] font-light text-foreground/80">
+          <p>{boy.proposal_contact_name}</p>
+          <p className="flex flex-wrap gap-x-3 gap-y-1">
+            <a href={`tel:${boy.proposal_contact_phone.replace(/[^\d+]/g, "")}`} className="text-primary hover:opacity-70">{boy.proposal_contact_phone}</a>
+            <a href={`mailto:${boy.proposal_contact_email}`} className="text-primary hover:opacity-70">{boy.proposal_contact_email}</a>
+          </p>
+        </div>
+      ) : (
+        <p className="mt-1 text-[12.5px] font-light text-muted-foreground">עדיין לא נוסף איש קשר להצעה.</p>
+      )}
+    </div>
+
     <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
       <p className="mb-3 text-[15px] font-light text-foreground">
         💗 {boy.recommendation_count} נשים בליבה ממליצות עליו
@@ -263,7 +265,6 @@ type Phase =
   | "maybe"
   | "friend"
   | "info"
-  | "contact"
   | "done"
   | "empty"
   | "filterEmpty"
@@ -293,7 +294,7 @@ export default function DailyBaarDialog({
 
   /* info / contact forms */
   const [infoText, setInfoText] = useState("");
-  const [contact, setContact] = useState({ name: "", phone: "", connection: "", note: "" });
+  const [contact, setContact] = useState({ name: "", phone: "", email: "" });
 
   const reset = () => {
     setPhase("loading");
@@ -303,7 +304,7 @@ export default function DailyBaarDialog({
     setFriendChannel("chat");
     setMessage(DEFAULT_MESSAGE);
     setInfoText("");
-    setContact({ name: "", phone: "", connection: "", note: "" });
+    setContact({ name: "", phone: "", email: "" });
   };
 
   const load = useCallback(async () => {
@@ -441,40 +442,25 @@ export default function DailyBaarDialog({
 
   const sendInfo = async () => {
     if (!pick || pick.status !== "ok") return;
-    if (infoText.trim().length < 5) {
-      toast.error("כתבי בכמה מילים מה יש לך לעדכן");
+    const hasContactDraft = contact.name.trim() || contact.phone.trim() || contact.email.trim();
+    const contactValid = contact.name.trim().length >= 2 && contact.phone.replace(/[^\d]/g, "").length >= 9 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email.trim());
+    if (!hasContactDraft && infoText.trim().length < 5) {
+      toast.error("כתבי מה יש לך להוסיף, או מלאי איש קשר להצעה");
+      return;
+    }
+    if (hasContactDraft && !contactValid) {
+      toast.error("לאיש הקשר צריך למלא שם מלא, טלפון ומייל");
       return;
     }
     setWorking(true);
     try {
-      await suggestBaarUpdate(pick.boy.id, "info", infoText.trim());
-      toast.success("המידע נשמר וממתין למנהלת — תודה 💗");
-      setPhase("done");
-    } catch {
-      toast.error("לא הצלחנו לשמור כרגע");
-    } finally {
-      setWorking(false);
-    }
-  };
-
-  const sendContact = async () => {
-    if (!pick || pick.status !== "ok") return;
-    if (!contact.name.trim() || !contact.phone.trim()) {
-      toast.error("חובה למלא שם וטלפון של איש הקשר");
-      return;
-    }
-    setWorking(true);
-    try {
-      const details = [
-        `איש קשר: ${contact.name.trim()}`,
-        `טלפון: ${contact.phone.trim()}`,
-        contact.connection.trim() ? `הקשר לבחור: ${contact.connection.trim()}` : "",
-        contact.note.trim() ? `הערה: ${contact.note.trim()}` : "",
-      ]
-        .filter(Boolean)
-        .join(" · ");
-      await suggestBaarUpdate(pick.boy.id, "contact", details);
-      toast.success("הפרטים נשמרו וממתינים למנהלת — תודה 💗");
+      if (contactValid) {
+        await setBaarProposalContact(pick.boy.id, contact);
+      }
+      if (infoText.trim().length >= 5) {
+        await suggestBaarUpdate(pick.boy.id, "info", infoText.trim());
+      }
+      toast.success("הפרטים נשמרו בכרטיס — תודה 💗");
       setPhase("done");
     } catch {
       toast.error("לא הצלחנו לשמור כרגע");
@@ -533,7 +519,7 @@ export default function DailyBaarDialog({
         )}
 
         {/* 2 — the card and her five answers */}
-        {(phase === "card" || phase === "maybe" || phase === "friend" || phase === "info" || phase === "contact") && (
+        {(phase === "card" || phase === "maybe" || phase === "friend" || phase === "info") && (
           <div className="flex min-h-0 flex-1 flex-col">
             {phase === "card" && (
               <>
@@ -544,46 +530,37 @@ export default function DailyBaarDialog({
                   </div>
                   <Flower2 className="h-5 w-5 text-primary/50" aria-hidden />
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto pe-1">
+                <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
                 </div>
-                <div className="mt-5 space-y-2 border-t border-border/60 pt-4">
+                <div className="sticky bottom-0 mt-4 border-t border-border/60 bg-background pt-3">
                   <p className="mb-1 text-[12.5px] font-light text-muted-foreground">מה תרצי לעשות?</p>
-                  <ChoiceButton
+                  <div className="grid grid-cols-4 gap-2">
+                    <ChoiceButton
                     onClick={() => void answer("maybe", "maybe")}
                     disabled={working}
                     icon={<Heart className="h-4 w-4 fill-primary/30" />}
                     title="אולי בשבילי 💗"
-                    note="אפשר לפנות ישר למי שהמליצה עליו"
                   />
                   <ChoiceButton
                     onClick={() => void answer("friend", "friend")}
                     disabled={working}
                     icon={<Send className="h-4 w-4" />}
-                    title="חשבתי על מישהי"
-                    note="לשלוח את הכרטיס לחברה — בצ׳אט או במייל"
+                    title="חשבתי על חברה שלי"
                   />
                   <ChoiceButton
                     onClick={() => void answer("info", "info")}
                     disabled={working}
                     icon={<Info className="h-4 w-4" />}
-                    title="יש לי מידע עליו"
-                    note="המידע יישמר אצל המנהלת ולא מתפרסם אוטומטית"
-                  />
-                  <ChoiceButton
-                    onClick={() => void answer("contact", "contact")}
-                    disabled={working}
-                    icon={<UserCircle className="h-4 w-4" />}
-                    title="יש לי איש קשר לבירורים"
-                    note="שם, טלפון ואיך הוא קשור לבחור — נשמר אצל המנהלת"
+                    title="יש לי פרטים להוסיף לכרטיס"
                   />
                   <ChoiceButton
                     onClick={() => void answer("not_now", "done")}
                     disabled={working}
-                    subtle
                     icon={<Flower2 className="h-4 w-4" />}
-                    title="לא הפעם"
+                    title="הפעם לא"
                   />
+                  </div>
                   <Button variant="ghost" onClick={() => onOpenChange(false)} className="w-full text-muted-foreground">
                     רוצה לחשוב עוד
                   </Button>
@@ -749,23 +726,30 @@ export default function DailyBaarDialog({
               </div>
             )}
 
-            {/* יש לי מידע עליו */}
+            {/* פרטים להוספה לכרטיס — איש הקשר להצעה הוא הפרט המרכזי */}
             {phase === "info" && boy && (
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="mb-4">
-                  <p className="text-[11px] text-primary">יש לי מידע עליו</p>
-                  <ScreenTitle>כמה טוב שיש לך מה לעדכן 💗</ScreenTitle>
+                  <p className="text-[11px] text-primary">יש לי פרטים להוסיף לכרטיס</p>
+                  <ScreenTitle>מה תרצי להוסיף? 💗</ScreenTitle>
                   <div className="mt-2">
-                    <ScreenHint>מה שתכתבי יישמר אצל המנהלת ולא מתפרסם אוטומטית בכרטיס.</ScreenHint>
+                    <ScreenHint>הפרט החשוב ביותר הוא איש קשר שיכול לקבל פנייה ולהעביר לבחור את ההצעה.</ScreenHint>
                   </div>
                 </div>
-                <textarea
-                  rows={6}
-                  value={infoText}
-                  onChange={(e) => setInfoText(e.target.value)}
-                  placeholder="מה יש לך לעדכן על הבחור?"
-                  className="w-full flex-1 resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-primary"
-                />
+                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pe-1">
+                  <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
+                    <p className="mb-3 text-[13px] font-medium text-foreground">איש קשר להצעת ההצעה</p>
+                    <div className="space-y-3">
+                      <Field label="שם מלא" value={contact.name} onChange={(v) => setContact((c) => ({ ...c, name: v }))} placeholder="שם איש/אשת הקשר" />
+                      <Field label="טלפון" value={contact.phone} onChange={(v) => setContact((c) => ({ ...c, phone: v }))} placeholder="05X-XXXXXXX" type="tel" />
+                      <Field label="מייל" value={contact.email} onChange={(v) => setContact((c) => ({ ...c, email: v }))} placeholder="name@email.com" type="email" />
+                    </div>
+                  </div>
+                  <label className="block">
+                    <span className="mb-1.5 block text-[13px] text-foreground">פרטים נוספים על הבחור</span>
+                    <textarea rows={4} value={infoText} onChange={(e) => setInfoText(e.target.value)} placeholder="מידע נוסף שחשוב לעדכן בכרטיס" className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-primary" />
+                  </label>
+                </div>
                 <div className="mt-4 flex gap-2 border-t border-border/60 pt-4">
                   <Button variant="ghost" onClick={() => setPhase("card")} className="rounded-full">
                     חזרה
@@ -782,46 +766,6 @@ export default function DailyBaarDialog({
               </div>
             )}
 
-            {/* יש לי איש קשר לבירורים */}
-            {phase === "contact" && boy && (
-              <div className="flex min-h-0 flex-1 flex-col">
-                <div className="mb-4">
-                  <p className="text-[11px] text-primary">יש לי איש קשר לבירורים</p>
-                  <ScreenTitle>שנחבר בין הכרטיס לאנשים 💗</ScreenTitle>
-                  <div className="mt-2">
-                    <ScreenHint>הפרטים יישמרו אצל המנהלת ולא מתפרסמים בכרטיס.</ScreenHint>
-                  </div>
-                </div>
-                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pe-1">
-                  <Field label="שם איש/אשת הקשר" value={contact.name} onChange={(v) => setContact((c) => ({ ...c, name: v }))} placeholder="שם מלא" />
-                  <Field label="טלפון" value={contact.phone} onChange={(v) => setContact((c) => ({ ...c, phone: v }))} placeholder="05X-XXXXXXX" type="tel" />
-                  <Field label="מה הקשר שלו/שלה לבחור" value={contact.connection} onChange={(v) => setContact((c) => ({ ...c, connection: v }))} placeholder="למשל: חבר של המשפחה" />
-                  <label className="block">
-                    <span className="mb-1.5 block text-[13px] text-foreground">הערה</span>
-                    <textarea
-                      rows={3}
-                      value={contact.note}
-                      onChange={(e) => setContact((c) => ({ ...c, note: e.target.value }))}
-                      placeholder="משהו שחשוב שהמנהלת תדע (אופציונלי)"
-                      className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] font-light leading-relaxed outline-none focus:border-primary"
-                    />
-                  </label>
-                </div>
-                <div className="mt-4 flex gap-2 border-t border-border/60 pt-4">
-                  <Button variant="ghost" onClick={() => setPhase("card")} className="rounded-full">
-                    חזרה
-                  </Button>
-                  <Button
-                    onClick={() => void sendContact()}
-                    disabled={working}
-                    className="ms-auto h-12 flex-1 rounded-full bg-primary text-[15px] text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))]"
-                  >
-                    {working && <Loader2 className="h-4 w-4 animate-spin" />}
-                    שמירה
-                  </Button>
-                </div>
-              </div>
-            )}
           </div>
         )}
 

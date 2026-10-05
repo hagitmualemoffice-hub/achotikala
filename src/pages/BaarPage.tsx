@@ -62,6 +62,7 @@ import {
   createBaarBoy,
   toggleBaarSave,
   updateBaarBoy,
+  setBaarProposalContact,
   archiveBaarBoy,
   recommendBaarBoy,
   removeBaarRecommendation,
@@ -288,6 +289,9 @@ const EMPTY_DRAFT = {
   contact_mode: "liba" as "liba" | "profile" | "both",
   contact_phone: "",
   contact_email: "",
+  proposal_contact_name: "",
+  proposal_contact_phone: "",
+  proposal_contact_email: "",
 };
 
 const DRAFT_KEY = "achotikala.baar.boy-draft";
@@ -366,6 +370,9 @@ const BoyDialog = ({
         contact_mode: (editing.my_recommendation?.contact_mode as any) || "liba",
         contact_phone: editing.my_recommendation?.contact_phone ?? profile?.contact_whatsapp ?? "",
         contact_email: editing.my_recommendation?.contact_email ?? profile?.contact_email ?? "",
+        proposal_contact_name: editing.proposal_contact_name ?? "",
+        proposal_contact_phone: editing.proposal_contact_phone ?? "",
+        proposal_contact_email: editing.proposal_contact_email ?? "",
       });
       setSimilar([]);
     } else {
@@ -462,6 +469,10 @@ const BoyDialog = ({
   const phone = draft.contact_phone.trim();
   const email = draft.contact_email.trim();
   const contactValid = phone.replace(/[^\d]/g, "").length >= 9 || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const proposalContactValid =
+    draft.proposal_contact_name.trim().length >= 2 &&
+    draft.proposal_contact_phone.replace(/[^\d]/g, "").length >= 9 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.proposal_contact_email.trim());
 
   /** editing someone else's boy: her own recommendation is optional */
   const editOnly = !!editing && !editing.my_recommendation;
@@ -476,6 +487,7 @@ const BoyDialog = ({
     detailsShort ? `פרטים על הבחור (עוד ${DETAILS_MIN - detailsLen} תווים לפחות)` : "",
     draft.has_photo || editOnly ? "" : "אם יש תמונה שלו",
     contactValid || editOnly ? "" : "טלפון או מייל שאפשר לפנות אלייך",
+    proposalContactValid ? "" : "שם מלא, טלפון ומייל של איש הקשר להצעה",
   ].filter(Boolean);
 
 
@@ -511,6 +523,11 @@ const BoyDialog = ({
       };
       if (editing) {
         await updateBaarBoy(editing.id, payload);
+        await setBaarProposalContact(editing.id, {
+          name: draft.proposal_contact_name,
+          phone: draft.proposal_contact_phone,
+          email: draft.proposal_contact_email,
+        });
         if (!editOnly || (payload.relationship_type && contactValid)) await recommendBaarBoy(
           editing.id,
           payload.relationship_type,
@@ -521,7 +538,12 @@ const BoyDialog = ({
         toast.success("הפרופיל עודכן");
         onOpenChange(false);
       } else {
-        await createBaarBoy(payload);
+        const boyId = await createBaarBoy(payload);
+        await setBaarProposalContact(boyId, {
+          name: draft.proposal_contact_name,
+          phone: draft.proposal_contact_phone,
+          email: draft.proposal_contact_email,
+        });
         clearSavedDraft();
         setDone(true);
       }
@@ -871,6 +893,35 @@ const BoyDialog = ({
               </FormCard>
 
               <FormCard>
+                <Label text="איש קשר להצעת ההצעה" required />
+                <p className="mb-3 text-[12px] font-light leading-relaxed text-muted-foreground">
+                  מי יכולה לקבל פנייה ולהעביר לבחור את ההצעה? הפרטים יוצגו בכרטיס כדי שיהיה ברור למי לפנות.
+                </p>
+                <div className="grid gap-2 md:grid-cols-2">
+                  <input
+                    value={draft.proposal_contact_name}
+                    onChange={(e) => set("proposal_contact_name", e.target.value)}
+                    placeholder="שם מלא"
+                    className="md:col-span-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-[15px] outline-none focus:border-primary"
+                  />
+                  <input
+                    value={draft.proposal_contact_phone}
+                    onChange={(e) => set("proposal_contact_phone", e.target.value)}
+                    placeholder="טלפון"
+                    inputMode="tel"
+                    className={inputCls}
+                  />
+                  <input
+                    value={draft.proposal_contact_email}
+                    onChange={(e) => set("proposal_contact_email", e.target.value)}
+                    placeholder="כתובת מייל"
+                    inputMode="email"
+                    className={inputCls}
+                  />
+                </div>
+              </FormCard>
+
+              <FormCard>
                 <Label text="איך אפשר לפנות אלייך לבירור?" />
                 <div className="flex flex-wrap gap-2">
                   <Choice selected={draft.contact_mode === "liba"} onClick={() => set("contact_mode", "liba")}>
@@ -1182,6 +1233,23 @@ const ProfileDialog = ({
                 </p>
               </div>
             )}
+
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
+              <p className="text-[14px] font-medium text-foreground">איש קשר להצעת ההצעה</p>
+              {boy.proposal_contact_name && boy.proposal_contact_phone && boy.proposal_contact_email ? (
+                <div className="mt-2 space-y-1 text-[13px] font-light text-foreground/80">
+                  <p>{boy.proposal_contact_name}</p>
+                  <p className="flex flex-wrap gap-x-3 gap-y-1">
+                    <a href={`tel:${boy.proposal_contact_phone.replace(/[^\d+]/g, "")}`} className="text-primary hover:opacity-70">{boy.proposal_contact_phone}</a>
+                    <a href={`mailto:${boy.proposal_contact_email}`} className="text-primary hover:opacity-70">{boy.proposal_contact_email}</a>
+                  </p>
+                </div>
+              ) : (
+                <Button type="button" variant="link" onClick={() => onEdit(boy)} className="mt-2 h-auto p-0 text-[12.5px] text-primary">
+                  עדיין חסרים פרטים — להוספת איש קשר
+                </Button>
+              )}
+            </div>
 
             <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
               <div className="mb-3">
