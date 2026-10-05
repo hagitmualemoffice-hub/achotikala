@@ -672,6 +672,8 @@ export default function AccountSettings({
                 />
               ))}
             </div>
+
+            <DailyBaarSettings />
           </section>
         )}
 
