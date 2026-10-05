@@ -2146,7 +2146,7 @@ const BaarPage = () => {
   const profile = bootTyped.profile;
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0">
+    <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0 lg:pl-[250px]">
       <LibaTopBar
         active="baar"
         actions={

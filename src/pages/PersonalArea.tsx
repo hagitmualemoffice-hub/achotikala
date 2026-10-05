@@ -86,7 +86,7 @@ const Shell = ({
   me?: { displayName: string; avatarUrl?: string | null };
   isAdmin?: boolean;
 }) => (
-  <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0">
+  <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0 lg:pl-[250px]">
     {/* the same ליבה bar as everywhere else */}
     <LibaTopBar
       active="sheli"
