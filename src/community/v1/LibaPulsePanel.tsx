@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone } from "lucide-react";
+import { CalendarDays, ArrowLeft, HandHeart, Clock3, Flame, Megaphone, Flower2, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInquiries, isInquiryNew, type Inquiry } from "./inquiries";
 import { HelpDialog } from "./InquiriesPage";
@@ -101,6 +101,8 @@ export default function LibaPulsePanel({
   onOpenInquiries,
   onOpenTalking,
   onOpenSince,
+  onOpenDaily,
+  onOpenDailySettings,
 }: {
   events?: CommunityEvent[];
   since?: { key: string; text: string }[];
@@ -111,6 +113,8 @@ export default function LibaPulsePanel({
   onOpenInquiries: (name?: string) => void;
   onOpenTalking?: (space: SpaceId, title: string) => void;
   onOpenSince?: (key: string) => void;
+  onOpenDaily?: () => void;
+  onOpenDailySettings?: () => void;
 }) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [helpInquiry, setHelpInquiry] = useState<Inquiry | null>(null);
@@ -156,6 +160,36 @@ export default function LibaPulsePanel({
   return (
     <div id="quick-look" className="mt-8 scroll-mt-24 divide-y divide-border/40 lg:mt-0">
       <h2 className="pb-1 text-[17px] font-medium text-foreground lg:hidden">מבט זריז</h2>
+      {/* ---------------------------- ההשתדלות היומית ---------------------------- */}
+      {(onOpenDaily || onOpenDailySettings) && (
+        <section className="py-5">
+          <SectionTitle
+            icon={<Flower2 className="h-4 w-4 text-primary" />}
+            title="ההשתדלות היומית"
+            sub="רגע קטן ואישי שמחכה לך בכל יום"
+          />
+          <div className="space-y-2">
+            {onOpenDaily && (
+              <button
+                onClick={onOpenDaily}
+                className="flex w-full items-center gap-2.5 rounded-xl border border-primary/20 bg-primary/[0.04] p-3 text-right transition-colors hover:bg-primary/[0.08]"
+              >
+                <Flower2 className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-[13.5px] font-medium text-foreground">לבחור היומי שלי</span>
+              </button>
+            )}
+            {onOpenDailySettings && (
+              <button
+                onClick={onOpenDailySettings}
+                className="flex w-full items-center gap-2.5 rounded-xl border border-border/60 p-3 text-right transition-colors hover:bg-muted/60"
+              >
+                <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <span className="text-[13px] font-light text-foreground">ניהול ההעדפות שלי</span>
+              </button>
+            )}
+          </div>
+        </section>
+      )}
       {/* ---------------------------- הודעות מערכת ---------------------------- */}
       {notices.length > 0 && (
         <section className="py-5">

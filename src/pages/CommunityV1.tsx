@@ -1062,6 +1062,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
+            onOpenDaily={() => setDailyOpen(true)}
+            onOpenDailySettings={() => setSettingsOpen(true)}
           />
         </div>
 
@@ -1088,6 +1090,8 @@ const CommunityBody = () => {
               feedTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
             onOpenSince={openSinceItem}
+            onOpenDaily={() => setDailyOpen(true)}
+            onOpenDailySettings={() => setSettingsOpen(true)}
           />
 
 
