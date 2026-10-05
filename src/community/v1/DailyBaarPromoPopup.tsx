@@ -46,7 +46,7 @@ export default function DailyBaarPromoPopup() {
             <Flower2 className="h-6 w-6" />
           </div>
           <h2 className="mt-4 text-[22px] font-light text-foreground">
-            חדש בבאר: ההשתדלות היומית 💛
+             חדש בבאר: ההשתדלות היומית 💗
           </h2>
           <p className="mt-3 text-[14.5px] font-light leading-relaxed text-muted-foreground">
             בכל יום מחכה לך בבאר כרטיס של בחור אחד — רגע קטן ואישי: להכיר, להמליץ,
