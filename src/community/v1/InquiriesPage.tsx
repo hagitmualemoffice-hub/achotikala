@@ -318,7 +318,7 @@ const InquiryCard = ({ inquiry, compact, onHelp, onThreads, onEdit, onChanged, o
     <Button variant="ghost" size="sm" onClick={onThreads} className={inquiry.help_count ? "gap-1 text-primary" : "gap-1 text-muted-foreground"}><Hand className="h-4 w-4"/>{inquiry.help_count}</Button>
     {!inquiry.mine && inquiry.status === "open" && <Button variant={inquiry.my_offer ? "default" : "outline"} size="sm" onClick={onHelp} className={`rounded-full ${inquiry.my_offer ? "" : "border-primary bg-card text-primary hover:bg-primary/5 hover:text-primary"}`}><HandHeart className="h-4 w-4"/>{inquiry.my_offer ? "עדכון העזרה" : "אני מכירה"}</Button>}
   </article>;
-  return <article className="relative mx-auto flex min-h-[270px] w-full max-w-none flex-col rounded-3xl border border-border/80 bg-card/90 px-5 pb-4 pt-10 text-center shadow-[var(--shadow-soft)] md:mx-0 md:max-w-[280px]">
+  return <article className="relative mx-auto flex min-h-[270px] w-full max-w-[320px] flex-col rounded-3xl border border-border/80 bg-card/90 px-5 pb-4 pt-10 text-center shadow-[var(--shadow-soft)] md:mx-0 md:max-w-none">
     {(inquiry.mine || inquiry.can_moderate) && <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="absolute left-3 top-3 h-8 w-8 text-muted-foreground" aria-label="פעולות בבירור"><MoreHorizontal className="h-4 w-4"/></Button></DropdownMenuTrigger><DropdownMenuContent align="start" className="direction-rtl text-right">
       {inquiry.mine && <DropdownMenuItem onSelect={onEdit}><Pencil className="ml-2 h-4 w-4"/>עריכה</DropdownMenuItem>}
       {inquiry.status === "open" && <DropdownMenuItem onSelect={() => void setStatus("resolved")}><CheckCircle2 className="ml-2 h-4 w-4"/>סימון כנפתר</DropdownMenuItem>}
