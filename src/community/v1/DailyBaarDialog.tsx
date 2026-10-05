@@ -128,13 +128,11 @@ const Field = ({
 
 /* --------------------------------- the card --------------------------------- */
 
-const TagChip = ({ children }: { children: string }) => {
-  const tone =
-    STATUS_OPTIONS.find((o) => o.value === children)?.value === children
-      ? "bg-[hsl(var(--tag-lilac-bg))] text-[hsl(var(--tag-lilac))]"
-      : "bg-[hsl(var(--tag-neutral-bg))] text-[hsl(var(--tag-neutral))]";
-  return <span className={`rounded-full px-2.5 py-1 text-[11.5px] font-medium ${tone}`}>{children}</span>;
-};
+const TagChip = ({ children }: { children: string }) => (
+  <span className="rounded-full bg-[hsl(var(--tag-neutral-bg))] px-2.5 py-1 text-[11.5px] font-medium text-[hsl(var(--tag-neutral))]">
+    {children}
+  </span>
+);
 
 const RecommendationLine = ({
   rec,
