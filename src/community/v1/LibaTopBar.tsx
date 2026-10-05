@@ -26,18 +26,58 @@ const NewBadge = ({ count }: { count: number }) =>
 
 export type LibaSection = "forum" | "messages" | "baar" | "mekomot" | "birurim" | "dirot" | "sheli" | null;
 
-const linkClass = (on: boolean) =>
-  `hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors md:inline-flex ${
-    on
-      ? "bg-[hsl(var(--primary)/0.12)] font-normal text-primary"
-      : "font-light text-foreground hover:bg-primary/[0.08] hover:text-primary"
-  }`;
-
-/** the same links, phone size */
-const mobileClass = (on: boolean) =>
-  `inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-colors ${
-    on ? "bg-[hsl(var(--primary)/0.12)] font-medium text-primary" : "font-light text-foreground/85"
-  }`;
+/**
+ * A desktop nav item in the quiet reference style: plain label on white, a
+ * faint gray pill while it is the area she is in, and a pink bar resting on
+ * the bar's bottom border — always under the current item, and under any
+ * other item the moment she hovers it, with the text turning pink too.
+ */
+const BarLink = ({
+  on,
+  to,
+  onClick,
+  children,
+}: {
+  on: boolean;
+  to?: string;
+  onClick?: () => void;
+  children: ReactNode;
+}) => {
+  const cls = "group relative hidden h-full items-center px-1 md:inline-flex";
+  const inner = (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors ${
+        on
+          ? "bg-muted/70 font-normal text-primary"
+          : "font-light text-foreground group-hover:text-primary"
+      }`}
+    >
+      {children}
+    </span>
+  );
+  const underline = (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-x-1 bottom-0 h-[3px] rounded-full bg-primary transition-opacity duration-200 ${
+        on ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      }`}
+    />
+  );
+  if (to) {
+    return (
+      <Link to={to} className={cls}>
+        {inner}
+        {underline}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className={cls}>
+      {inner}
+      {underline}
+    </button>
+  );
+};
 
 const LibaTopBar = ({
   active = null,
@@ -77,37 +117,36 @@ const LibaTopBar = ({
       </Link>
       <span className="hidden h-5 w-px bg-border md:block" />
 
-      <Link to="/liba" className={linkClass(active === "forum")}>
-         המרחב 
-      </Link>
-      <Link to="/liba/baar" className={linkClass(active === "baar")}>
+      <BarLink on={active === "forum"} to="/liba">
+        המרחב
+      </BarLink>
+      <BarLink on={active === "baar"} to="/liba/baar">
         <Users className="h-3.5 w-3.5" />
         הבאר
         <NewBadge count={badge("baar")} />
-      </Link>
-      <Link to="/liba/mekomot" className={linkClass(active === "mekomot")}>
+      </BarLink>
+      <BarLink on={active === "mekomot"} to="/liba/mekomot">
         <MapPin className="h-3.5 w-3.5" />
         ליד הבאר
-
-      </Link>
+      </BarLink>
       {onBirurim ? (
-        <button onClick={onBirurim} className={linkClass(active === "birurim")}>
+        <BarLink on={active === "birurim"} onClick={onBirurim}>
           <MessageSquareQuote className="h-3.5 w-3.5" />
           בירורים
           <NewBadge count={badge("birurim")} />
-        </button>
+        </BarLink>
       ) : (
-        <Link to="/liba?birurim=1" className={linkClass(active === "birurim")}>
+        <BarLink on={active === "birurim"} to="/liba?birurim=1">
           <MessageSquareQuote className="h-3.5 w-3.5" />
           בירורים
           <NewBadge count={badge("birurim")} />
-        </Link>
+        </BarLink>
       )}
-      <Link to="/liba/dirot" className={linkClass(active === "dirot")}>
+      <BarLink on={active === "dirot"} to="/liba/dirot">
         <Building2 className="h-3.5 w-3.5" />
         דירות
         <NewBadge count={badge("dirot")} />
-      </Link>
+      </BarLink>
 
       {actions}
     </div>
