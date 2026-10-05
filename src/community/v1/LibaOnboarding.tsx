@@ -449,7 +449,7 @@ const LibaOnboarding = ({
     >
       <div
         dir="rtl"
-        className="max-h-[calc(92vh-1.5rem)] animate-in fade-in overflow-y-auto px-5 pb-0 pt-4 duration-300 md:max-h-[88vh] md:px-12 md:pb-10 md:pt-10"
+        className="popup-scroll animate-in fade-in px-5 pb-6 pt-4 duration-300 md:px-12 md:pb-10 md:pt-10"
       >
         {/* 0 — פתיחה */}
         {step === 0 && (

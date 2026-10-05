@@ -142,7 +142,7 @@ const CreateDialog = ({ open, onOpenChange, profile, editing, onSaved }: { open:
     } catch { toast.error(editing ? "לא הצלחנו לעדכן את הבירור" : "לא הצלחנו לפרסם את הבירור"); } finally { setSaving(false); }
   };
   return <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-xl">
-    <div dir="rtl" className="overflow-y-auto px-8 pb-10 pt-6 md:px-12 md:pt-10">
+    <div dir="rtl" className="popup-scroll px-8 pb-10 pt-6 md:px-12 md:pt-10">
        <div className="mb-6"><p className="text-[11px] text-primary">{editing ? "עריכת בירור" : "פתיחת בירור"}</p><h2 className="mt-1 text-[22px] font-light text-foreground">את מי תרצי לברר?</h2></div>
       <div className="space-y-5">
         <label className="block"><span className="mb-1.5 block text-[13px] text-foreground">שם מלא *</span><input autoFocus value={draft.boy_name} maxLength={100} onChange={(e) => set("boy_name", e.target.value)} placeholder="שם הבחור" className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-[15px] outline-none focus:border-primary" /></label>
@@ -215,7 +215,7 @@ const ThreadsDialog = ({ inquiry, open, onOpenChange }: { inquiry: Inquiry | nul
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-xl">
-      <div dir="rtl" className="overflow-y-auto px-8 pb-10 pt-6 md:px-12 md:pt-10">
+      <div dir="rtl" className="popup-scroll px-8 pb-10 pt-6 md:px-12 md:pt-10">
         <h2 className="text-[21px] font-light">העזרה לבירור על {inquiry?.boy_name}</h2>
         {loading ? (
           <Loader2 className="mx-auto my-12 h-5 w-5 animate-spin text-primary" />
@@ -381,11 +381,11 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
     <ResponsiveDialog open={filtersOpen} onOpenChange={setFiltersOpen} mobileContentClassName="h-[78vh]">
       <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
         <div className="flex items-center justify-between border-b border-border px-5 py-4"><h2 className="text-lg font-medium">סינון</h2><Button variant="ghost" size="sm" onClick={()=>{setBackground("all");setHelpStatus("all")}}>ניקוי</Button></div>
-        <div className="flex-1 overflow-y-auto px-5">
+        <div className="popup-scroll px-5">
           <div className="border-b border-border/70 py-5"><p className="mb-3 text-sm">מי מחכה לעזרה?</p><div className="flex flex-wrap gap-2"><Choice selected={helpStatus==="all"} onClick={()=>setHelpStatus("all")}>כל הבירורים</Choice><Choice selected={helpStatus==="waiting"} onClick={()=>setHelpStatus("waiting")}>מחכות לעזרה</Choice></div></div>
           <div className="border-b border-border/70 py-5"><p className="mb-3 text-sm">עדה</p><div className="flex flex-wrap gap-2"><Choice selected={background==="all"} onClick={()=>setBackground("all")}>הכול</Choice><Choice selected={background==="ashkenazi"} onClick={()=>setBackground("ashkenazi")}>אשכנזים</Choice><Choice selected={background==="sephardi"} onClick={()=>setBackground("sephardi")}>ספרדים</Choice></div></div>
         </div>
-        <div className="border-t border-border bg-muted/40 p-4"><Button onClick={()=>setFiltersOpen(false)} className="h-12 w-full rounded-md">הצגת תוצאות</Button></div>
+        <div className="popup-footer p-4 pt-4"><Button onClick={()=>setFiltersOpen(false)} className="h-12 w-full rounded-xl">הצגת תוצאות</Button></div>
       </div>
     </ResponsiveDialog>
     {loading?<p className="flex justify-center py-16 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin"/></p>:items.length===0?(query||background!=="all"||helpStatus!=="all"?<EmptyState icon={CircleHelp} title="לא מצאנו בירור שמתאים לחיפוש הזה" description="אפשר לנקות את החיפוש והסינונים ולראות את כל הבירורים הפתוחים." action={{label:"ניקוי חיפוש וסינונים",onClick:()=>{setQuery("");setBackground("all");setHelpStatus("all")}}}/>:<EmptyState icon={CircleHelp} title="אין כרגע בירורים פתוחים" description="בירור הוא בקשה לעזרה בבדיקה על בחור. אם את מחפשת מידע — אפשר לפתוח בירור והקהילה תנסה לעזור." action={{label:"פתיחת בירור",onClick:()=>{setEditing(null);setCreateOpen(true)}}}/>):<div className={view==="cards"?"grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fill,minmax(230px,280px))] md:justify-start":"divide-y divide-border/60"}>{items.map((q)=><InquiryCard key={q.id} inquiry={q} compact={view==="list"} onHelp={()=>setHelping(q)} onThreads={()=>setThreading(q)} onEdit={()=>{setEditing(q);setCreateOpen(true)}} onChanged={patch} onRemoved={()=>setItems((xs)=>xs.filter((x)=>x.id!==q.id))}/>)}</div>}

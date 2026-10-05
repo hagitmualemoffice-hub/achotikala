@@ -1,3 +1,4 @@
 - Keep Daily Baar selection and personal filters in authenticated database functions; this protects access and makes the same assigned card consistent across devices.
 - Store each boy's proposal contact on the boy record and update it through an authenticated Baar RPC; this keeps one shared contact visible across Baar and Daily Baar.
 - Keep automatic popup cadence separate from manual card access; muting reminders must never hide an already assigned card.
+- Route Liba modal experiences through the shared responsive dialog shell so mobile drawers keep one stable top, scrolling body, and sticky action region.

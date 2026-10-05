@@ -458,7 +458,7 @@ export default function DailyBaarDialog({
       desktopContentClassName="max-w-xl"
       mobileContentClassName="h-[92dvh] max-h-[92dvh]"
     >
-      <div dir="rtl" className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pb-10 pt-7 md:px-10">
+      <div dir="rtl" className="popup-scroll flex min-h-0 flex-1 flex-col px-6 pb-0 pt-7 md:px-10">
         {phase === "loading" && (
           <div className="grid flex-1 place-items-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -500,7 +500,7 @@ export default function DailyBaarDialog({
                 <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
                 </div>
-                <div className="sticky bottom-0 mt-4 border-t border-border/60 bg-background pt-3">
+                <div className="popup-footer mt-4 -mx-6 px-6 pt-3 md:-mx-10 md:px-10">
                   <p className="mb-1 text-[12.5px] font-light text-muted-foreground">על מה את חושבת?</p>
                   <div className="grid grid-cols-4 gap-2">
                     <ChoiceButton
@@ -685,7 +685,7 @@ export default function DailyBaarDialog({
                   </label>
                 </div>
 
-                <div className="mt-4 flex gap-2 border-t border-border/60 pt-4">
+                <div className="popup-footer -mx-6 mt-4 flex gap-2 px-6 pt-4 md:-mx-10 md:px-10">
                   <Button variant="ghost" onClick={() => setPhase("card")} className="rounded-full">
                     חזרה
                   </Button>
@@ -725,7 +725,7 @@ export default function DailyBaarDialog({
                     <textarea rows={4} value={infoText} onChange={(e) => setInfoText(e.target.value)} placeholder="מידע נוסף שחשוב לעדכן בכרטיס" className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-primary" />
                   </label>
                 </div>
-                <div className="mt-4 flex gap-2 border-t border-border/60 pt-4">
+                <div className="popup-footer -mx-6 mt-4 flex gap-2 px-6 pt-4 md:-mx-10 md:px-10">
                   <Button variant="ghost" onClick={() => setPhase("card")} className="rounded-full">
                     חזרה
                   </Button>

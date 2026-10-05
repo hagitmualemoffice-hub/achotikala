@@ -28,7 +28,8 @@ export default function EventDetailsDialog({
   return (
     <ResponsiveDialog open={!!event} onOpenChange={(v) => !v && onClose()} desktopContentClassName="max-w-xl">
       {event && (
-        <div dir="rtl" className="overflow-y-auto text-right">
+        <div dir="rtl" className="flex min-h-0 flex-1 flex-col text-right">
+          <div className="popup-scroll">
           {event.image && (
             <img src={event.image} alt={event.title} className="max-h-[42vh] w-full bg-muted object-contain" />
           )}
@@ -96,14 +97,18 @@ export default function EventDetailsDialog({
               </div>
             )}
 
-            {isSaveTheDate && !event.registration?.url ? (
+            {isSaveTheDate && !event.registration?.url && (
               <p className="rounded-xl border border-dashed border-primary/30 bg-accent/40 p-4 text-center text-sm text-foreground/70">
                 פרטים והרשמה בקרוב — שמרו את התאריך ביומן 💌
               </p>
-            ) : (
-              <RegistrationButton event={event} />
             )}
           </div>
+          </div>
+          {(!isSaveTheDate || event.registration?.url) && (
+            <div className="popup-footer px-6 pt-4 md:px-10">
+              <RegistrationButton event={event} />
+            </div>
+          )}
         </div>
       )}
     </ResponsiveDialog>

@@ -67,25 +67,25 @@ export const ResponsiveDialog = ({
           aria-label="פתיחה"
           dir="rtl"
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[92dvh] flex-col overflow-hidden rounded-t-[28px] bg-card shadow-[var(--shadow-card)] animate-in slide-in-from-bottom-6 fade-in-0 duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none",
+            "fixed inset-x-0 bottom-0 z-50 flex h-auto max-h-[94dvh] flex-col overflow-hidden rounded-t-[24px] border-x border-t border-border/60 bg-card shadow-[0_-18px_55px_-24px_hsl(var(--foreground)_/_0.32)] animate-in slide-in-from-bottom-6 fade-in-0 duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none",
             contentClassName,
             mobileContentClassName,
           )}
         >
-            <div className="relative shrink-0">
-              <div className="mx-auto mt-2.5 mb-1 h-1.5 w-12 rounded-full bg-muted" />
+            <div className="relative z-20 h-12 shrink-0 border-b border-border/50 bg-card/95 backdrop-blur-md">
+              <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted-foreground/25" />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
                 onClick={() => onOpenChange(false)}
                 aria-label="סגירה"
-                className="absolute left-3 top-1 grid h-8 w-8 place-items-center rounded-full bg-muted/70 text-muted-foreground transition-colors active:bg-muted"
+                className="absolute left-3 top-2 grid h-8 w-8 place-items-center rounded-full bg-muted/80 text-foreground transition-colors active:bg-muted"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-scroll]:overscroll-contain [&_.popup-footer]:sticky [&_.popup-footer]:bottom-0 [&_.popup-footer]:z-10 [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card/95 [&_.popup-footer]:pb-[max(1rem,env(safe-area-inset-bottom))] [&_.popup-footer]:backdrop-blur-md">
               {children}
             </div>
         </div>
@@ -99,7 +99,7 @@ export const ResponsiveDialog = ({
       <DialogContent
         dir="rtl"
         className={cn(
-          "max-w-[820px] p-0 overflow-hidden rounded-[32px] border-0 bg-card shadow-[0_32px_64px_-16px_hsl(0_0%_0%_/_0.18)] max-h-[92vh] flex flex-col gap-0",
+          "max-w-[820px] p-0 overflow-hidden rounded-[24px] border border-border/60 bg-card shadow-[0_32px_64px_-16px_hsl(var(--foreground)_/_0.18)] max-h-[92vh] flex flex-col gap-0 [&_.popup-scroll]:min-h-0 [&_.popup-scroll]:flex-1 [&_.popup-scroll]:overflow-y-auto [&_.popup-footer]:shrink-0 [&_.popup-footer]:border-t [&_.popup-footer]:border-border/60 [&_.popup-footer]:bg-card",
           hideCloseButton && "[&>button]:hidden",
           contentClassName,
           desktopContentClassName,
