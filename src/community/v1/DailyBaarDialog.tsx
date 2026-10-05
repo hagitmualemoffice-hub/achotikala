@@ -492,13 +492,10 @@ export default function DailyBaarDialog({
               <PetalsRow />
             </div>
             <ScreenTitle>ההשתדלות שלך להיום 💗</ScreenTitle>
-            <div className="mt-4 max-w-sm space-y-2">
-              <ScreenHint>
-                 מחכה לך כאן כרטיס אחד — בחור אחד, שנבחר בזהירות ובכוונה. אפשר להסתכל בנחת, לעשות עליו חשבון,
-                ולבחור מה לעשות עם זה.
-              </ScreenHint>
-              <p className="text-[12px] font-light leading-relaxed text-muted-foreground/80">
-                הכרטיס נבחר במיוחד בשבילך — ולא יוצג לך שוב.
+            <div className="mt-4 max-w-sm space-y-3">
+              <ScreenHint>אולי בשבילך. אולי בשביל מישהי שאת מכירה.</ScreenHint>
+              <p className="text-[13px] font-light leading-relaxed text-muted-foreground">
+                כרטיס אחד, כמה דקות, והזדמנות לעשות היום השתדלות קטנה.
               </p>
             </div>
             <Button
@@ -507,13 +504,13 @@ export default function DailyBaarDialog({
               className="mt-8 h-12 w-full max-w-xs rounded-full bg-primary text-[15px] text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))]"
             >
               {working ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className="h-4 w-4 fill-primary-foreground/30" />}
-              לפתיחת הכרטיס
+              בואי נראה מי מחכה לך
             </Button>
             <button
               onClick={() => onOpenChange(false)}
               className="mt-4 text-[12.5px] font-light text-muted-foreground transition-colors hover:text-foreground"
             >
-              אולי אחר כך — יחכה לך גם היום
+              לא עכשיו? הכרטיס יחכה לך כאן להמשך היום.
             </button>
           </div>
         )}
