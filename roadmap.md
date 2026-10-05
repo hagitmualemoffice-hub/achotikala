@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Refine Daily Baar: pink hearts, replayable card and thinking option, dedicated settings, age range, and every-other-day default popup.
+- [x] Refine Daily Baar: pink hearts, replayable card and thinking option, dedicated settings, age range, and every-other-day default popup.
 
 - [x] Move all emoji choices into the reactions panel.
 - [x] Keep mobile feed titles on one line.
