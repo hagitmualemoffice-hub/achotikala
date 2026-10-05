@@ -37,6 +37,10 @@ export const ResponsiveDialog = ({
   children,
 }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile();
+  const openedAt = React.useRef(0);
+  React.useEffect(() => {
+    if (open) openedAt.current = Date.now();
+  }, [open]);
 
   React.useEffect(() => {
     if (!isMobile || !open) return;
@@ -58,7 +62,11 @@ export const ResponsiveDialog = ({
       <div className="fixed inset-0 z-50" role="presentation">
         <div
           className="absolute inset-0 bg-foreground/50 backdrop-blur-[2px] animate-in fade-in-0 duration-300 motion-reduce:animate-none"
-          onClick={() => closeOnBackdrop && onOpenChange(false)}
+          onClick={() => {
+            // ignore the tap that opened the drawer landing on the backdrop
+            if (Date.now() - openedAt.current < 450) return;
+            if (closeOnBackdrop) onOpenChange(false);
+          }}
           aria-hidden="true"
         />
         <div
