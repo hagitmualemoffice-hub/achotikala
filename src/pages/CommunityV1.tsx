@@ -1212,7 +1212,13 @@ const CommunityBody = () => {
       <NewEventPopup />
       <DailyBaarPromoPopup />
       <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />
-      <DailyBaarPreferences open={dailyPreferencesOpen} onOpenChange={setDailyPreferencesOpen} />
+      <DailyBaarPreferences
+        open={dailyPreferencesOpen}
+        onOpenChange={(v) => {
+          setDailyPreferencesOpen(v);
+          if (!v) fetchDailyState().then((st) => setDailyHidden(!!st.hidden)).catch(() => undefined);
+        }}
+      />
       <Composer
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
