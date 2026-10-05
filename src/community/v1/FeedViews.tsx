@@ -476,7 +476,7 @@ export const CompactRow = ({
   const hasImage = !!imageAttachment(post);
 
   return (
-    <div className="border-b border-border/50 px-1 py-2.5 text-right md:flex md:flex-nowrap md:items-center md:gap-x-3 md:gap-y-1.5 md:px-2">
+    <div className="border-b border-border/50 px-2 py-3 text-right transition-colors last:border-b-0 hover:bg-muted/25 md:grid md:min-h-[72px] md:grid-cols-[minmax(260px,1fr)_auto_54px_minmax(76px,auto)_76px] md:items-center md:gap-x-4 md:px-3 md:py-2.5">
       {/* on the phone the whole row opens the discussion, not only the title */}
       <div
         role="button"
@@ -530,15 +530,15 @@ export const CompactRow = ({
         </span>
       </div>
 
-      <button onClick={onOpen} className="hidden min-w-0 flex-1 text-start md:block">
-        <span className="flex items-center gap-2">
+      <button onClick={onOpen} className="hidden min-w-0 text-start md:block">
+        <span className="flex min-w-0 items-center gap-2">
           {post.pinned && <Pin className="h-3 w-3 shrink-0 text-muted-foreground" />}
-          <span className="min-w-0 truncate text-[14.5px] font-semibold text-foreground">
+          <span className="min-w-0 truncate text-[15px] font-semibold leading-snug text-foreground transition-colors hover:text-primary">
             {postTitle(post)}
           </span>
           {hasImage && <ImageIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />}
         </span>
-        <span className="mt-1 flex flex-nowrap items-center gap-2 text-[12px]">
+        <span className="mt-1.5 flex min-w-0 flex-nowrap items-center gap-2 text-[11.5px]">
           <MemberAvatar
             name={post.author.name}
             seed={post.author.seed ?? post.author.user_id}
@@ -565,31 +565,22 @@ export const CompactRow = ({
             </span>
           </MemberHover>
           <SpaceChip space={space} />
-          {preview && (
-            <span className="hidden min-w-0 truncate font-light text-muted-foreground sm:inline">
-              {preview}
-            </span>
-          )}
+          {preview && <span className="min-w-0 truncate font-light text-muted-foreground">{preview}</span>}
         </span>
       </button>
 
-      <span className="hidden md:inline-flex">
+      <span className="hidden items-center justify-center md:inline-flex">
         <PostActions post={post} onEdit={onEdit ?? onOpen} onDeleted={onDeleted} compact />
-      </span>
-
-
-
-      <span className="hidden md:inline-flex">
         <ReactionRow map={post.reactions} dense />
       </span>
 
-      <span className="hidden shrink-0 items-center gap-1 text-[12px] font-light tabular-nums text-muted-foreground md:inline-flex">
+      <span className="hidden shrink-0 items-center justify-center gap-1 text-[12px] font-light tabular-nums text-muted-foreground md:inline-flex">
         <MessageCircle className="h-3.5 w-3.5" />
         {post.comment_count}
       </span>
 
       {commenters(post).length > 0 && (
-        <span className="hidden shrink-0 sm:block">
+        <span className="hidden shrink-0 justify-self-center md:block">
           <AvatarStack
             people={commenters(post)}
             total={Math.max(0, (post.participant_count ?? commenters(post).length + 1) - 1)}
@@ -598,7 +589,7 @@ export const CompactRow = ({
         </span>
       )}
 
-      <span className="hidden shrink-0 text-end text-[11.5px] font-light text-muted-foreground md:block md:w-24">
+      <span className="hidden shrink-0 text-end text-[11.5px] font-light text-muted-foreground md:block">
         {activityTime(post)}
       </span>
     </div>
