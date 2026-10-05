@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { baarBootstrap } from "./baar";
 
@@ -38,9 +38,10 @@ export default function DailyBaarPromoPopup() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())}>
-      <DialogContent dir="rtl" className="max-w-md rounded-[28px] p-0 overflow-hidden">
-        <div className="bg-gradient-to-b from-primary/[0.10] to-transparent px-7 pt-8 pb-6 text-center">
+    <ResponsiveDialog open={open} onOpenChange={(v) => (v ? setOpen(true) : close())} desktopContentClassName="max-w-md">
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
+        <div className="popup-scroll">
+        <div className="bg-gradient-to-b from-primary/[0.09] to-card px-7 pb-6 pt-8 text-center">
           <h2 className="text-[22px] font-light text-foreground">
              חדש בבאר: ההשתדלות היומית 💗
           </h2>
@@ -50,7 +51,7 @@ export default function DailyBaarPromoPopup() {
           </p>
         </div>
 
-        <div className="px-7 pb-7">
+        <div className="px-7 pb-6">
           <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
             <p className="text-[13.5px] font-medium text-foreground">
               איך מצטרפות?
@@ -61,7 +62,9 @@ export default function DailyBaarPromoPopup() {
             </p>
           </div>
 
-          <div className="mt-5 flex flex-col gap-2">
+        </div>
+        </div>
+          <div className="popup-footer flex flex-col gap-2 px-7 pt-4">
             <Button
               className="rounded-full"
               onClick={() => {
@@ -78,8 +81,7 @@ export default function DailyBaarPromoPopup() {
               אולי בהמשך
             </button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </ResponsiveDialog>
   );
 }

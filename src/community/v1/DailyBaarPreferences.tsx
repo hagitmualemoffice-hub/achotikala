@@ -56,9 +56,10 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-md">
-      <div dir="rtl" className="space-y-6 px-6 pb-8 pt-7 md:px-8">
-        <h2 className="text-[20px] text-foreground">העדפות ההשתדלות היומית</h2>
-        {loading ? <div className="grid h-40 place-items-center"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div> : <>
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
+        <div className="popup-scroll space-y-6 px-6 pb-6 pt-7 md:px-8">
+          <h2 className="text-[20px] text-foreground">העדפות ההשתדלות היומית</h2>
+          {loading ? <div className="grid h-40 place-items-center"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div> : <>
           <fieldset className="space-y-2">
             <legend className="mb-2 text-[14px] text-foreground">מתי להציג לי כרטיס באופן אוטומטי?</legend>
             {([ ["every_other_day", "אחת ליומיים"], ["daily", "כל יום"], ["muted", "ללא התראה אוטומטית"] ] as const).map(([key, label]) => (
@@ -86,10 +87,13 @@ export default function DailyBaarPreferences({ open, onOpenChange }: { open: boo
               <label className="space-y-1 text-[12px] text-muted-foreground">עד גיל<input type="number" inputMode="numeric" min="18" max="100" value={maxAge} onChange={(e) => setMaxAge(e.target.value)} placeholder="ללא הגבלה" className={inputClass} /></label>
             </div>
           </fieldset>
-          <Button onClick={() => void save()} disabled={saving} className="w-full rounded-full">
+          </>}
+        </div>
+        {!loading && <div className="popup-footer px-6 pt-4 md:px-8">
+          <Button onClick={() => void save()} disabled={saving} className="h-12 w-full rounded-xl">
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}שמירת ההעדפות
           </Button>
-        </>}
+        </div>}
       </div>
     </ResponsiveDialog>
   );
