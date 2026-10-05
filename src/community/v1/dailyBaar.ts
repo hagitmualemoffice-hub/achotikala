@@ -21,6 +21,7 @@ export type DailyState = {
   cadence: DailyCadence;
   min_age: number | null;
   max_age: number | null;
+  last_shown_date: string | null;
   filter_kind: DailyFilterKind | null;
   filter_value: string | null;
   today: {
