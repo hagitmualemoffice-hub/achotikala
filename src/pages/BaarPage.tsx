@@ -2214,6 +2214,15 @@ const BaarPage = () => {
 
             <Button
               type="button"
+              onClick={() => setDailyOpen(true)}
+              aria-label="ההשתדלות היומית"
+              className="fixed bottom-36 left-4 z-40 h-12 w-12 rounded-full bg-card text-primary shadow-[var(--shadow-card)] md:hidden"
+            >
+              <Flower2 className="h-5 w-5" />
+            </Button>
+
+            <Button
+              type="button"
               size="icon"
               onClick={() => setCreateOpen(true)}
               aria-label="הוספת בחור"
