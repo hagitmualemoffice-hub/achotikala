@@ -708,7 +708,7 @@ const Index = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6">
               {[
-                { num: "836+", label: "משתתפות בפרויקט" },
+                { num: "936+", label: "משתתפות בפרויקט" },
                 { num: "1,458+", label: "משתתפות באירועים בשנה" },
                 { num: "76+", label: "אירועים בשנה" },
                 { num: "4+", label: "שנות פעילות" },
