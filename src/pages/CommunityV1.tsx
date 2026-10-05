@@ -630,7 +630,7 @@ const CommunityBody = () => {
         }
       />
 
-      <div className={`mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:ml-[250px] lg:px-6 lg:py-8 xl:px-10 ${inquiriesOnly ? "lg:grid-cols-1" : "lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)]"} xl:gap-10`}>
+      <div className={`mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:ml-[325px] lg:px-6 lg:py-8 xl:px-10 ${inquiriesOnly ? "lg:grid-cols-1" : "lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)]"} xl:gap-10`}>
         {/* RIGHT — community spaces */}
         {!inquiriesOnly && <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
           <nav className="space-y-5">

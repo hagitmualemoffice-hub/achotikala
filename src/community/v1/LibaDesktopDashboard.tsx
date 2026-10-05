@@ -37,7 +37,7 @@ const LibaDesktopDashboard = () => {
       <aside
         dir="rtl"
         aria-label="דשבורד ליבה שלי"
-        className="fixed bottom-0 left-0 top-16 z-30 hidden w-[250px] overflow-y-auto border-r border-border/40 bg-background px-5 pb-8 pt-6 shadow-[10px_0_28px_-24px_hsl(var(--foreground)/0.24)] lg:block"
+        className="fixed bottom-0 left-0 top-16 z-30 hidden w-[325px] overflow-y-auto border-r border-border/40 bg-background px-6 pb-8 pt-6 shadow-[10px_0_28px_-24px_hsl(var(--foreground)/0.24)] lg:block"
       >
         <h2 className="border-b border-border/50 pb-4 text-[17px] font-medium text-foreground">
           דשבורד ליבה שלי

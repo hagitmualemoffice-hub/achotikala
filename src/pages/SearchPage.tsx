@@ -43,7 +43,7 @@ const SearchPage = () => {
   const visible = KIND_ORDER.filter((k) => (results.groups[k]?.total ?? 0) > 0);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0 lg:pl-[250px]">
+    <div dir="rtl" className="min-h-screen bg-background pb-20 md:pb-0 lg:pl-[325px]">
       <LibaTopBar active={null} />
 
       <main className="mx-auto max-w-[900px] px-4 py-6 md:px-6 md:py-9">
