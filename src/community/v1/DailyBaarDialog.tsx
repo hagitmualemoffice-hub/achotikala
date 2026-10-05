@@ -424,8 +424,8 @@ export default function DailyBaarDialog({
           setWorking(false);
           return;
         }
-        await sendDailyCardChat(pick.boy.id, friendId, text);
-        openExisting((await Promise.resolve()) as never);
+        const res = await sendDailyCardChat(pick.boy.id, friendId, text);
+        if (res?.thread_id) openExisting(res.thread_id);
         toast.success("הכרטיס נשלח בצ׳אט 💛");
         setPhase("done");
       } else {
