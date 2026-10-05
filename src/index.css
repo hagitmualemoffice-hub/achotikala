@@ -32,6 +32,7 @@
 
     --shadow-soft: 0 10px 40px -10px hsl(0 0% 0% / 0.08);
     --shadow-card: 0 8px 30px -8px hsl(0 0% 0% / 0.12);
+    --popup-surface: linear-gradient(180deg, hsl(var(--accent) / 0.36) 0, hsl(var(--card)) 112px);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -173,6 +174,10 @@
       radial-gradient(circle at 10px 10px, hsl(var(--chat-sage) / 0.075) 1px, transparent 1.5px),
       radial-gradient(circle at 27px 27px, hsl(var(--chat-sage) / 0.045) 1px, transparent 1.5px);
     background-size: 36px 36px;
+  }
+  .popup-scroll {
+    background-image: var(--popup-surface);
+    background-repeat: no-repeat;
   }
 }
 

@@ -108,7 +108,7 @@ export const MasteritDialog = ({
       }}
       contentClassName="max-w-md"
     >
-      <div dir="rtl" className="max-h-[80vh] overflow-y-auto p-6">
+      <div dir="rtl" className="popup-scroll p-6">
         {joined ? (
           <div className="space-y-4 text-start">
             <p className="text-[20px] font-light text-foreground">

@@ -177,7 +177,7 @@ export const BaarInquiriesDrawer = ({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-2xl">
-      <div dir="rtl" className="max-h-[80vh] overflow-y-auto px-8 pb-10 pt-6 md:px-12 md:pt-10">
+      <div dir="rtl" className="popup-scroll px-8 pb-10 pt-6 md:px-12 md:pt-10">
         {!active ? (
           <>
             <p className="text-[11px] text-primary">ליבה</p>

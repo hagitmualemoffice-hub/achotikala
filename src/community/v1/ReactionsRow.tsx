@@ -329,7 +329,7 @@ const ReactionsRow = ({
 
           </div>
 
-          <div className="max-h-[52vh] min-h-[120px] overflow-y-auto px-5 py-3">
+          <div className="popup-scroll min-h-[120px] px-5 py-3">
             {actors === null ? (
               <span className="flex items-center gap-2 text-[13px] font-light text-muted-foreground">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
