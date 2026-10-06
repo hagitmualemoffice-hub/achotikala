@@ -5,3 +5,4 @@
 - Keep Daily Baar working screens text-led; use custom floral artwork only at entry, the sidebar card, and successful completion/share.
 - Keep Liba identity experiment settings and versioned member acknowledgements in authenticated RPCs; enforce new-content identity with insert/update triggers, never rewrite nickname history or silently convert nickname requests.
 - Clear and reload shared identity state on authentication changes; an initial signed-out request must not leave signed-in controls or announcements without settings.
+- Keep the forum/inquiries view synchronized with the existing birurim query parameter and explicit forum reset callback; same-path navigation must not leave the previous view active.
