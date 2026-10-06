@@ -1,3 +1,5 @@
+import IdentityPostingNotice from "./IdentityPostingNotice";
+import { useIdentityExperiment, identityErrorMessage } from "./identityExperiment";
 import { useEffect, useRef, useState } from "react";
 import {
   Bookmark,
@@ -183,6 +185,7 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
 
   const [deleting, setDeleting] = useState(false);
 
+  const { allowNickname, ready, state: identityState } = useIdentityExperiment();
   const [asNickname, setAsNickname] = useState(false);
   const [replyAsNickname, setReplyAsNickname] = useState(false);
 
@@ -378,8 +381,8 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
       reinforce("firstComment");
       await loadThread();
       patch({ ...current, comment_count: current.comment_count + 1 });
-    } catch {
-      toast.error("לא הצלחנו לשלוח, נסי שוב");
+    } catch (error) {
+      toast.error(identityErrorMessage(error, "לא הצלחנו לשלוח, נסי שוב"));
     }
   };
 
@@ -394,8 +397,8 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
       reinforce("firstComment");
       await loadThread();
       patch({ ...current, comment_count: current.comment_count + 1 });
-    } catch {
-      toast.error("לא הצלחנו לשלוח, נסי שוב");
+    } catch (error) {
+      toast.error(identityErrorMessage(error, "לא הצלחנו לשלוח, נסי שוב"));
     }
   };
 
@@ -790,6 +793,7 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
             )}
 
             <div className="mt-7 border-t border-border/50 pt-5">
+              <IdentityPostingNotice comment />
               <div className="flex items-end gap-3">
                 <Avatar
                   initials={me.initials}
@@ -824,6 +828,7 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
                 {/* phones: a round send button with an arrow, as in WhatsApp */}
                 <button
                   onClick={sendComment}
+                  disabled={!ready || (!allowNickname && !identityState?.has_full_name)}
                   aria-label="שליחה"
                   title="שליחה"
                   className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25 transition-all hover:bg-[hsl(var(--primary-glow))] md:h-auto md:w-auto md:px-4 md:py-2.5 md:text-[12.5px]"
@@ -833,7 +838,7 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
                   <span className="hidden md:inline">שליחה</span>
                 </button>
               </div>
-              {me.nickname && (
+              {allowNickname && me.nickname && (
                 <button
                   onClick={() => setAsNickname((v) => !v)}
                   className="mt-2 ms-11 text-[11.5px] font-light text-muted-foreground/80 transition-colors hover:text-foreground"
@@ -905,6 +910,7 @@ const CommentItem = ({
   nested = false,
   replyParentId,
 }: CommentItemProps) => {
+  const { allowNickname, ready, state: identityState } = useIdentityExperiment();
   const { openChat } = useLibaChat();
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -1090,6 +1096,7 @@ const CommentItem = ({
                   </span>
                 </span>
                 <button
+                  disabled={!ready || (!allowNickname && !identityState?.has_full_name)}
                   onClick={() => onSendReply(replyParentId ?? comment.id)}
                   aria-label="שליחה"
                   title="שליחה"
@@ -1099,7 +1106,8 @@ const CommentItem = ({
                   <span className="hidden text-[12px] md:inline">שליחה</span>
                 </button>
               </div>
-              {myNickname && (
+              <IdentityPostingNotice comment />
+              {allowNickname && myNickname && (
                 <button
                   onClick={() => setReplyAsNickname(!replyAsNickname)}
                   className="text-[11px] font-light text-muted-foreground/80 transition-colors hover:text-foreground"

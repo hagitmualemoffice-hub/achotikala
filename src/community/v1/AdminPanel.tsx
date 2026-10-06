@@ -1,3 +1,4 @@
+import IdentityExperimentAdmin from "./IdentityExperimentAdmin";
 import { useCallback, useEffect, useState } from "react";
 import { Loader2, X, Wrench, Flag } from "lucide-react";
 import { toast } from "sonner";
@@ -78,6 +79,7 @@ export default function AdminPanel({
           </p>
         ) : (
           <div className="space-y-8 px-10 py-10 md:px-12 md:py-12">
+            <IdentityExperimentAdmin />
             <section>
               <p className="mb-3 flex items-center gap-2 text-[10.5px] tracking-[0.2em] text-muted-foreground">
                 <Wrench className="h-3.5 w-3.5" /> המלצות לכלים ({queue.tools.length})

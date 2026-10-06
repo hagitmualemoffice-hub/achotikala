@@ -1,3 +1,5 @@
+import IdentityPostingNotice from "./IdentityPostingNotice";
+import { useIdentityExperiment, identityErrorMessage } from "./identityExperiment";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X,
@@ -107,6 +109,7 @@ export default function Composer({
   onPublished,
 }: ComposerProps) {
   const reinforce = useReinforce();
+  const { allowNickname, ready, state: identityState } = useIdentityExperiment();
 
   const [step, setStep] = useState<Step>(initialSpace ? 1 : 0);
   const [space, setSpace] = useState<SpaceId | null>(initialSpace);
@@ -158,6 +161,7 @@ export default function Composer({
 
   const identityReady = as === "name" || Boolean(myNick);
   const canPublish =
+    ready && (allowNickname || !!identityState?.has_full_name) &&
     Boolean(space) &&
     title.trim().length >= 4 &&
     body.trim().length >= 15 &&
@@ -284,8 +288,8 @@ export default function Composer({
       setAttached([]);
       reinforce("firstComment");
       await onPublished(postId);
-    } catch {
-      toast.error("הפרסום לא נשמר. נסי שוב.");
+    } catch (error) {
+      toast.error(identityErrorMessage(error, "הפרסום לא נשמר. נסי שוב."));
     } finally {
       setPublishing(false);
     }
@@ -419,7 +423,7 @@ export default function Composer({
                     </span>
                     .
                   </p>
-                ) : (
+                ) : allowNickname ? (
                   <>
                     <p className="text-[12.5px] font-light leading-relaxed text-muted-foreground">
                       אם התכוונת אחרת — אפשר להחליף בין השם לניק בשעה הראשונה, כל עוד אף אחת עוד
@@ -443,7 +447,7 @@ export default function Composer({
                       {as === "name" ? "פרסום בניק במקום בשמי" : "פרסום בשמי במקום בניק"}
                     </button>
                   </>
-                )}
+                ) : <IdentityPostingNotice />}
               </div>
 
               <div className="mt-7 flex items-center justify-center gap-3">
@@ -714,7 +718,7 @@ export default function Composer({
                 </p>
 
                 {/* collapsed summary */}
-                {!identityOpen ? (
+                {!allowNickname ? <IdentityPostingNotice /> : !identityOpen ? (
                   <div className="mt-4 flex items-start gap-3.5">
                     <span
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] ${

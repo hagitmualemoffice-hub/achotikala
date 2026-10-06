@@ -1,3 +1,5 @@
+import IdentityPostingNotice from "./IdentityPostingNotice";
+import { useIdentityExperiment } from "./identityExperiment";
 /**
  * "ליבה, נעים להכיר" — ההיכרות וההתאמה האישית של ליבה.
  *
@@ -222,7 +224,9 @@ const ChatDemo = () => {
 
 /** הדגמה של בחירת הזהות — בלי לפרסם דבר. */
 const IdentityDemo = ({ name }: { name: string }) => {
+  const { allowNickname } = useIdentityExperiment();
   const [as, setAs] = useState<"name" | "nick">("name");
+  if (!allowNickname) return <IdentityPostingNotice />;
   return (
     <div className="inline-flex rounded-full border border-border/70 p-1">
       {(

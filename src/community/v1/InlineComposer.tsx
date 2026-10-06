@@ -1,3 +1,5 @@
+import IdentityPostingNotice from "./IdentityPostingNotice";
+import { useIdentityExperiment, identityErrorMessage } from "./identityExperiment";
 import { useEffect, useRef, useState } from "react";
 import {
   Paperclip,
@@ -77,6 +79,7 @@ export default function InlineComposer({
   onPublished,
 }: InlineComposerProps) {
   const reinforce = useReinforce();
+  const { allowNickname, ready, state: identityState } = useIdentityExperiment();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(() => draftField(draftKeys.newPost, "title"));
   const [body, setBody] = useState(() => draftField(draftKeys.newPost, "body"));
@@ -106,6 +109,7 @@ export default function InlineComposer({
   const activeSpace = spaceById(space);
   const accent = accentColor(activeSpace);
   const canPublish =
+    ready && (allowNickname || !!identityState?.has_full_name) &&
     title.trim().length >= 4 &&
     body.trim().length >= 15 &&
     (as === "name" || Boolean(nickname)) &&
@@ -209,8 +213,8 @@ export default function InlineComposer({
       setOpen(false);
       window.setTimeout(() => setPosted(false), 4000);
       await onPublished(postId);
-    } catch {
-      toast.error("הפרסום לא נשמר. נסי שוב.");
+    } catch (error) {
+      toast.error(identityErrorMessage(error, "הפרסום לא נשמר. נסי שוב."));
     } finally {
       setPublishing(false);
     }
@@ -268,7 +272,7 @@ export default function InlineComposer({
             {open && (
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2.5 text-[12.5px] font-light">
               {/* identity */}
-              <span className="flex items-center gap-1.5">
+              {!allowNickname ? <IdentityPostingNotice /> : <span className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">מפרסמת כ:</span>
                 <span className="relative">
                   <button
@@ -326,7 +330,7 @@ export default function InlineComposer({
                     </span>
                   )}
                 </span>
-              </span>
+              </span>}
 
               {/* space */}
               <span className="flex items-center gap-1.5">
@@ -401,7 +405,7 @@ export default function InlineComposer({
             )}
 
             {/* nickname creation, naturally from here */}
-            {nickPanel && !nickname && (
+            {allowNickname && nickPanel && !nickname && (
               <div className="mt-3 rounded-2xl bg-background/80 p-4">
                 <p className="text-[13px] text-foreground">בחרי לך ניק לקהילה</p>
                 <p className="mt-1 text-[11.5px] font-light leading-relaxed text-muted-foreground">
@@ -546,7 +550,7 @@ export default function InlineComposer({
                     <Maximize2 className="h-3.5 w-3.5" />
                     כתיבה מורחבת
                   </button>
-                  {as === "nick" && nickname && <span>השם שלך לא יוצג לחברות הקהילה.</span>}
+                  {allowNickname && as === "nick" && nickname && <span>השם שלך לא יוצג לחברות הקהילה.</span>}
                 </span>
                 <span className="flex items-center gap-3">
                   <button
