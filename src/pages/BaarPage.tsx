@@ -1,3 +1,4 @@
+import { DirectoryHeading, DirectoryAdd, DirectoryFilter, DirectoryView } from "@/community/v1/DirectoryToolbar";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -1910,30 +1911,7 @@ const QuickFilters = ({
   filters: BaarFilters;
   onChange: (f: BaarFilters) => void;
 }) => {
-  const ethnicityLabel = ETHNICITY_OPTIONS.find((o) => o.value === filters.ethnicity)?.label;
-
-  return (
-    <>
-      <Select
-        value={filters.ethnicity ?? "__all__"}
-        onValueChange={(v) => onChange({ ...filters, ethnicity: v === "__all__" ? undefined : v })}
-      >
-        <SelectTrigger className={quickFilterTrigger(!!filters.ethnicity)} aria-label="סינון לפי עדה">
-          <span className="truncate">עדה: {ethnicityLabel ?? "הכל"}</span>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="__all__" className="text-[13px]">
-            הכל
-          </SelectItem>
-          {ETHNICITY_OPTIONS.map((o) => (
-            <SelectItem key={o.value} value={o.value} className="text-[13px]">
-              {o.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </>
-  );
+  return <DirectoryFilter label="עדה" value={filters.ethnicity ?? "__all__"} onChange={(value) => onChange({ ...filters, ethnicity: value === "__all__" ? undefined : value })} options={[{ value: "__all__", label: "הכול" }, ...ETHNICITY_OPTIONS]} />;
 };
 
 
@@ -2185,31 +2163,13 @@ const BaarPage = () => {
           </div>
         ) : (
           <>
-            <div className="mb-6 hidden flex-col gap-4 md:flex md:flex-row md:items-end md:justify-between">
-              <div>
-                <h1 className="text-[26px] font-light leading-[1.2] text-foreground md:text-[34px]">הבאר</h1>
-                <p className="mt-1.5 max-w-2xl text-[14.5px] font-light leading-relaxed text-muted-foreground">
-                  מאגר בחורים מומלצים עם הטוויסט של אחותי כלה: לכל בחור כאן יש מישהי שהמליצה עליו,
-                  ואצלה תוכלי לקבל מידע שחשוב לך. מזמינות אותך להיעזר בבאר - וגם להיות שם בשביל אחרות. 💗
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setDailyOpen(true)}
-                  className="rounded-full border-primary/40 px-5 text-[14px] text-primary hover:bg-primary/[0.06]"
-                >
-                  <Flower2 className="h-4 w-4" />
-                  ההשתדלות היומית
-                </Button>
-                <Button onClick={() => setCreateOpen(true)} className="rounded-full px-6">
-                  <Plus className="h-4 w-4" />
-                  הוספת בחור
-                </Button>
-              </div>
-            </div>
-
-            <div className="mb-5 flex items-center gap-2">
+            <DirectoryHeading title="הבאר" actions={<Button variant="outline" onClick={() => setDailyOpen(true)} className="hidden rounded-full text-primary md:inline-flex"><Flower2 />ההשתדלות היומית</Button>}>
+              <p>הבאר היא מאגר בחורים מומלצים של חברות אחותי כלה. לכל בחור יש חברה שמכירה אותו או המליצה עליו, וניתן לפנות אליה כדי לקבל מידע נוסף.</p>
+              <p>בכרטיס הבחור תוכלי לקרוא פרטים, המלצות ומידע שנוסף על ידי חברות, ולמצוא את פרטי איש הקשר להצעה. אפשר לשמור כרטיסים באזור האישי ולסנן את המאגר לפי הפרטים שחשובים לך.</p>
+              <p>מכירה בחור שיכול להתאים? הוסיפי אותו למאגר, או הוסיפי מידע והמלצה לכרטיס קיים. המידע הוא נקודת פתיחה להיכרות ולבירור אישי, ולא תחליף לבדיקה שלך.</p>
+            </DirectoryHeading>
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <DirectoryAdd onClick={() => setCreateOpen(true)} label="הוספת בחור" />
               <label className="relative min-w-0 flex-1 sm:w-[16.5rem] sm:flex-none">
                 <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
@@ -2260,26 +2220,7 @@ const BaarPage = () => {
                   setFilters(next);
                 }}
               />
-              <div className="flex h-9 shrink-0 items-center rounded-full border border-border bg-muted/50 p-0.5">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setView("cards")}
-                  className={`h-8 w-8 rounded-full ${view === "cards" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
-                  title="כרטיסים"
-                >
-                  <Grid2X2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setView("rows")}
-                  className={`h-8 w-8 rounded-full ${view === "rows" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
-                  title="שורות"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
+              <DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} />
             </div>
 
             <Button
@@ -2291,15 +2232,7 @@ const BaarPage = () => {
               <Flower2 className="h-5 w-5" />
             </Button>
 
-            <Button
-              type="button"
-              size="icon"
-              onClick={() => setCreateOpen(true)}
-              aria-label="הוספת בחור"
-              className="fixed bottom-20 left-4 z-40 h-14 w-14 rounded-full shadow-[var(--shadow-card)] md:hidden"
-            >
-              <Plus className="h-6 w-6" />
-            </Button>
+
 
             {view === "rows" && boys.length > 0 && (
               <div className="hidden grid-cols-[1.2fr_0.5fr_0.8fr_0.8fr_0.8fr_0.75fr_0.9fr_auto] gap-4 border-b border-border/60 pb-2 text-[12px] font-light text-muted-foreground md:grid" dir="rtl">

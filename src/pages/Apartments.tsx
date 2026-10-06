@@ -1,3 +1,4 @@
+import { DirectoryHeading, DirectoryAdd, DirectoryFilter, DirectoryView } from "@/community/v1/DirectoryToolbar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
@@ -87,6 +88,7 @@ const Apartments = () => {
   const [offline, setOffline] = useState(false);
   const [filters, setFilters] = useState<Filters>(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [view, setView] = useState<"cards" | "list">("cards");
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"choose" | "code">("choose");
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -360,28 +362,10 @@ const Apartments = () => {
 
       {/* כותרת הדף — בסגנון ליבה, מכווצת בטלפון */}
       <section className="mx-auto max-w-[1400px] px-4 pt-3 md:px-6 md:pt-8">
-        <div className="flex flex-row items-center justify-between gap-2 md:items-end md:gap-4">
-          <div className="min-w-0">
-            <h1 className="text-[19px] font-light leading-[1.2] text-foreground md:text-[34px]">לוח דירות</h1>
-            <p className="mt-1.5 hidden max-w-2xl text-[14.5px] font-light leading-relaxed text-muted-foreground md:block">
-              דירות, שותפות ובית שמחכה לך. הלוח פתוח לחברות הקהילה - מזמינות אותך לחפש, וגם לפרסם בשביל אחרות.
-            </p>
-          </div>
-          {access === "granted" && (
-            <div className="flex items-center gap-2">
-              <Button onClick={startPublish} className="hidden h-9 shrink-0 rounded-full px-5 text-[13px] font-light lg:inline-flex">
-                <Plus className="h-4 w-4 me-1.5" />
-                פרסמי מודעה
-              </Button>
-              <button type="button" className={PILL_IDLE} onClick={() => setMineOpen(true)}>
-                המודעות שלי
-                {mine.length > 0 && (
-                  <span className="rounded-full bg-primary/10 px-1.5 text-[11px] text-primary">{mine.length}</span>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
+        <DirectoryHeading title="לוח דירות" actions={access === "granted" ? <Button variant="outline" className="rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button> : undefined}>
+          <p>דירות, שותפות ובית שמחכה לך. הלוח פתוח לחברות הקהילה — לחיפוש דירה, שותפה, סאבלט או הקמת בית משותף.</p>
+          <p>אפשר לסנן לפי סוג מודעה ולפי הפרטים שחשובים לך. בכרטיס המודעה תמצאי את פרטי הדירה ואת הדרך ליצור קשר עם המפרסמת, ותוכלי לשמור מודעות באזור האישי.</p>
+        </DirectoryHeading>
       </section>
 
 
@@ -408,50 +392,12 @@ const Apartments = () => {
         />
       ) : (
         <>
-      {/* כפתור פרסום צף במובייל */}
-      <button
-        type="button"
-        onClick={startPublish}
-        aria-label="פרסמי מודעה"
-        className="fixed bottom-20 left-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform active:scale-95 md:hidden"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
-
-      {/* filters */}
-      <section className="mx-auto max-w-[1400px] px-4 pt-3 md:px-6 md:pt-5">
-        <div className="flex items-center gap-2">
-          <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1">
-            <button
-              type="button"
-              onClick={() => setFilters((f) => ({ ...f, type: "all" }))}
-              className={cn(PILL_IDLE, "shrink-0", filters.type === "all" && PILL_ACTIVE)}
-            >
-              הכול
-            </button>
-            {LISTING_TYPES.map((t) => {
-              const Icon = TYPE_META[t].icon;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setFilters((f) => ({ ...f, type: t }))}
-                  className={cn(PILL_IDLE, "shrink-0", filters.type === t && PILL_ACTIVE)}
-                >
-                  <Icon className="h-4 w-4" />
-                  {TYPE_META[t].short}
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              onClick={() => setFiltersOpen(true)}
-              className={cn(PILL_IDLE, "shrink-0", filtersActive && PILL_ACTIVE)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              סינון
-            </button>
-          </div>
+      <section className="mx-auto max-w-[1400px] px-4 pt-3 md:px-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <DirectoryAdd onClick={startPublish} label="פרסמי מודעה" />
+          <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
+          <Button variant="outline" onClick={() => setFiltersOpen(true)} className={cn(PILL_IDLE, filtersActive && PILL_ACTIVE)}><SlidersHorizontal />סינון</Button>
+          <DirectoryView value={view} onChange={setView} />
         </div>
       </section>
 
@@ -487,11 +433,12 @@ const Apartments = () => {
             )}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className={view === "cards" ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "divide-y divide-border"}>
             {visible.map((l) => (
               <ListingCard
                 key={l.id}
                 listing={l}
+                compact={view === "list"}
                 onOpen={() => setDetail(l)}
                 saved={savedIds.has(l.id)}
                 onToggleSave={userId ? () => void toggleSave(l.id) : undefined}

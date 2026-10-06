@@ -14,11 +14,13 @@ const ListingCard = ({
   listing,
   onOpen,
   saved = false,
+  compact = false,
   onToggleSave,
 }: {
   listing: Listing;
   onOpen: () => void;
   saved?: boolean;
+  compact?: boolean;
   onToggleSave?: () => void;
 }) => {
   const meta = typeMeta(listing.listing_type);
@@ -47,7 +49,9 @@ const ListingCard = ({
         }
       }}
       dir="rtl"
-      className="group relative flex min-h-[200px] w-full min-w-0 max-w-full cursor-pointer flex-col rounded-3xl border border-border/70 bg-card p-5 text-right shadow-[var(--shadow-soft)] transition-all [overflow-wrap:anywhere] hover:border-primary/30 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={compact
+        ? "group relative grid w-full min-w-0 cursor-pointer gap-2 py-4 pe-10 text-right transition-colors hover:bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:grid-cols-[minmax(0,1.5fr)_1fr_1fr] md:items-center"
+        : "group relative flex min-h-[200px] w-full min-w-0 max-w-full cursor-pointer flex-col rounded-3xl border border-border/70 bg-card p-5 text-right shadow-[var(--shadow-soft)] transition-all [overflow-wrap:anywhere] hover:border-primary/30 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"}
     >
       {onToggleSave && (
         <button
@@ -64,7 +68,7 @@ const ListingCard = ({
       )}
 
       <div className="flex items-start gap-3 pe-8">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+        <div className={`${compact ? "hidden" : "grid"} h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary`}>
           <Home className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
@@ -78,7 +82,7 @@ const ListingCard = ({
         </div>
       </div>
 
-      <div className="mt-3.5 flex flex-wrap items-center gap-1.5">
+      <div className={`${compact ? "" : "mt-3.5"} flex flex-wrap items-center gap-1.5`}>
         <span className={`rounded-full px-2.5 py-1 text-[11.5px] font-medium ${tone}`}>{meta.short}</span>
         {women ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11.5px] font-medium text-primary">
@@ -99,13 +103,13 @@ const ListingCard = ({
         {dateText}
       </p>
 
-      {listing.description && (
+      {!compact && listing.description && (
         <p className="mt-2.5 line-clamp-2 flex-1 text-[13px] font-light leading-relaxed text-foreground/75">
           {listing.description}
         </p>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-3">
+      <div className={`${compact ? "hidden" : "flex"} mt-auto items-center justify-between pt-3`}>
         <span className="text-[11.5px] font-light text-muted-foreground">
           {left > 0 ? `עוד ${left} ימים בלוח` : "פג תוקף"}
         </span>

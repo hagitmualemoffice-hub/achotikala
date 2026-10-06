@@ -1,3 +1,4 @@
+import { DirectoryHeading, DirectoryAdd, DirectoryFilter, DirectoryView } from "@/community/v1/DirectoryToolbar";
 /**
  * מקומות לדייטים — the sister database of הבאר, inside ליבה.
  * Same language, same chips, same calm cards — only the content is places.
@@ -1007,28 +1008,12 @@ const PlacesPage = () => {
       />
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 md:px-6 md:py-8">
-        <div className="mb-6 hidden flex-col gap-4 md:flex md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-[26px] font-light leading-[1.2] text-foreground md:text-[34px]">ליד הבאר</h1>
-            <p className="mt-1.5 max-w-2xl text-[14.5px] font-light leading-relaxed text-muted-foreground">
-              מקומות שחברות בליבה כבר היו בהם וסימנו לנו מה טוב בהם: עד כמה שקט, אם נגיש בתחבורה ציבורית,
-              {"\n"}מה הכשרות ומה כדאי לדעת לפני שיוצאים. מזמינות אותך להיעזר - וגם להוסיף מקום שאהבת. 💗
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-            className="rounded-full px-6"
-          >
-            <Plus className="h-4 w-4" />
-            הוספת מקום
-          </Button>
-        </div>
-
-        {/* שורה אחת רגועה: חיפוש · אזור · סוג מקום · חיפוש מתקדם · תצוגה */}
-        <div className="mb-5 flex items-center gap-2">
+        <DirectoryHeading title="ליד הבאר">
+          <p>מקומות לדייטים שחברות בליבה כבר ביקרו בהם והמליצו עליהם. בכרטיס המקום תמצאי מידע על השקט, הנגישות בתחבורה ציבורית, הכשרות ומה כדאי לדעת לפני שיוצאים.</p>
+          <p>אפשר לסנן לפי אזור וסוג מקום, לשמור מקום שאהבת ולהוסיף מקום או מידע מניסיונך. לפני היציאה כדאי לבדוק מול המקום פרטים שעשויים להשתנות.</p>
+        </DirectoryHeading>
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <DirectoryAdd onClick={() => { setEditing(null); setFormOpen(true); }} label="הוספת מקום" />
           <label className="relative min-w-0 flex-1 sm:w-[16.5rem] sm:flex-none">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -1040,46 +1025,8 @@ const PlacesPage = () => {
             />
           </label>
 
-          {/* סליידר אזור */}
-          <div className="hidden h-9 shrink-0 items-center rounded-full border border-border bg-muted/50 p-0.5 md:flex">
-            {AREA_OPTIONS.map((a) => (
-              <button
-                key={a}
-                type="button"
-                onClick={() => patch({ area: filters.area === a ? "" : a })}
-                aria-pressed={filters.area === a}
-                className={`relative h-7 rounded-full px-3 text-[12.5px] font-light transition-all ${
-                  filters.area === a
-                    ? "bg-background text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-
-          <span className="hidden h-5 w-px bg-border sm:block" aria-hidden />
-
-          {/* תפריט נפתח סוג מקום */}
-          <div className="hidden md:block"><Select
-            value={filters.kind || "__all__"}
-            onValueChange={(value) => patch({ kind: value === "__all__" ? "" : value })}
-          >
-            <SelectTrigger className={`h-9 w-auto min-w-[8.5rem] justify-between gap-1.5 rounded-full px-3 text-[13px] font-light outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 ${filters.kind ? "border-primary bg-primary/10 text-primary" : "border-border bg-card"}`}>
-              <span className="truncate">סוג מקום: {filters.kind || "הכל"}</span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__" className="text-[13px]">
-                הכל
-              </SelectItem>
-              {KIND_OPTIONS.map((k) => (
-                <SelectItem key={k} value={k} className="text-[13px]">
-                  {k}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select></div>
+          <DirectoryFilter label="אזור" value={filters.area || "__all__"} onChange={(value) => patch({ area: value === "__all__" ? "" : value })} options={[{ value: "__all__", label: "הכול" }, ...AREA_OPTIONS.map((area) => ({ value: area, label: area }))]} />
+          <DirectoryFilter label="סוג מקום" value={filters.kind || "__all__"} onChange={(value) => patch({ kind: value === "__all__" ? "" : value })} options={[{ value: "__all__", label: "הכול" }, ...KIND_OPTIONS.map((kind) => ({ value: kind, label: kind }))]} />
 
           <PlacesFilterDrawer
             filters={filters}
@@ -1089,38 +1036,8 @@ const PlacesPage = () => {
             }}
           />
 
-          <div className="flex h-9 shrink-0 items-center rounded-full border border-border bg-muted/50 p-0.5 md:ms-auto">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setView("cards")}
-              className={`h-8 w-8 rounded-full ${view === "cards" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
-              title="כרטיסים"
-            >
-              <Grid2X2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setView("rows")}
-              className={`h-8 w-8 rounded-full ${view === "rows" ? "bg-background text-primary shadow-sm" : "text-muted-foreground"}`}
-              title="שורות"
-            >
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
+          <DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} />
         </div>
-
-        <Button
-          type="button"
-          size="icon"
-          onClick={() => { setEditing(null); setFormOpen(true); }}
-          aria-label="הוספת מקום"
-          className="fixed bottom-20 left-4 z-40 h-14 w-14 rounded-full shadow-[var(--shadow-card)] md:hidden"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-
 
         <p className="mb-3 text-[13px] font-light text-muted-foreground">{total} מקומות במאגר</p>
 
