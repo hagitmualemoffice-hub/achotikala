@@ -45,8 +45,8 @@ export function useIdentityExperiment() {
     return () => { listeners.delete(listener); };
   }, () => state);
   useEffect(() => {
-    if (!state) void refreshIdentityState().catch(() => undefined);
-  }, []);
+    if (!value) void refreshIdentityState().catch(() => undefined);
+  }, [value]);
   return { state: value, allowNickname: value?.allow_nickname_posting === true, ready: value !== null };
 }
 export const identityAdmin = async (allowNickname?: boolean, announcementActive?: boolean) => {

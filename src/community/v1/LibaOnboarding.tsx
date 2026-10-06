@@ -148,6 +148,7 @@ const Reveal = ({
   children: React.ReactNode;
   label?: string;
 }) => {
+  const { allowNickname } = useIdentityExperiment();
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -491,9 +492,9 @@ const LibaOnboarding = ({
         {/* 2 — את בוחרת איך להופיע */}
         {step === 2 && (
           <>
-            <Slide img={obIdentity} title="את בוחרת איך להופיע">
+            <Slide img={obIdentity} title={allowNickname ? "את בוחרת איך להופיע" : "בתקופה הקרובה כותבות בשם מלא"}>
               <p className="text-[13.5px] font-light leading-relaxed text-muted-foreground">
-                בכל פעם שאת כותבת בליבה, תוכלי לבחור אם לכתוב בשם שלך או בניק הקבוע שלך.
+                {allowNickname ? "בכל פעם שאת כותבת בליבה, תוכלי לבחור אם לכתוב בשם שלך או בניק הקבוע שלך." : "במסגרת הניסוי הזמני, פוסטים ותגובות חדשים יופיעו בשם המלא שלך."}
               </p>
               <div className="mt-3">
                 <IdentityDemo name={displayName} />
