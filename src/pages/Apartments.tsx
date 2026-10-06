@@ -398,7 +398,7 @@ const Apartments = () => {
           <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
           <Button variant="outline" onClick={() => setFiltersOpen(true)} className={cn(PILL_IDLE, filtersActive && PILL_ACTIVE)}><SlidersHorizontal />סינון</Button>
           <Button variant="outline" className="h-9 rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button>
-          <DirectoryView value={view} onChange={setView} />
+          <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
       </section>
 

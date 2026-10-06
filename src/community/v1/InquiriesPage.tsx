@@ -332,7 +332,7 @@ const InquiryCard = ({ inquiry, compact, onHelp, onThreads, onEdit, onChanged, o
     {!inquiry.mine && inquiry.status === "open" && <Button variant={inquiry.my_offer ? "default" : "outline"} onClick={onHelp} className={`mx-auto mt-4 h-11 w-full max-w-[230px] rounded-full text-[15px] font-light ${inquiry.my_offer ? "" : "border-primary bg-card text-primary hover:bg-primary/5 hover:text-primary"}`}><HandHeart className="h-5 w-5"/>{inquiry.my_offer ? "עדכון העזרה" : "אני מכירה"}</Button>}
     {inquiry.mine && <p className="mt-4 text-[12px] text-muted-foreground">הבקשה פורסמה {inquiry.author.nickname ? "באופן אנונימי" : "בשם שלך"}</p>}
     <div className="mt-3 flex h-10 shrink-0 items-center justify-between gap-2 border-t border-border/60 pt-2"><Button type="button" variant="ghost" onClick={onThreads} className={`h-8 min-w-0 justify-start gap-1 px-0 py-0 text-[11px] font-light hover:bg-transparent ${inquiry.help_count ? "text-primary hover:text-primary" : "text-muted-foreground"}`}>{people.length > 0 && <span className="shrink-0"><AvatarStack people={people} total={inquiry.help_count} max={1}/></span>}<Hand className="h-3.5 w-3.5 shrink-0"/><span className="truncate">{helperLabel}</span></Button><span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] text-muted-foreground"><Clock3 className="h-3.5 w-3.5 shrink-0"/>{timeAgo(inquiry.created_at)}</span></div>
-    <div className="mt-1 h-7 shrink-0">{inquiry.my_offer && <Button variant="ghost" size="sm" onClick={async () => { try { onChanged(await cancelInquiryHelp(inquiry.id)); toast.success("הצעת העזרה בוטלה"); } catch { toast.error("לא הצלחנו לבטל"); } }} className="mx-auto h-7 text-[11px] font-light text-muted-foreground hover:text-destructive">ביטול העזרה שלי</Button>}</div>
+    <div className="h-3 shrink-0">{inquiry.my_offer && <Button variant="ghost" size="sm" onClick={async () => { try { onChanged(await cancelInquiryHelp(inquiry.id)); toast.success("הצעת העזרה בוטלה"); } catch { toast.error("לא הצלחנו לבטל"); } }} className="mx-auto h-3 text-[11px] font-light text-muted-foreground hover:text-destructive">ביטול העזרה שלי</Button>}</div>
   </article>;
 };
 
@@ -352,13 +352,13 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <DirectoryAdd onClick={() => setCreateOpen(true)} label="פתיחת בירור" />
-          <label className="relative min-w-0 flex-1">
+          <label className="relative w-56 max-w-full shrink-0">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="חיפוש לפי שם, עיר, ישיבה או פרט" className="h-9 w-full rounded-full border border-border bg-card py-2 pe-4 ps-10 text-[13px] outline-none focus:border-primary"/>
           </label>
           <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
           <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
-          <DirectoryView value={view} onChange={setView} />
+          <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
         <p className="text-[11.5px] text-muted-foreground">{countText}</p>
       </div>
