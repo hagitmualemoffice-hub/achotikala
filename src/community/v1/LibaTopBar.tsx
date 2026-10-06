@@ -65,7 +65,7 @@ const BarLink = ({
   );
   if (to) {
     return (
-      <Link to={to} className={cls}>
+      <Link to={to} onClick={onClick} className={cls}>
         {inner}
         {underline}
       </Link>
@@ -82,12 +82,14 @@ const BarLink = ({
 const LibaTopBar = ({
   active = null,
   actions,
+  onForum,
   onBirurim,
   sticky = true,
 }: {
   active?: LibaSection;
   /** the personal action group (search · saved · messages · bell · avatar) */
   actions?: ReactNode;
+  onForum?: () => void;
   /** the forum page opens בירורים in place instead of navigating */
   onBirurim?: () => void;
   sticky?: boolean;
@@ -117,7 +119,7 @@ const LibaTopBar = ({
       </Link>
       <span className="hidden h-5 w-px bg-border md:block" />
 
-      <BarLink on={active === "forum"} to="/liba">
+      <BarLink on={active === "forum"} to="/liba" onClick={onForum}>
         הפורום
       </BarLink>
       <BarLink on={active === "baar"} to="/liba/baar">

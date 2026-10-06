@@ -7,7 +7,7 @@ import type { LibaNewCounts } from "./newCounts";
 import { fetchMessagesUnread } from "./messages";
 
 const items = [
-  { key: "forum", label: "המרחב", to: "/liba", Icon: MessagesSquare },
+  { key: "forum", label: "הפורום", to: "/liba", Icon: MessagesSquare },
   { key: "messages", label: "צ׳אט", to: "/liba/messages", Icon: MessageCircle },
   { key: "baar", label: "הבאר", to: "/liba/baar", Icon: Users },
   { key: "mekomot", label: "ליד הבאר", to: "/liba/mekomot", Icon: MapPin },
