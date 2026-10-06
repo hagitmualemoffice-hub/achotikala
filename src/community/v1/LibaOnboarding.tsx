@@ -148,7 +148,6 @@ const Reveal = ({
   children: React.ReactNode;
   label?: string;
 }) => {
-  const { allowNickname } = useIdentityExperiment();
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -281,6 +280,7 @@ const LibaOnboarding = ({
   displayName?: string;
   notifyPrefs?: NotifyPrefs;
 }) => {
+  const { allowNickname } = useIdentityExperiment();
   const [open, setOpen] = useState(false);
   const [returning, setReturning] = useState(false);
   const [step, setStep] = useState(0);
