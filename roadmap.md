@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Implement reversible Liba full-name posting experiment with backend enforcement, independent announcement control and per-member response summary.
+- [ ] Verify nickname history preservation, new posts/comments/replies enforcement and safe behavior for stale offline clients.
+
 - [x] Unify Liba popups as Wolt-style mobile drawers with stable top/content/bottom regions and preserve every popup's text.
 - [x] Add custom floral illustration accents to the Daily Baar entry, sidebar card, and completion/share state only.
 - [x] Prioritize relevant open inquiries on the Daily Baar completion screen and reuse the existing filtered inquiries flow.
