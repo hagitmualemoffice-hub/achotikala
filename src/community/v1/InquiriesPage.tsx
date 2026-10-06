@@ -1,3 +1,4 @@
+import { DirectoryHeading, DirectoryAdd, DirectoryFilter, DirectoryView } from "@/community/v1/DirectoryToolbar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
@@ -344,40 +345,26 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
   const countText=useMemo(()=>items.length===1?"בירור פתוח אחד":`${items.length} בירורים`,[items.length]);
   return <section dir="rtl" className="relative pb-20 md:pb-0">
     <div className="sticky top-0 z-20 -mx-4 mb-5 border-b border-border/50 bg-background/95 px-4 pb-4 pt-2 backdrop-blur-sm md:-mx-6 md:px-6">
-      <div className="mb-4 hidden flex-wrap items-center justify-between gap-4 md:flex">
-        <h1 className="text-[22px] font-light text-foreground md:text-[28px]"><span className="text-primary">אולי את מכירה?</span><span className="mx-2 text-muted-foreground">|</span>פורום הבירורים</h1>
-        <Button onClick={()=>setCreateOpen(true)} className="rounded-full px-5"><Plus className="h-4 w-4"/>פתיחת בירור</Button>
-      </div>
+      <DirectoryHeading title="פורום הבירורים">
+        <p>מחפשת מידע על בחור? כאן אפשר לפתוח בירור ולציין אילו פרטים יעזרו לך. חברות שמכירות אותו או את משפחתו יכולות להציע עזרה, ובהמשך אפשר לפנות אליהן ולשוחח.</p>
+        <p>לפני פתיחת בירור כדאי לבדוק אם כבר קיימת בקשה על אותו בחור. אפשר לראות את כל הבירורים או רק בקשות שמחכות לעזרה שלך, ולסנן לפי עדה.</p>
+      </DirectoryHeading>
       <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="hidden h-9 shrink-0 rounded-full border border-border bg-muted/50 p-0.5 md:flex">
-            <Button type="button" variant="ghost" size="sm" onClick={()=>setHelpStatus("all")} className={`h-full rounded-full px-4 text-[12.5px] font-light ${helpStatus==="all"?"bg-background text-primary shadow-sm hover:bg-background hover:text-primary":"text-muted-foreground"}`}>הכול</Button>
-            <Button type="button" variant="ghost" size="sm" onClick={()=>setHelpStatus("waiting")} className={`h-full rounded-full px-4 text-[12.5px] font-light ${helpStatus==="waiting"?"bg-background text-primary shadow-sm hover:bg-background hover:text-primary":"text-muted-foreground"}`}>בקשות שמחכות לעזרה שלך</Button>
-          </div>
-          <div className="hidden md:block"><SegmentedFilter
-            value={background}
-            onChange={(v) => setBackground(v)}
-            options={[
-              { value: "all", label: "הכול" },
-              { value: "ashkenazi", label: "אשכנזים" },
-              { value: "sephardi", label: "ספרדים" },
-            ]}
-          /></div>
+        <div className="flex flex-wrap items-center gap-2">
+          <DirectoryAdd onClick={() => setCreateOpen(true)} label="פתיחת בירור" />
+          <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
+          <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
           <label className="relative min-w-0 flex-1">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="חיפוש לפי שם, עיר, ישיבה או פרט" className="h-9 w-full rounded-full border border-border bg-card py-2 pe-4 ps-10 text-[13px] outline-none focus:border-primary"/>
           </label>
-          <Button variant="outline" size="icon" onClick={()=>setFiltersOpen(true)} className="h-9 w-9 shrink-0 rounded-full md:hidden" aria-label="סינון"><Filter className="h-4 w-4"/></Button>
-          <div className="flex h-9 shrink-0 items-center rounded-full bg-muted/60 p-0.5">
-            <Button variant="ghost" size="icon" onClick={()=>setView("cards")} className={`h-8 w-8 rounded-full ${view==="cards"?"bg-background text-primary shadow-sm":"text-muted-foreground"}`} title="כרטיסים"><Grid2X2 className="h-4 w-4"/></Button>
-            <Button variant="ghost" size="icon" onClick={()=>setView("list")} className={`h-8 w-8 rounded-full ${view==="list"?"bg-background text-primary shadow-sm":"text-muted-foreground"}`} title="רשימה"><List className="h-4 w-4"/></Button>
-          </div>
+          <DirectoryView value={view} onChange={setView} />
         </div>
         <p className="text-[11.5px] text-muted-foreground">{countText}</p>
       </div>
 
     </div>
-    <Button type="button" size="icon" onClick={()=>setCreateOpen(true)} aria-label="פתיחת בירור" className="fixed bottom-20 left-4 z-40 h-14 w-14 rounded-full shadow-[var(--shadow-card)] md:hidden"><Plus className="h-6 w-6"/></Button>
+
     <ResponsiveDialog open={filtersOpen} onOpenChange={setFiltersOpen} mobileContentClassName="h-[78vh]">
       <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
         <div className="flex items-center justify-between border-b border-border px-5 py-4"><h2 className="text-lg font-medium">סינון</h2><Button variant="ghost" size="sm" onClick={()=>{setBackground("all");setHelpStatus("all")}}>ניקוי</Button></div>
