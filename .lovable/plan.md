@@ -1,22 +1,31 @@
-# Why offline users don't see the latest update
+# ניסוי כתיבה בשם מלא בליבה
 
-## Findings (checked today, 5 Oct 2026, 14:20 UTC)
+## מה ייבנה
+- ניסוי זמני והפיך: בזמן שהוא פעיל, פוסטים, תגובות ותגובות־המשך חדשים יתפרסמו בשם המלא בלבד. כל הניקים, אפשרויות הניק והתוכן הישן יישארו ללא שינוי.
+- בכל מקום שבו כותבים תוסתר בחירת „בשמי / בניק שלי”, ותופיע הודעה ברורה: „הפוסט יפורסם בשם המלא שלך” או „התגובה תפורסם בשם המלא שלך”, לצד שם הכותבת. אם חסר שם מלא, תידרש השלמתו לפני פרסום.
+- אפשרות הניק תחזור דרך מתג בניהול, ללא שינוי קוד או פרסום גרסה חדשה. שינוי ההגדרה יתעדכן גם אצל חברות שכבר נמצאות בליבה.
 
-1. **Offline channel state**
-   - New repo (achotikala-offline): GitHub v17, jsDelivr v17. Released 12:00 UTC today (commit "offline publish 12:01:55").
-   - Old repo (achotikala): GitHub v17, but **jsDelivr still serves v16** (stale cache). It was never purged after the v17 sync.
-   - Drive: all four files were updated at 12:04 UTC (16.4MB). The Drive connection answers normally (200), so it is not expired right now.
-2. **Site vs package**: the published manifest has no source fingerprint field, so the comparison is by commit. Only one code file changed after the v17 package: `ResponsiveDialog` at 12:25 UTC, which is the fix for the daily card opening and closing on phones. The current fingerprint is `34be9e395276`.
-3. **What updates on its own**: events, blog posts, songs and podcast arrive through the content sync. Code, pages, layout and popups only arrive with a new offline release. The phone fix is **code**, so it needs a release.
-4. **Drive credential**: it works today. The Drive function's own token (`OFFLINE_DRIVE_TOKEN`) still isn't readable, so uploading goes through the Drive connector, as it did for v17. Nothing needs the owner.
-5. **Failed or partial release**: none. Both repos have v17 on GitHub. The only gap is the old repo's stale jsDelivr cache.
+## הודעת הניסוי
+- חלון חד־פעמי לכל חברה, כולל חברות ותיקות, לפי גרסת הניסוי ובשמירה בין מכשירים. ייעשה שימוש במעטפת החלונות הקיימת, ללא התנגשות עם חלונות הכניסה האחרים.
+- הכותרת והטקסט יהיו בדיוק בנוסח ששלחת, כולל „ואז נחליט יחד איך נכון להמשיך”. מתחתיהם תופיע ההבהרה: „חשוב לדעת: בתקופה הזו, כל פוסט או תגובה שתכתבי בליבה יופיעו בשם המלא שלך.”
+- שני כפתורים שווי־משקל: „אוהבת את זה ❤️” ו„אוקיי, ננסה 🙂”. שניהם סוגרים ומאשרים את ההודעה, ללא השפעה על הרשאות. סגירה ללא תשובה תישמר בנפרד ולא תגרום להצגה חוזרת.
 
-## Most likely reason
-There are two causes, depending on the member:
-- Members on new installs (rev 14+) have v17. They don't have the phone fix because it was made after v17 was packaged.
-- Members on old installs (rev 13) read the old repo through jsDelivr, which still shows v16. They haven't received v17 at all.
+## שליטה וסיכום בניהול הקהילה
+- „כתיבה בשם מלא בליבה” — פעיל / לא פעיל, עם הבהרה שכיבוי מחזיר בחירה בניק.
+- „הודעת הניסוי” — פעילה / לא פעילה, בשליטה נפרדת. ההודעה לא תטען שכל התוכן מתפרסם בשם מלא כאשר הניסוי עצמו כבוי.
+- סיכום קטן: חברות שראו, חברות שענו, מספר ואחוז לכל תשובה מתוך העונות, וסגירות ללא תשובה. כל חברה תיספר פעם אחת לכל גרסת ניסוי, גם בלחיצה כפולה או ברענון.
 
-## Fix steps (after approval)
-1. Purge jsDelivr for the old repo's manifest and check that it shows v17.
-2. Publish v18 with the full release chain: build, pack, local verify, runtime check, push, purge and verify jsDelivr for both repos, rebuild the install file, update all four Drive files, then download and verify each link.
-3. Add `sourceFingerprint` to the manifest when packing, so the admin "up to date" check works.
+## פרטיות ואופליין
+- בקשה לפרסם בניק בזמן הניסוי תיחסם, ולא תומר בשקט לפרסום בשם מלא. כך טיוטה שנכתבה בהנחת אנונימיות לא תחשוף שם בטעות.
+- האכיפה תחול גם על גרסאות אופליין ישנות. הן לא יוכלו לפרסם בניק בזמן הניסוי; ההודעה ומסכי הכתיבה המעודכנים יגיעו אליהן רק בשחרור אופליין חדש.
+- שחרור אופליין אינו חלק מהשינוי הזה; אין שינוי ב־launcher, באריזה או בפורמט העדכונים.
+
+## פרטים טכניים
+- שימוש במסלולי יצירת הפוסטים והתגובות הקיימים ובזהות המשתמשת המחוברת. אכיפה בצד השרת לכל יצירה חדשה, כולל מניעת עקיפה דרך API ודרך החלפת זהות של תוכן חדש, בלי לשנות זהות של תוכן היסטורי.
+- הגדרות מאומתות בניהול; אין הסתמכות על אחסון מקומי להרשאות. מעקב נפרד ומינימלי לפי מזהה חברה וגרסת ניסוי, עם שמירת התשובה הראשונה בלבד.
+- לא נמצא מנגנון קיים מתאים המשלב מתג כתיבה והיענות להודעה; יתווסף רק המידע החסר, תוך שימוש בחלונות, בניהול ובמערכת הכניסה הקיימים.
+
+## בדיקות וסיום
+- בדיקות עם משתמשת מחוברת: פוסט, תגובה ותגובה־המשך בשם מלא; חסימת בקשות ישירות בניק; החזרת אפשרות הניק; שמירת זהות התוכן הישן; מניעת ספירה כפולה; הרשאות ניהול בלבד.
+- בדיקת הופעת ההודעה, סגירה, חזרה לליבה וסיכום התשובות בניהול. הפעלת הניסוי רק לאחר שההגנות ומסכי הכתיבה מוכנים ונבדקו.
+- בסיום יפורט איפה להחזיר כתיבה בניק, איפה לשלוט בהודעה ואיפה לראות תשובות, לצד תוצאות הבדיקות ומצב האופליין.
