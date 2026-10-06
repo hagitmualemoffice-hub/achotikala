@@ -1014,7 +1014,7 @@ const PlacesPage = () => {
         </DirectoryHeading>
         <div className="mb-5 flex flex-wrap items-center gap-2">
           <DirectoryAdd onClick={() => { setEditing(null); setFormOpen(true); }} label="הוספת מקום" />
-          <label className="relative min-w-0 flex-1">
+          <label className="relative w-56 max-w-full shrink-0">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               ref={searchRef}
@@ -1036,7 +1036,7 @@ const PlacesPage = () => {
             }}
           />
 
-          <DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} />
+          <div className="ms-auto"><DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} /></div>
         </div>
 
         <p className="mb-3 text-[13px] font-light text-muted-foreground">{total} מקומות במאגר</p>
