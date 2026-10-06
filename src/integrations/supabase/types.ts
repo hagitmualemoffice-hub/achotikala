@@ -985,6 +985,7 @@ export type Database = {
           edited_at: string | null
           helpful_at: string | null
           id: string
+          identity_experiment_version: number | null
           parent_id: string | null
           post_id: string
           status: string
@@ -998,6 +999,7 @@ export type Database = {
           edited_at?: string | null
           helpful_at?: string | null
           id?: string
+          identity_experiment_version?: number | null
           parent_id?: string | null
           post_id: string
           status?: string
@@ -1011,6 +1013,7 @@ export type Database = {
           edited_at?: string | null
           helpful_at?: string | null
           id?: string
+          identity_experiment_version?: number | null
           parent_id?: string | null
           post_id?: string
           status?: string
@@ -1228,6 +1231,60 @@ export type Database = {
           id?: string
           idem_key?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      community_identity_acknowledgements: {
+        Row: {
+          dismissed_at: string | null
+          experiment_version: number
+          responded_at: string | null
+          response: string | null
+          shown_at: string
+          user_id: string
+        }
+        Insert: {
+          dismissed_at?: string | null
+          experiment_version: number
+          responded_at?: string | null
+          response?: string | null
+          shown_at?: string
+          user_id: string
+        }
+        Update: {
+          dismissed_at?: string | null
+          experiment_version?: number
+          responded_at?: string | null
+          response?: string | null
+          shown_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_identity_settings: {
+        Row: {
+          activated_at: string | null
+          allow_nickname_posting: boolean
+          announcement_active: boolean
+          experiment_version: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          allow_nickname_posting?: boolean
+          announcement_active?: boolean
+          experiment_version?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          allow_nickname_posting?: boolean
+          announcement_active?: boolean
+          experiment_version?: number
+          id?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1652,6 +1709,7 @@ export type Database = {
           created_at: string
           edited_at: string | null
           id: string
+          identity_experiment_version: number | null
           last_activity_at: string
           pinned: boolean
           show_in_sidebar: boolean
@@ -1667,6 +1725,7 @@ export type Database = {
           created_at?: string
           edited_at?: string | null
           id?: string
+          identity_experiment_version?: number | null
           last_activity_at?: string
           pinned?: boolean
           show_in_sidebar?: boolean
@@ -1682,6 +1741,7 @@ export type Database = {
           created_at?: string
           edited_at?: string | null
           id?: string
+          identity_experiment_version?: number | null
           last_activity_at?: string
           pinned?: boolean
           show_in_sidebar?: boolean
@@ -3262,6 +3322,15 @@ export type Database = {
         Returns: Json
       }
       community_hearts_json: { Args: { _uid: string }; Returns: Json }
+      community_identity_ack: {
+        Args: { _event: string; _version: number }
+        Returns: Json
+      }
+      community_identity_admin: {
+        Args: { _allow_nickname?: boolean; _announcement_active?: boolean }
+        Returns: Json
+      }
+      community_identity_state: { Args: never; Returns: Json }
       community_initials: { Args: { _name: string }; Returns: string }
       community_inquiry_admin_action: {
         Args: { _action: string; _id: string; _payload?: Json }
