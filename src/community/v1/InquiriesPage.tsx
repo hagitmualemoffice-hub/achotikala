@@ -344,7 +344,7 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
   const patch=(q:Inquiry)=>setItems((xs)=>xs.map((x)=>x.id===q.id?q:x));
   const countText=useMemo(()=>items.length===1?"בירור פתוח אחד":`${items.length} בירורים`,[items.length]);
   return <section dir="rtl" className="relative pb-20 md:pb-0">
-    <div className="sticky top-0 z-20 -mx-4 mb-5 border-b border-border/50 bg-background/95 px-4 pb-4 pt-2 backdrop-blur-sm md:-mx-6 md:px-6">
+    <div className="sticky top-0 z-20 -mx-4 mb-5 bg-background/95 px-4 pt-2 backdrop-blur-sm md:-mx-6 md:px-6">
       <DirectoryHeading title="פורום הבירורים">
         <p>מחפשת מידע על בחור? כאן אפשר לפתוח בירור ולציין אילו פרטים יעזרו לך. חברות שמכירות אותו או את משפחתו יכולות להציע עזרה, ובהמשך אפשר לפנות אליהן ולשוחח.</p>
         <p>לפני פתיחת בירור כדאי לבדוק אם כבר קיימת בקשה על אותו בחור. אפשר לראות את כל הבירורים או רק בקשות שמחכות לעזרה שלך, ולסנן לפי עדה.</p>
@@ -360,7 +360,7 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
           <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
           <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
-        <p className="text-[11.5px] text-muted-foreground">{countText}</p>
+        <p className="text-right text-[12px] font-light text-muted-foreground">{countText}</p>
       </div>
 
     </div>
