@@ -1,3 +1,4 @@
+import IdentityExperimentPopup from "@/community/v1/IdentityExperimentPopup";
 import LibaHeartIcon from "@/community/v1/LibaHeartIcon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -1225,6 +1226,7 @@ const CommunityBody = () => {
       />
 
       {/* Composer — full "כתבי פוסט" flow */}
+      <IdentityExperimentPopup blocked={!!boot?.requires_agreement || agreementOpen || namePromptOpen || settingsOpen || composerOpen} />
       <NewEventPopup />
       <DailyBaarPromoPopup />
       <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} />

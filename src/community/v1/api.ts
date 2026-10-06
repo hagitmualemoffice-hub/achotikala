@@ -1,3 +1,4 @@
+import { requirePostingIdentity } from "./identityExperiment";
 /**
  * The one door between the community UI and the backend.
  *
@@ -396,6 +397,7 @@ export const createPost = async (input: {
   asNickname?: boolean;
   attachments?: NewAttachment[];
 }) => {
+  await requirePostingIdentity(input.asNickname ?? false);
   const id = await rpc<string>("community_create_post", {
     _space: input.space,
     _body: input.body,
@@ -416,13 +418,14 @@ export const addComment = (input: {
   body: string;
   parentId?: string | null;
   asNickname?: boolean;
-}) =>
-  rpc<string>("community_add_comment", {
+}) => {
+  return requirePostingIdentity(input.asNickname ?? false).then(() => rpc<string>("community_add_comment", {
     _post_id: input.postId,
     _body: input.body,
     _parent_id: input.parentId ?? null,
     _as_nickname: input.asNickname ?? false,
-  });
+  }));
+};
 
 export const toggleReaction = (
   targetType: ReactionTarget,

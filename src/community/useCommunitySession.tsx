@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { forgetAllGrants } from "@/community/v1/accessMemo";
+import { publishIdentityState } from "@/community/v1/identityExperiment";
 
 export type MemberStatus = "approved" | "pending" | "blocked" | "none";
 
@@ -63,6 +64,7 @@ export function CommunitySessionProvider({ children }: { children: ReactNode }) 
       setSession(s);
       setSessionReady(true);
       if (event === "SIGNED_OUT") {
+        publishIdentityState(null);
         rememberMember(null);
         forgetAllGrants();
         setStatus("none");

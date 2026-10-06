@@ -1,3 +1,5 @@
+import IdentityPostingNotice from "./IdentityPostingNotice";
+import { useIdentityExperiment } from "./identityExperiment";
 /**
  * "ליבה, נעים להכיר" — ההיכרות וההתאמה האישית של ליבה.
  *
@@ -222,7 +224,9 @@ const ChatDemo = () => {
 
 /** הדגמה של בחירת הזהות — בלי לפרסם דבר. */
 const IdentityDemo = ({ name }: { name: string }) => {
+  const { allowNickname } = useIdentityExperiment();
   const [as, setAs] = useState<"name" | "nick">("name");
+  if (!allowNickname) return <IdentityPostingNotice />;
   return (
     <div className="inline-flex rounded-full border border-border/70 p-1">
       {(
@@ -276,6 +280,7 @@ const LibaOnboarding = ({
   displayName?: string;
   notifyPrefs?: NotifyPrefs;
 }) => {
+  const { allowNickname } = useIdentityExperiment();
   const [open, setOpen] = useState(false);
   const [returning, setReturning] = useState(false);
   const [step, setStep] = useState(0);
@@ -487,9 +492,9 @@ const LibaOnboarding = ({
         {/* 2 — את בוחרת איך להופיע */}
         {step === 2 && (
           <>
-            <Slide img={obIdentity} title="את בוחרת איך להופיע">
+            <Slide img={obIdentity} title={allowNickname ? "את בוחרת איך להופיע" : "בתקופה הקרובה כותבות בשם מלא"}>
               <p className="text-[13.5px] font-light leading-relaxed text-muted-foreground">
-                בכל פעם שאת כותבת בליבה, תוכלי לבחור אם לכתוב בשם שלך או בניק הקבוע שלך.
+                {allowNickname ? "בכל פעם שאת כותבת בליבה, תוכלי לבחור אם לכתוב בשם שלך או בניק הקבוע שלך." : "במסגרת הניסוי הזמני, פוסטים ותגובות חדשים יופיעו בשם המלא שלך."}
               </p>
               <div className="mt-3">
                 <IdentityDemo name={displayName} />
