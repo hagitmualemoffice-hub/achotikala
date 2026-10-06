@@ -2165,7 +2165,7 @@ const BaarPage = () => {
               <p>בכרטיס הבחור תוכלי לקרוא פרטים, המלצות ומידע שנוסף על ידי חברות, ולמצוא את פרטי איש הקשר להצעה. אפשר לשמור כרטיסים באזור האישי ולסנן את המאגר לפי הפרטים שחשובים לך.</p>
               <p>מכירה בחור שיכול להתאים? הוסיפי אותו למאגר, או הוסיפי מידע והמלצה לכרטיס קיים. המידע הוא נקודת פתיחה להיכרות ולבירור אישי, ולא תחליף לבדיקה שלך.</p>
             </DirectoryHeading>
-            <div className="mb-5 flex flex-wrap items-center gap-2">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <DirectoryAdd onClick={() => setCreateOpen(true)} label="הוספת בחור" />
               <label className="relative w-56 max-w-full shrink-0">
                 <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -2219,10 +2219,7 @@ const BaarPage = () => {
               />
               <div className="ms-auto"><DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} /></div>
             </div>
-
-
-
-
+            <p className="mb-5 text-right text-[12px] font-light text-muted-foreground">{totalBoys} בחורים במאגר</p>
             {view === "rows" && boys.length > 0 && (
               <div className="hidden grid-cols-[1.2fr_0.5fr_0.8fr_0.8fr_0.8fr_0.75fr_0.9fr_auto] gap-4 border-b border-border/60 pb-2 text-[12px] font-light text-muted-foreground md:grid" dir="rtl">
                 <span>שם</span>
@@ -2325,9 +2322,6 @@ const BaarPage = () => {
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
-                <span className="ms-2 text-[12px] text-muted-foreground" dir="rtl">
-                  {totalBoys} בחורים
-                </span>
               </nav>
             )}
           </>

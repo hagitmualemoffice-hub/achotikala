@@ -400,10 +400,11 @@ const Apartments = () => {
           <Button variant="outline" className="h-9 rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button>
           <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
+        <p className="mb-5 mt-3 text-right text-[12px] font-light text-muted-foreground">{visible.length} מודעות בלוח</p>
       </section>
 
       {/* board */}
-      <section className="mx-auto max-w-[1400px] px-4 pt-4 pb-10 md:px-6 md:pt-5"><div>
+      <section className="mx-auto max-w-[1400px] px-4 pb-10 md:px-6"><div>
         {offline ? (
           <div className="rounded-[28px] border border-border/70 bg-card p-10 text-center">
             <WifiOff className="h-8 w-8 mx-auto text-muted-foreground" />
