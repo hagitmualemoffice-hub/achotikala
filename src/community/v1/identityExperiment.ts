@@ -13,6 +13,14 @@ export type IdentityAdminState = IdentityState & { stats: { shown: number; respo
 let state: IdentityState | null = null;
 const listeners = new Set<() => void>();
 let pending: Promise<IdentityState> | null = null;
+let generation = 0;
+supabase.auth.onAuthStateChange((event) => {
+  if (event === "SIGNED_OUT" || event === "SIGNED_IN") {
+    generation += 1;
+    pending = null;
+    publishIdentityState(null);
+  }
+});
 const rpc = async <T>(fn: string, args: Record<string, unknown> = {}): Promise<T> => {
   const { data, error } = await supabase.rpc(fn as never, args as never);
   if (error) throw error;
@@ -24,10 +32,11 @@ export function publishIdentityState(value: IdentityState | null) {
 }
 export function refreshIdentityState(): Promise<IdentityState> {
   if (pending) return pending;
+  const requestGeneration = generation;
   pending = rpc<IdentityState>("community_identity_state").then((value) => {
-    publishIdentityState(value);
+    if (requestGeneration === generation) publishIdentityState(value);
     return value;
-  }).finally(() => { pending = null; });
+  }).finally(() => { if (requestGeneration === generation) pending = null; });
   return pending;
 }
 export function useIdentityExperiment() {

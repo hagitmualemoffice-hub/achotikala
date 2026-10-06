@@ -793,7 +793,7 @@ const PostCard = ({ post, me, onRecommend, onChanged, onDeleted, defaultOpen, fe
             )}
 
             <div className="mt-7 border-t border-border/50 pt-5">
-              <IdentityPostingNotice comment />
+              <IdentityPostingNotice comment previousNickname={asNickname} onUseName={() => setAsNickname(false)} />
               <div className="flex items-end gap-3">
                 <Avatar
                   initials={me.initials}
@@ -1106,7 +1106,7 @@ const CommentItem = ({
                   <span className="hidden text-[12px] md:inline">שליחה</span>
                 </button>
               </div>
-              <IdentityPostingNotice comment />
+              <IdentityPostingNotice comment previousNickname={replyAsNickname} onUseName={() => setReplyAsNickname(false)} />
               {allowNickname && myNickname && (
                 <button
                   onClick={() => setReplyAsNickname(!replyAsNickname)}

@@ -718,7 +718,7 @@ export default function Composer({
                 </p>
 
                 {/* collapsed summary */}
-                {!allowNickname ? <IdentityPostingNotice /> : !identityOpen ? (
+                {!allowNickname ? <IdentityPostingNotice previousNickname={as === "nick"} onUseName={() => setAs("name")} /> : !identityOpen ? (
                   <div className="mt-4 flex items-start gap-3.5">
                     <span
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] ${

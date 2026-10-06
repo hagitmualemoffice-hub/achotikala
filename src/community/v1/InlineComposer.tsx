@@ -272,7 +272,7 @@ export default function InlineComposer({
             {open && (
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2.5 text-[12.5px] font-light">
               {/* identity */}
-              {!allowNickname ? <IdentityPostingNotice /> : <span className="flex items-center gap-1.5">
+              {!allowNickname ? <IdentityPostingNotice previousNickname={as === "nick"} onUseName={() => setAs("name")} /> : <span className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">מפרסמת כ:</span>
                 <span className="relative">
                   <button
