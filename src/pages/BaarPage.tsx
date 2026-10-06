@@ -25,7 +25,6 @@ import {
   Trash2,
   UserCircle,
   X,
-  Flower2,
 } from "lucide-react";
 import { toast } from "sonner";
 import * as SliderPrimitive from "@radix-ui/react-slider";
@@ -40,7 +39,6 @@ import LibaHeaderActions from "@/community/v1/LibaHeaderActions";
 import LibaTopBar from "@/community/v1/LibaTopBar";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import LibaEmptyState from "@/components/EmptyState";
-import DailyBaarDialog from "@/community/v1/DailyBaarDialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -1947,7 +1945,6 @@ const BaarPage = () => {
   const [inquiryUnread, setInquiryUnread] = useState(0);
   const [editingBoy, setEditingBoy] = useState<BaarBoy | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [dailyOpen, setDailyOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -2163,14 +2160,14 @@ const BaarPage = () => {
           </div>
         ) : (
           <>
-            <DirectoryHeading title="הבאר" actions={<Button variant="outline" onClick={() => setDailyOpen(true)} className="hidden rounded-full text-primary md:inline-flex"><Flower2 />ההשתדלות היומית</Button>}>
+            <DirectoryHeading title="הבאר">
               <p>הבאר היא מאגר בחורים מומלצים של חברות אחותי כלה. לכל בחור יש חברה שמכירה אותו או המליצה עליו, וניתן לפנות אליה כדי לקבל מידע נוסף.</p>
               <p>בכרטיס הבחור תוכלי לקרוא פרטים, המלצות ומידע שנוסף על ידי חברות, ולמצוא את פרטי איש הקשר להצעה. אפשר לשמור כרטיסים באזור האישי ולסנן את המאגר לפי הפרטים שחשובים לך.</p>
               <p>מכירה בחור שיכול להתאים? הוסיפי אותו למאגר, או הוסיפי מידע והמלצה לכרטיס קיים. המידע הוא נקודת פתיחה להיכרות ולבירור אישי, ולא תחליף לבדיקה שלך.</p>
             </DirectoryHeading>
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <DirectoryAdd onClick={() => setCreateOpen(true)} label="הוספת בחור" />
-              <label className="relative min-w-0 flex-1 sm:w-[16.5rem] sm:flex-none">
+              <label className="relative min-w-0 flex-1">
                 <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   ref={searchRef}
@@ -2223,14 +2220,6 @@ const BaarPage = () => {
               <DirectoryView value={view === "cards" ? "cards" : "list"} onChange={(v) => setView(v === "cards" ? "cards" : "rows")} />
             </div>
 
-            <Button
-              type="button"
-              onClick={() => setDailyOpen(true)}
-              aria-label="ההשתדלות היומית"
-              className="fixed bottom-36 left-4 z-40 h-12 w-12 rounded-full bg-card text-primary shadow-[var(--shadow-card)] md:hidden"
-            >
-              <Flower2 className="h-5 w-5" />
-            </Button>
 
 
 
@@ -2362,8 +2351,6 @@ const BaarPage = () => {
         }}
       />
 
-      {/* ההשתדלות היומית — כרטיס אחד ביום, שנבחר במיוחד בשבילה */}
-      <DailyBaarDialog open={dailyOpen} onOpenChange={setDailyOpen} onAddBoy={() => setCreateOpen(true)} />
 
       <ProfileDialog
         boyId={openBoyId}

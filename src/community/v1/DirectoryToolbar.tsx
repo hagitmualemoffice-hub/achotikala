@@ -25,7 +25,7 @@ export function DirectoryHeading({ title, children, actions }: { title: string; 
 }
 
 export function DirectoryAdd({ onClick, label }: { onClick: () => void; label: string }) {
-  return <Button variant="directoryAdd" size="icon" onClick={onClick} aria-label={label} title={label} className="h-10 w-10 shrink-0 rounded-full"><Plus className="h-5 w-5" /></Button>;
+  return <Button size="icon" onClick={onClick} aria-label={label} title={label} className="h-10 w-10 shrink-0 rounded-full"><Plus className="h-5 w-5" /></Button>;
 }
 
 export function DirectoryView({ value, onChange }: { value: "cards" | "list"; onChange: (value: "cards" | "list") => void }) {
