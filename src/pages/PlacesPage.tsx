@@ -1014,7 +1014,7 @@ const PlacesPage = () => {
         </DirectoryHeading>
         <div className="mb-5 flex flex-wrap items-center gap-2">
           <DirectoryAdd onClick={() => { setEditing(null); setFormOpen(true); }} label="הוספת מקום" />
-          <label className="relative min-w-0 flex-1 sm:w-[16.5rem] sm:flex-none">
+          <label className="relative min-w-0 flex-1">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               ref={searchRef}

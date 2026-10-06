@@ -352,12 +352,12 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <DirectoryAdd onClick={() => setCreateOpen(true)} label="פתיחת בירור" />
-          <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
-          <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
-          <label className="relative min-w-[180px] flex-1 basis-full sm:basis-auto">
+          <label className="relative min-w-0 flex-1">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="חיפוש לפי שם, עיר, ישיבה או פרט" className="h-9 w-full rounded-full border border-border bg-card py-2 pe-4 ps-10 text-[13px] outline-none focus:border-primary"/>
           </label>
+          <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
+          <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
           <DirectoryView value={view} onChange={setView} />
         </div>
         <p className="text-[11.5px] text-muted-foreground">{countText}</p>

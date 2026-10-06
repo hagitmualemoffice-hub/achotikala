@@ -362,7 +362,7 @@ const Apartments = () => {
 
       {/* כותרת הדף — בסגנון ליבה, מכווצת בטלפון */}
       <section className="mx-auto max-w-[1400px] px-4 pt-3 md:px-6 md:pt-8">
-        <DirectoryHeading title="לוח דירות" actions={access === "granted" ? <Button variant="outline" className="rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button> : undefined}>
+        <DirectoryHeading title="לוח דירות">
           <p>דירות, שותפות ובית שמחכה לך. הלוח פתוח לחברות הקהילה — לחיפוש דירה, שותפה, סאבלט או הקמת בית משותף.</p>
           <p>אפשר לסנן לפי סוג מודעה ולפי הפרטים שחשובים לך. בכרטיס המודעה תמצאי את פרטי הדירה ואת הדרך ליצור קשר עם המפרסמת, ותוכלי לשמור מודעות באזור האישי.</p>
         </DirectoryHeading>
@@ -397,6 +397,7 @@ const Apartments = () => {
           <DirectoryAdd onClick={startPublish} label="פרסמי מודעה" />
           <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
           <Button variant="outline" onClick={() => setFiltersOpen(true)} className={cn(PILL_IDLE, filtersActive && PILL_ACTIVE)}><SlidersHorizontal />סינון</Button>
+          <Button variant="outline" className="h-9 rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button>
           <DirectoryView value={view} onChange={setView} />
         </div>
       </section>

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Match directory plus to primary pink, move apartment personal ads into filters, remove Baar Daily Baar controls, and align expanding searches immediately after add. Verified all four authenticated screens and personal ads dialog; build OK. Offline release not requested.
+
 - [x] Make inquiries five cards per desktop row and reserve helper/avatar/cancellation space; verified five populated cards per row, aligned help/update buttons and no button movement when reserved slots fill. Help dialog opens; no help submitted. Offline release not requested.
 
 - [x] Unify directory headings/info, circular red add controls, dropdown filters and card/list selectors across Baar, Places, Inquiries and Apartments; verified authenticated info/add dialogs, filters, populated apartment rows and mobile layout. Offline release not requested.
