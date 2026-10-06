@@ -90,6 +90,8 @@ type Filter = "all" | SpaceId;
 type ViewMode = "feed" | "compact";
 
 const VIEW_KEY = "achotikala.community.view";
+// Keep the category strip available for an explicit future restoration.
+const SHOW_FORUM_CATEGORY_STRIP = false;
 
 /** The feed / compact switch — one control, reused in the title row and on phones. */
 const ViewToggle = ({
@@ -104,13 +106,14 @@ const ViewToggle = ({
       { id: "feed" as ViewMode, label: "פיד", Icon: LayoutList },
       { id: "compact" as ViewMode, label: "מרוכז", Icon: Rows3 },
     ]).map(({ id, label, Icon: VIcon }) => (
-      <button
+      <Button
         key={id}
+        variant="ghost"
         onClick={() => setView(id)}
         aria-pressed={view === id}
         aria-label={label}
         title={label}
-        className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1.5 transition-colors md:px-2.5 md:py-1 ${
+        className={`inline-flex h-7 items-center gap-1 rounded-full px-2 py-1 text-[12px] font-normal transition-colors [&_svg]:size-3.5 ${
           view === id
             ? "bg-background text-foreground shadow-sm"
             : "font-light text-muted-foreground hover:text-foreground"
@@ -119,7 +122,7 @@ const ViewToggle = ({
         <VIcon className="h-4 w-4 md:h-3.5 md:w-3.5" />
         {/* on phones the icons speak for themselves, as in הבאר */}
         <span className="hidden md:inline">{label}</span>
-      </button>
+      </Button>
     ))}
   </span>
 );
@@ -216,7 +219,7 @@ const CommunityBody = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   useEffect(() => {
-    if (searchParams.get("borerim")) setInquiriesOnly(true);
+    setInquiriesOnly(searchParams.get("birurim") === "1" || !!searchParams.get("borerim"));
   }, [searchParams]);
   const [hasNewInquiries, setHasNewInquiries] = useState(false);
   useEffect(() => {
@@ -651,7 +654,17 @@ const CommunityBody = () => {
       {/* Slim community bar */}
       <LibaTopBar
         active={inquiriesOnly ? "birurim" : "forum"}
+        onForum={() => {
+          setInquiriesOnly(false);
+          setSavedOnly(false);
+          setPulseOnly(false);
+          setActiveRotatingId(null);
+          setOpenPostId(null);
+          setQuery("");
+          setFilter("all");
+        }}
         onBirurim={() => {
+          navigate("/liba?birurim=1");
           setInquiriesOnly(true);
           setSavedOnly(false);
           setPulseOnly(false);
@@ -679,9 +692,11 @@ const CommunityBody = () => {
         }
       />
 
-      <div className="mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:px-6 lg:py-8 xl:px-10 lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_260px] xl:gap-10">
+      <div className={inquiriesOnly
+        ? "mx-auto max-w-[1400px] px-4 py-6 md:px-6 md:py-8"
+        : "mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:px-6 lg:py-8 xl:px-10 lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_260px] xl:gap-10"}>
         {/* RIGHT — community spaces */}
-        <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
+        {!inquiriesOnly && <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
           <nav className="space-y-5">
 
             <div>
@@ -804,10 +819,10 @@ const CommunityBody = () => {
               </button>
             </div>
           </nav>
-        </aside>
+        </aside>}
 
         {/* CENTER — feed */}
-        <main className="order-1 min-w-0 lg:order-2 xl:me-10" ref={feedTop}>
+        <main className={inquiriesOnly ? "min-w-0" : "order-1 min-w-0 lg:order-2 xl:me-10"} ref={feedTop}>
           {inquiriesOnly ? (
             <InquiriesPage
               key={inquiryFocus || "all"}
@@ -875,7 +890,7 @@ const CommunityBody = () => {
           </div>
 
           {/* filters */}
-          <div className="sticky top-12 z-30 mb-1 flex items-center justify-between gap-2 border-b border-border/70 bg-background/95 py-2 backdrop-blur md:top-16 md:gap-4 md:py-3">
+          <div className={`sticky top-12 z-30 mb-1 flex items-center justify-between gap-2 border-b border-border/70 bg-background/95 py-2 backdrop-blur md:top-16 md:gap-4 md:py-3 ${!SHOW_FORUM_CATEGORY_STRIP && !pulseChip && !rotatingItems.length ? "md:hidden" : ""}`}>
             {/* mobile: single chip opening a bottom drawer with all spaces */}
             <div className="flex min-w-0 items-center gap-2 md:hidden">
               <button
@@ -899,6 +914,7 @@ const CommunityBody = () => {
             </div>
             {/* desktop: full scrollable chips row */}
             <div className="no-scrollbar -mb-px hidden items-center gap-1.5 overflow-x-auto md:flex">
+              {SHOW_FORUM_CATEGORY_STRIP && <>
               <button
                 onClick={() => {
                   setInquiriesOnly(false);
@@ -914,9 +930,10 @@ const CommunityBody = () => {
               >
                 הכול
               </button>
+              </>}
               {pulseChip}
               {rotatingChips}
-              {SPACES.map((s) => (
+              {SHOW_FORUM_CATEGORY_STRIP && SPACES.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => {
@@ -1099,7 +1116,7 @@ const CommunityBody = () => {
         </div>
 
         {/* LEFT — modular panel */}
-        <aside className="order-3 hidden space-y-5 lg:block lg:space-y-7 xl:sticky xl:top-24 xl:self-start">
+        {!inquiriesOnly && <aside className="order-3 hidden space-y-5 lg:block lg:space-y-7 xl:sticky xl:top-24 xl:self-start">
           {/* מה קורה עכשיו בליבה: מאז שהיית כאן + אירועים קרובים + אולי את מכירה? */}
           <LibaPulsePanel
             events={events}
@@ -1204,7 +1221,7 @@ const CommunityBody = () => {
               </ul>
             </section>
           )}
-        </aside>
+        </aside>}
       </div>
 
       {/* Her own account: name, nickname, photo, privacy, notifications */}
