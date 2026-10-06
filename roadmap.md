@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Unify directory headings/info, circular red add controls, dropdown filters and card/list selectors across Baar, Places, Inquiries and Apartments; verify controls.
+
 - [x] Remove inquiry side columns and forum category strip; compact view switch; fix forum navigation from inquiries and mobile forum label.
 
 - [x] Implement reversible Liba full-name posting experiment with backend enforcement, independent announcement control and per-member response summary.
