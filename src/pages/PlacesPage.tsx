@@ -1026,25 +1026,7 @@ const PlacesPage = () => {
           </label>
 
           <DirectoryFilter label="אזור" value={filters.area || "__all__"} onChange={(value) => patch({ area: value === "__all__" ? "" : value })} options={[{ value: "__all__", label: "הכול" }, ...AREA_OPTIONS.map((area) => ({ value: area, label: area }))]} />
-          {/* תפריט נפתח סוג מקום */}
-          <div><Select
-            value={filters.kind || "__all__"}
-            onValueChange={(value) => patch({ kind: value === "__all__" ? "" : value })}
-          >
-            <SelectTrigger className={`h-9 w-auto min-w-[8.5rem] justify-between gap-1.5 rounded-full px-3 text-[13px] font-light outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 ${filters.kind ? "border-primary bg-primary/10 text-primary" : "border-border bg-card"}`}>
-              <span className="truncate">סוג מקום: {filters.kind || "הכל"}</span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__" className="text-[13px]">
-                הכל
-              </SelectItem>
-              {KIND_OPTIONS.map((k) => (
-                <SelectItem key={k} value={k} className="text-[13px]">
-                  {k}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select></div>
+          <DirectoryFilter label="סוג מקום" value={filters.kind || "__all__"} onChange={(value) => patch({ kind: value === "__all__" ? "" : value })} options={[{ value: "__all__", label: "הכול" }, ...KIND_OPTIONS.map((kind) => ({ value: kind, label: kind }))]} />
 
           <PlacesFilterDrawer
             filters={filters}

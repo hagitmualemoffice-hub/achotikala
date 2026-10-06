@@ -1911,30 +1911,7 @@ const QuickFilters = ({
   filters: BaarFilters;
   onChange: (f: BaarFilters) => void;
 }) => {
-  const ethnicityLabel = ETHNICITY_OPTIONS.find((o) => o.value === filters.ethnicity)?.label;
-
-  return (
-    <>
-      <Select
-        value={filters.ethnicity ?? "__all__"}
-        onValueChange={(v) => onChange({ ...filters, ethnicity: v === "__all__" ? undefined : v })}
-      >
-        <SelectTrigger className={quickFilterTrigger(!!filters.ethnicity)} aria-label="סינון לפי עדה">
-          <span className="truncate">עדה: {ethnicityLabel ?? "הכל"}</span>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="__all__" className="text-[13px]">
-            הכל
-          </SelectItem>
-          {ETHNICITY_OPTIONS.map((o) => (
-            <SelectItem key={o.value} value={o.value} className="text-[13px]">
-              {o.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </>
-  );
+  return <DirectoryFilter label="עדה" value={filters.ethnicity ?? "__all__"} onChange={(value) => onChange({ ...filters, ethnicity: value === "__all__" ? undefined : value })} options={[{ value: "__all__", label: "הכול" }, ...ETHNICITY_OPTIONS]} />;
 };
 
 
