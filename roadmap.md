@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Remove inquiry side columns and forum category strip; compact view switch; fix forum navigation from inquiries and mobile forum label.
+- [x] Remove inquiry side columns and forum category strip; compact view switch; fix forum navigation from inquiries and mobile forum label.
 
 - [x] Implement reversible Liba full-name posting experiment with backend enforcement, independent announcement control and per-member response summary.
 - [x] Verify nickname history preservation, authenticated posts/comments/replies, direct nickname rejection, automatic announcement and per-member dismissal/response counts; clean up test content and restore inactive settings. Offline UI has not been released; stale clients are covered by server enforcement.

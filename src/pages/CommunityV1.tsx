@@ -1089,7 +1089,7 @@ const CommunityBody = () => {
 
         </main>
 
-        <div className="order-3 lg:hidden">
+        {!inquiriesOnly && <div className="order-3 lg:hidden">
           <LibaPulsePanel
             events={events}
             since={since}
@@ -1113,7 +1113,7 @@ const CommunityBody = () => {
             onOpenDaily={dailyHidden ? undefined : () => setDailyOpen(true)}
             onOpenDailySettings={dailyHidden ? undefined : () => setDailyPreferencesOpen(true)}
           />
-        </div>
+        </div>}
 
         {/* LEFT — modular panel */}
         {!inquiriesOnly && <aside className="order-3 hidden space-y-5 lg:block lg:space-y-7 xl:sticky xl:top-24 xl:self-start">
