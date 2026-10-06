@@ -19,6 +19,9 @@ supabase.auth.onAuthStateChange((event) => {
     generation += 1;
     pending = null;
     publishIdentityState(null);
+    if (event === "SIGNED_IN") {
+      window.setTimeout(() => { void refreshIdentityState().catch(() => undefined); }, 0);
+    }
   }
 });
 const rpc = async <T>(fn: string, args: Record<string, unknown> = {}): Promise<T> => {
