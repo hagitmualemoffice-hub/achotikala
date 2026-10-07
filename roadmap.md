@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Release offline v19: build/pack/local and network-blocked fresh-install checks passed; both GitHub/jsDelivr channels serve matching v19 manifests and 436 unique parts with zero problems; all four fixed Drive installers uploaded and publicly downloaded (16,392,936 bytes each, MD5 b237668bd45f9df8dabe7596674ba2f3, embedded v19); actual rev13 legacy/rev14 primary launchers upgraded seeded v18 to v19, retained v18 backup and passed health checks without runtime errors. Manifest, packaging, chunking and launcher unchanged.
+
 - [x] Match directory plus to primary pink, move apartment personal ads into filters, remove Baar Daily Baar controls, and align expanding searches immediately after add. Verified all four authenticated screens and personal ads dialog; build OK. Offline release not requested.
 
 - [x] Make inquiries five cards per desktop row and reserve helper/avatar/cancellation space; verified five populated cards per row, aligned help/update buttons and no button movement when reserved slots fill. Help dialog opens; no help submitted. Offline release not requested.
@@ -85,8 +87,8 @@
 - [x] Show active announcements as temporary top feed tabs and create the Sukkot save-the-date for one day after the correct cover is supplied.
 - [x] Verify admin management, automatic expiry, member reading/comments, and mobile/desktop presentation; keep the offline release unpublished.
 - [x] Offline: events, blog and songs load live with last-known cache + baked fallback (unreleased).
-- [ ] Release offline v13 — waiting for owner's go-ahead.
-- [ ] Move offline updates to a dedicated repository (waiting on a GitHub connection).
+- [x] Release offline v13 — superseded by verified v18 release.
+- [x] Move offline updates to a dedicated repository — completed before v18.
 - [ ] Investigate "email not found" for NetFree users with evidence.
 - [x] Baar "ההשתדלות היומית" — card including recommendations, settings and sidebar access built.
 - [x] Offline v18 released: both channels, 4 Drive links, rev13/rev14 upgrades verified.
