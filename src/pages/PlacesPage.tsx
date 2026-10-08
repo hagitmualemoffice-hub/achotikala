@@ -700,7 +700,8 @@ const PlaceSheet = ({
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="space-y-5 overflow-y-auto px-10 pb-12 pt-8 md:px-14 md:pt-12" dir="rtl">
+        <div className="flex min-h-0 flex-1 flex-col" dir="rtl">
+        <div className="popup-scroll space-y-5 px-10 pb-5 pt-8 md:px-14 md:pt-12">
           <h2 className="text-[22px] font-light leading-snug text-foreground">{place.name}</h2>
           <div className="flex flex-wrap gap-1.5">
             {place.area && <Chip>{place.area}</Chip>}
@@ -756,48 +757,6 @@ const PlaceSheet = ({
             </a>
           )}
 
-          <div className="flex flex-wrap items-center gap-2 border-t border-border/70 pt-4">
-            <Button variant="outline" className="rounded-full" onClick={save}>
-              {place.saved ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
-              {place.saved ? "שמור אצלך" : "לשמור אצלי"}
-            </Button>
-            {place.can_edit && (
-              <Button variant="outline" className="rounded-full" onClick={() => onEdit(place)}>
-                <Pencil className="h-4 w-4" />
-                עריכה
-              </Button>
-            )}
-            {!place.can_edit && (
-              <Button variant="outline" className="rounded-full" onClick={() => setSuggestOpen(true)}>
-                <Sparkles className="h-4 w-4" />
-                הצעת עדכון
-              </Button>
-            )}
-            <Button variant="ghost" className="rounded-full text-muted-foreground" onClick={() => setReportOpen(true)}>
-              <Flag className="h-4 w-4" />
-              דיווח
-            </Button>
-            {isAdmin && (
-              <Button
-                variant="ghost"
-                className="rounded-full text-muted-foreground"
-                onClick={async () => {
-                  try {
-                    await archivePlace(place.id);
-                    toast.success("המקום הועבר לארכיון.");
-                    onClose();
-                    onChanged();
-                  } catch (e) {
-                    toast.error(placeErrorText(e));
-                  }
-                }}
-              >
-                <X className="h-4 w-4" />
-                ארכוב
-              </Button>
-            )}
-          </div>
-
           {(suggestOpen || reportOpen) && (
             <div className="space-y-3 rounded-2xl border border-border/70 p-4">
               {reportOpen && (
@@ -851,6 +810,49 @@ const PlaceSheet = ({
               </div>
             </div>
           )}
+        </div>
+          <div className="popup-footer flex flex-wrap items-center gap-2 px-5 py-4 md:px-14">
+            <Button variant="outline" className="rounded-full" onClick={save}>
+              {place.saved ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
+              {place.saved ? "שמור אצלך" : "לשמור אצלי"}
+            </Button>
+            {place.can_edit && (
+              <Button variant="outline" className="rounded-full" onClick={() => onEdit(place)}>
+                <Pencil className="h-4 w-4" />
+                עריכה
+              </Button>
+            )}
+            {!place.can_edit && (
+              <Button variant="outline" className="rounded-full" onClick={() => setSuggestOpen(true)}>
+                <Sparkles className="h-4 w-4" />
+                הצעת עדכון
+              </Button>
+            )}
+            <Button variant="ghost" className="rounded-full text-muted-foreground" onClick={() => setReportOpen(true)}>
+              <Flag className="h-4 w-4" />
+              דיווח
+            </Button>
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                className="rounded-full text-muted-foreground"
+                onClick={async () => {
+                  try {
+                    await archivePlace(place.id);
+                    toast.success("המקום הועבר לארכיון.");
+                    onClose();
+                    onChanged();
+                  } catch (e) {
+                    toast.error(placeErrorText(e));
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+                ארכוב
+              </Button>
+            )}
+          </div>
+
         </div>
       )}
     </ResponsiveDialog>

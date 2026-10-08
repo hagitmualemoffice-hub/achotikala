@@ -503,7 +503,7 @@ export default function DailyBaarDialog({
 
         {/* 1 — the greeting */}
         {phase === "entry" && (
-          <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <div className="popup-scroll flex flex-1 flex-col items-center py-8 text-center">
             <img
               src={dailyBaarEntryArt}
               alt=""
@@ -826,7 +826,7 @@ export default function DailyBaarDialog({
 
         {/* 3 — the goodbye */}
         {(phase === "done" || phase === "empty" || phase === "filterEmpty" || phase === "unavailable" || phase === "paused") && (
-          <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
+          <div className="popup-scroll flex flex-1 flex-col items-center py-10 text-center">
             {phase === "done" && (
               <>
                 <img
