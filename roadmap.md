@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Mobile directories: floating add, one-row search/filter icon/view; fixed drawer actions; balanced forum spacing and flush sticky header. Verify authenticated mobile flows.
+- [ ] Release the mobile fixes through the complete offline chain; stop at any failed step and identify the blocker.
+
 - [x] Release offline v19: build/pack/local and network-blocked fresh-install checks passed; both GitHub/jsDelivr channels serve matching v19 manifests and 436 unique parts with zero problems; all four fixed Drive installers uploaded and publicly downloaded (16,392,936 bytes each, MD5 b237668bd45f9df8dabe7596674ba2f3, embedded v19); actual rev13 legacy/rev14 primary launchers upgraded seeded v18 to v19, retained v18 backup and passed health checks without runtime errors. Manifest, packaging, chunking and launcher unchanged.
 
 - [x] Match directory plus to primary pink, move apartment personal ads into filters, remove Baar Daily Baar controls, and align expanding searches immediately after add. Verified all four authenticated screens and personal ads dialog; build OK. Offline release not requested.

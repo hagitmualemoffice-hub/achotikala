@@ -25,7 +25,7 @@ export function DirectoryHeading({ title, children, actions }: { title: string; 
 }
 
 export function DirectoryAdd({ onClick, label }: { onClick: () => void; label: string }) {
-  return <Button size="icon" onClick={onClick} aria-label={label} title={label} className="h-10 w-10 shrink-0 rounded-full"><Plus className="h-5 w-5" /></Button>;
+  return <Button size="icon" onClick={onClick} aria-label={label} title={label} className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] left-4 z-40 h-12 w-12 shrink-0 rounded-full shadow-lg md:static md:h-10 md:w-10 md:shadow-none"><Plus className="h-5 w-5" /></Button>;
 }
 
 export function DirectoryView({ value, onChange }: { value: "cards" | "list"; onChange: (value: "cards" | "list") => void }) {
@@ -37,7 +37,7 @@ export function DirectoryView({ value, onChange }: { value: "cards" | "list"; on
 export function DirectoryFilter({ label, value, options, onChange }: { label: string; value: string; options: readonly { value: string; label: string }[]; onChange: (value: string) => void }) {
   const selected = options.find((option) => option.value === value);
   return <Select value={value} onValueChange={onChange} dir="rtl">
-    <SelectTrigger aria-label={label} className="h-9 w-auto max-w-full shrink-0 gap-2 rounded-full border-border bg-card px-3 text-[13px] font-light"><span className="truncate">{label}: {selected?.label ?? "הכול"}</span></SelectTrigger>
+    <SelectTrigger aria-label={label} className="hidden h-9 w-auto max-w-full shrink-0 gap-2 rounded-full border-border bg-card px-3 text-[13px] font-light md:flex"><span className="truncate">{label}: {selected?.label ?? "הכול"}</span></SelectTrigger>
     <SelectContent>{options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
   </Select>;
 }
