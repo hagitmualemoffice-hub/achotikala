@@ -350,14 +350,15 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
         <p>לפני פתיחת בירור כדאי לבדוק אם כבר קיימת בקשה על אותו בחור. אפשר לראות את כל הבירורים או רק בקשות שמחכות לעזרה שלך, ולסנן לפי עדה.</p>
       </DirectoryHeading>
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-nowrap items-center gap-2 md:flex-wrap">
           <DirectoryAdd onClick={() => setCreateOpen(true)} label="פתיחת בירור" />
-          <label className="relative w-56 max-w-full shrink-0">
+          <label className="relative min-w-0 flex-1 md:w-56 md:max-w-full md:flex-none md:shrink-0">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="חיפוש לפי שם, עיר, ישיבה או פרט" className="h-9 w-full rounded-full border border-border bg-card py-2 pe-4 ps-10 text-[13px] outline-none focus:border-primary"/>
           </label>
           <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
           <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
+          <Button variant="outline" size="icon" aria-label="סינון" onClick={() => setFiltersOpen(true)} className={`h-9 w-9 shrink-0 rounded-full md:hidden ${background !== "all" || helpStatus !== "all" ? "text-primary border-primary" : "text-muted-foreground"}`}><Filter className="h-4 w-4" /></Button>
           <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
         <p className="text-right text-[12px] font-light text-muted-foreground">{countText}</p>

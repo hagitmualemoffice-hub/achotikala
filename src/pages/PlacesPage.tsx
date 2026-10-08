@@ -257,12 +257,13 @@ const PlacesFilterDrawer = ({
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className={`h-9 rounded-full px-3.5 text-[12.5px] font-light ${
+        aria-label="סינון"
+        className={`h-9 w-9 shrink-0 rounded-full p-0 text-[12.5px] font-light md:w-auto md:px-3.5 ${
           hasActive ? "border-primary text-primary" : "text-muted-foreground"
         }`}
       >
-        <Filter className="ml-1.5 h-3.5 w-3.5" />
-        חיפוש מתקדם
+        <Filter className="h-4 w-4 md:ml-1.5" />
+        <span className="hidden md:inline">חיפוש מתקדם</span>
       </Button>
 
       <ResponsiveDialog open={open} onOpenChange={setOpen} desktopContentClassName="max-w-lg">
@@ -271,7 +272,7 @@ const PlacesFilterDrawer = ({
             <SectionTitle>סינון</SectionTitle>
             <Button variant="ghost" size="sm" onClick={() => onChange({ query: filters.query, sort: "recent" })}>ניקוי</Button>
           </div>
-          <div className="flex-1 space-y-0 overflow-y-auto px-10 md:space-y-6 md:px-14 md:py-8">
+          <div className="popup-scroll space-y-0 px-10 md:space-y-6 md:px-14 md:py-8">
             <div className="border-b border-border/70 py-5 md:border-0 md:py-0">
               <Label text="אזור" />
               <div className="flex flex-wrap gap-2">{AREA_OPTIONS.map((a) => <Choice key={a} selected={filters.area === a} onClick={() => onChange({ ...filters, area: filters.area === a ? "" : a })}>{a}</Choice>)}</div>
@@ -371,7 +372,7 @@ const PlacesFilterDrawer = ({
             </div>
           </div>
 
-          <div className="border-t border-border bg-muted/40 p-4 md:bg-background">
+          <div className="popup-footer border-t border-border bg-muted/40 p-4 md:bg-background">
             <Button onClick={() => setOpen(false)} className="h-12 w-full rounded-md text-[15px] md:ms-auto md:h-10 md:w-auto md:rounded-full md:px-6">הצגת תוצאות</Button>
           </div>
         </div>
@@ -1012,9 +1013,9 @@ const PlacesPage = () => {
           <p>מקומות לדייטים שחברות בליבה כבר ביקרו בהם והמליצו עליהם. בכרטיס המקום תמצאי מידע על השקט, הנגישות בתחבורה ציבורית, הכשרות ומה כדאי לדעת לפני שיוצאים.</p>
           <p>אפשר לסנן לפי אזור וסוג מקום, לשמור מקום שאהבת ולהוסיף מקום או מידע מניסיונך. לפני היציאה כדאי לבדוק מול המקום פרטים שעשויים להשתנות.</p>
         </DirectoryHeading>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-nowrap items-center gap-2 md:flex-wrap">
           <DirectoryAdd onClick={() => { setEditing(null); setFormOpen(true); }} label="הוספת מקום" />
-          <label className="relative w-56 max-w-full shrink-0">
+          <label className="relative min-w-0 flex-1 md:w-56 md:max-w-full md:flex-none md:shrink-0">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               ref={searchRef}

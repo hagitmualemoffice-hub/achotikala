@@ -393,11 +393,12 @@ const Apartments = () => {
       ) : (
         <>
       <section className="mx-auto max-w-[1400px] px-4 pt-3 md:px-6">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-nowrap items-center gap-2 md:flex-wrap">
           <DirectoryAdd onClick={startPublish} label="פרסמי מודעה" />
+          <Input aria-label="חיפוש דירות לפי עיר" placeholder="חיפוש לפי עיר..." value={filters.city} onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))} className="h-9 min-w-0 flex-1 rounded-full text-[13px] md:hidden" />
           <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
-          <Button variant="outline" onClick={() => setFiltersOpen(true)} className={cn(PILL_IDLE, filtersActive && PILL_ACTIVE)}><SlidersHorizontal />סינון</Button>
-          <Button variant="outline" className="h-9 rounded-full text-[13px] font-light" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button>
+          <Button variant="outline" aria-label="סינון" onClick={() => setFiltersOpen(true)} className={cn("h-9 w-9 shrink-0 rounded-full p-0 md:w-auto md:px-3.5", filtersActive && PILL_ACTIVE)}><SlidersHorizontal className="h-4 w-4" /><span className="hidden md:inline">סינון</span></Button>
+          <Button variant="outline" className="hidden h-9 rounded-full text-[13px] font-light md:inline-flex" onClick={() => setMineOpen(true)}>המודעות שלי{mine.length > 0 && <span className="text-primary">{mine.length}</span>}</Button>
           <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
         <p className="mb-5 mt-3 text-right text-[12px] font-light text-muted-foreground">{visible.length} מודעות בלוח</p>
@@ -459,7 +460,8 @@ const Apartments = () => {
         onOpenChange={setFiltersOpen}
         desktopContentClassName="max-w-[480px]"
       >
-        <div className="px-7 md:px-9 py-8 md:py-9 space-y-5 overflow-y-auto" dir="rtl">
+        <div className="flex min-h-0 flex-1 flex-col" dir="rtl">
+        <div className="popup-scroll px-7 md:px-9 py-8 md:py-9 space-y-5">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium">סינון מודעות</h2>
             <button
@@ -472,6 +474,11 @@ const Apartments = () => {
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2 flex flex-wrap items-center gap-2 md:hidden">
+              <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
+              <select aria-label="סוג מודעה" value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as Filters["type"] }))} className="h-9 rounded-full border border-border bg-card px-3 text-sm"><option value="all">כל סוגי המודעות</option>{LISTING_TYPES.map((type) => <option key={type} value={type}>{TYPE_META[type].short}</option>)}</select>
+              <Button variant="outline" className="h-9 rounded-full" onClick={() => { setFiltersOpen(false); setMineOpen(true); }}>המודעות שלי</Button>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="f-city">עיר</Label>
               <Input
@@ -533,7 +540,8 @@ const Apartments = () => {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-3 pt-3">
+        </div>
+          <div className="popup-footer flex items-center gap-3 px-7 py-4 md:px-9">
             <Button
               className="flex-1 h-12 rounded-full font-light"
               onClick={() => setFiltersOpen(false)}

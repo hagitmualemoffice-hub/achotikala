@@ -1700,12 +1700,13 @@ const FilterDrawer = ({
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className={`rounded-full px-3.5 text-[12.5px] font-light ${
+        aria-label="סינון"
+        className={`h-9 w-9 shrink-0 rounded-full p-0 text-[12.5px] font-light md:w-auto md:px-3.5 ${
           hasActive ? "border-primary text-primary" : "text-muted-foreground"
         }`}
       >
-        <Filter className="ml-1.5 h-3.5 w-3.5" />
-        סינון
+        <Filter className="h-4 w-4 md:ml-1.5" />
+        <span className="hidden md:inline">סינון</span>
       </Button>
 
       <ResponsiveDialog open={open} onOpenChange={setOpen} desktopContentClassName="max-w-lg">
@@ -2165,9 +2166,9 @@ const BaarPage = () => {
               <p>בכרטיס הבחור תוכלי לקרוא פרטים, המלצות ומידע שנוסף על ידי חברות, ולמצוא את פרטי איש הקשר להצעה. אפשר לשמור כרטיסים באזור האישי ולסנן את המאגר לפי הפרטים שחשובים לך.</p>
               <p>מכירה בחור שיכול להתאים? הוסיפי אותו למאגר, או הוסיפי מידע והמלצה לכרטיס קיים. המידע הוא נקודת פתיחה להיכרות ולבירור אישי, ולא תחליף לבדיקה שלך.</p>
             </DirectoryHeading>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="mb-3 flex flex-nowrap items-center gap-2 md:flex-wrap">
               <DirectoryAdd onClick={() => setCreateOpen(true)} label="הוספת בחור" />
-              <label className="relative w-56 max-w-full shrink-0">
+              <label className="relative min-w-0 flex-1 md:w-56 md:max-w-full md:flex-none md:shrink-0">
                 <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   ref={searchRef}
