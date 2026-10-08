@@ -177,9 +177,9 @@ const ListingWizard = ({
       onOpenChange={close}
       mobileContentClassName="h-[calc(100dvh-0.75rem)] max-h-[calc(100dvh-0.75rem)]"
     >
-      <div className="min-h-0 flex-1 overflow-y-auto" dir="rtl">
+      <div className="flex min-h-0 flex-1 flex-col" dir="rtl">
         {!v ? (
-          <div className="px-10 md:px-14 py-11 md:py-14">
+          <div className="popup-scroll px-10 md:px-14 py-11 md:py-14">
             <h2 className="text-xl font-medium text-center">מה את רוצה לפרסם?</h2>
             <p className="text-sm text-muted-foreground text-center mt-2">
               בחרי סוג מודעה ונמשיך לטופס קצר
@@ -208,7 +208,8 @@ const ListingWizard = ({
             </div>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-6 px-5 pb-24 pt-5 md:px-14 md:py-12">
+          <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
+            <div className="popup-scroll space-y-6 px-5 pb-5 pt-5 md:px-14 md:py-12">
             <div className="flex items-center gap-2">
               {!editing && (
                 <button
@@ -424,7 +425,8 @@ const ListingWizard = ({
             </div>
             <p className="text-xs text-muted-foreground">יש להשאיר לפחות דרך אחת ליצירת קשר.</p>
 
-            <div className="fixed inset-x-0 bottom-0 z-[60] border-t border-border/60 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:shadow-none">
+            </div>
+            <div className="popup-footer border-t border-border/60 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:shadow-none">
               <Button type="submit" className="h-12 w-full rounded-full bg-primary font-light text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))]" disabled={saving}>
                 {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                 {editing ? "שמירת השינויים" : "פרסום המודעה"}

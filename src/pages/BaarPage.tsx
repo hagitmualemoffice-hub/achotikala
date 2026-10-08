@@ -573,7 +573,8 @@ const BoyDialog = ({
       mobileContentClassName="h-[calc(100dvh-0.75rem)] max-h-[calc(100dvh-0.75rem)]"
       closeOnBackdrop={false}
     >
-      <div dir="rtl" className="popup-scroll space-y-3 px-5 pb-24 pt-4 md:px-12 md:pb-10 md:pt-8">
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
+        <div className="popup-scroll space-y-3 px-5 pb-5 pt-4 md:px-12 md:pb-10 md:pt-8">
         <div className="pe-10 pt-1 md:pe-0 md:pt-2">
           <p className="text-[11px] text-primary">{editing ? "עריכת פרופיל" : "הוספת בחור לבאר"}</p>
           <SectionTitle>טופס פרטי בחור מומלץ 🥇💙</SectionTitle>
@@ -628,11 +629,7 @@ const BoyDialog = ({
               })}
             </div>
 
-            <FormCard className="popup-footer fixed inset-x-0 bottom-0 z-[60] flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:shadow-sm">
-              <Button onClick={goToForm} disabled={!allConfirmed} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
-                לשלב הבא
-              </Button>
-            </FormCard>
+
             {!allConfirmed && (
               <p className="pb-2 text-center text-[12px] font-light text-muted-foreground">
                 כדי להמשיך צריך לאשר את כל הסעיפים למעלה 🌷
@@ -964,7 +961,23 @@ const BoyDialog = ({
               </FormCard>
             </fieldset>
 
-            <FormCard className="popup-footer fixed inset-x-0 bottom-0 z-[60] space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)] md:static md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
+
+            {!editing && (
+              <p className="pb-2 text-center text-[11.5px] font-light text-muted-foreground">
+                מה שאת ממלאת נשמר אוטומטית — גם אם החלון ייסגר בטעות
+              </p>
+            )}
+          </>
+        )}
+        </div>
+        {!done && (showRulesStep ? (
+            <FormCard className="popup-footer  flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:shadow-sm">
+              <Button onClick={goToForm} disabled={!allConfirmed} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
+                לשלב הבא
+              </Button>
+            </FormCard>
+        ) : (
+            <FormCard className="popup-footer  space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
               {missing.length > 0 && (
                 <div className="rounded-2xl bg-primary/[0.07] p-3">
                   <p className="text-[12.5px] font-medium text-primary">כמה דברים עוד חסרים:</p>
@@ -984,13 +997,7 @@ const BoyDialog = ({
                 </Button>
               </div>
             </FormCard>
-            {!editing && (
-              <p className="pb-2 text-center text-[11.5px] font-light text-muted-foreground">
-                מה שאת ממלאת נשמר אוטומטית — גם אם החלון ייסגר בטעות
-              </p>
-            )}
-          </>
-        )}
+        ))}
       </div>
     </ResponsiveDialog>
   );
