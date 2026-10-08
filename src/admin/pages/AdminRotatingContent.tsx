@@ -176,7 +176,8 @@ export default function AdminRotatingContent() {
       )}
 
       <ResponsiveDialog open={open} onOpenChange={setOpen} desktopContentClassName="max-w-2xl" mobileContentClassName="h-[calc(100dvh-0.75rem)] max-h-[calc(100dvh-0.75rem)]">
-        <div className="px-5 pb-28 pt-4 md:px-8 md:pb-8" dir="rtl">
+        <div className="flex min-h-0 flex-1 flex-col">
+         <div className="popup-scroll px-5 pb-5 pt-4 md:px-8 md:pb-8" dir="rtl">
           <div className="mb-5 pe-10">
             <h2 className="text-xl font-medium">{form.id ? "עריכת תוכן" : "פרסום חדש"}</h2>
             <p className="text-sm text-muted-foreground">אפשר לשמור כטיוטה או לפרסם לזמן מוגדר.</p>
@@ -237,7 +238,8 @@ export default function AdminRotatingContent() {
             </div>
             <div className="flex flex-wrap gap-2"><span className="self-center text-xs text-muted-foreground">משך מההתחלה:</span>{[1,2,3,7].map((days) => <Button key={days} type="button" size="sm" variant="outline" onClick={() => chooseDuration(days)}>{days === 1 ? "יום" : days === 2 ? "יומיים" : `${days} ימים`}</Button>)}</div>
           </div>
-          <div className="fixed inset-x-0 bottom-0 z-[60] flex items-center justify-end gap-2 border-t bg-background/95 px-5 py-3 backdrop-blur md:static md:mt-7 md:border-0 md:bg-transparent md:px-0 md:py-0">
+         </div>
+          <div className="popup-footer flex items-center justify-end gap-2 border-t bg-background/95 px-5 py-3 backdrop-blur md:static md:mt-7 md:border-0 md:bg-transparent md:px-0 md:py-0">
             <Button variant="outline" disabled={saving} onClick={() => void save("draft")}>שמירה כטיוטה</Button>
             <Button disabled={saving} onClick={() => void save("published")}>{saving && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}פרסום</Button>
           </div>

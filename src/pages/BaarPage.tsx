@@ -969,15 +969,6 @@ const BoyDialog = ({
             )}
           </>
         )}
-        </div>
-        {!done && (showRulesStep ? (
-            <FormCard className="popup-footer  flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:shadow-sm">
-              <Button onClick={goToForm} disabled={!allConfirmed} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
-                לשלב הבא
-              </Button>
-            </FormCard>
-        ) : (
-            <FormCard className="popup-footer  space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
               {missing.length > 0 && (
                 <div className="rounded-2xl bg-primary/[0.07] p-3">
                   <p className="text-[12.5px] font-medium text-primary">כמה דברים עוד חסרים:</p>
@@ -990,6 +981,15 @@ const BoyDialog = ({
                   </ul>
                 </div>
               )}
+        </div>
+        {!done && (showRulesStep ? (
+            <FormCard className="popup-footer  flex justify-end rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:shadow-sm">
+              <Button onClick={goToForm} disabled={!allConfirmed} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
+                לשלב הבא
+              </Button>
+            </FormCard>
+        ) : (
+            <FormCard className="popup-footer  space-y-3 rounded-none border-x-0 border-b-0 bg-card px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_hsl(var(--foreground)/0.06)]  md:mx-0 md:rounded-2xl md:border md:p-6 md:shadow-sm">
               <div className="flex justify-end">
                 <Button onClick={submit} disabled={saving} className="h-12 w-full rounded-full bg-primary px-6 text-primary-foreground shadow-md shadow-primary/20 hover:bg-[hsl(var(--primary-glow))] md:w-auto">
                   {saving && <Loader2 className="animate-spin" />}

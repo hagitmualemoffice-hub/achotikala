@@ -108,9 +108,10 @@ export const MasteritDialog = ({
       }}
       contentClassName="max-w-md"
     >
-      <div dir="rtl" className="popup-scroll p-6">
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
         {joined ? (
-          <div className="space-y-4 text-start">
+          <div className="flex min-h-0 flex-1 flex-col text-start">
+            <div className="popup-scroll space-y-4 p-6">
             <p className="text-[20px] font-light text-foreground">
               את מאסטרית ב{space.shortName} <Heart className="inline h-4 w-4 text-primary" fill="currentColor" />
             </p>
@@ -125,7 +126,8 @@ export const MasteritDialog = ({
                 {chosen ? `${chosen.label} · ${chosen.note}` : ""}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 pt-1">
+            </div>
+            <div className="popup-footer flex flex-wrap gap-2 px-6 py-4">
               <button
                 onClick={() => setJoined(false)}
                 className="rounded-full bg-muted px-4 py-2 text-[13px] font-light text-foreground transition-colors hover:bg-muted/70"
@@ -141,7 +143,8 @@ export const MasteritDialog = ({
             </div>
           </div>
         ) : (
-          <div className="space-y-4 text-start">
+          <div className="flex min-h-0 flex-1 flex-col text-start">
+            <div className="popup-scroll space-y-4 p-6">
             <p className="text-[20px] font-light text-foreground">להיות מאסטרית ב{space.shortName}</p>
             <p className="text-[13.5px] font-light leading-relaxed text-muted-foreground">
               יש לך ניסיון שיכול לעזור לאחרות. כמאסטרית, נדאג שתדעי כשעולה כאן שאלה חדשה, כדי שתוכלי
@@ -165,7 +168,8 @@ export const MasteritDialog = ({
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 pt-1">
+            </div>
+            <div className="popup-footer flex flex-wrap items-center gap-2 px-6 py-4">
               <button
                 onClick={() => void save()}
                 disabled={saving}
