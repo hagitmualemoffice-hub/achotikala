@@ -75,7 +75,8 @@ const AccessRequestDialog = ({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-md">
-      <div dir="rtl" className="min-h-0 overflow-y-auto px-5 pb-6 pt-4 text-right md:px-10 md:py-10">
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col text-right">
+        <div className="popup-scroll px-5 pb-6 pt-4 md:px-10 md:py-10">
         <h2 className="pe-10 text-right text-xl font-light">{done ? "ברוכה הבאה לליבה" : title}</h2>
 
         {done ? (
@@ -126,16 +127,18 @@ const AccessRequestDialog = ({
               <Label htmlFor="ar-note">הערה (לא חובה)</Label>
               <Textarea id="ar-note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
             </div>
-            <Button
+
+          </div>
+        )}
+        </div>
+        {!done && <div className="popup-footer px-5 py-4 md:px-10">            <Button
               onClick={() => void submit()}
               disabled={busy}
               className="w-full h-12 rounded-full font-light"
             >
               {busy && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               שליחת הבקשה
-            </Button>
-          </div>
-        )}
+            </Button></div>}
       </div>
     </ResponsiveDialog>
   );

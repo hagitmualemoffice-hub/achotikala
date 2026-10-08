@@ -694,7 +694,7 @@ const CommunityBody = () => {
 
       <div className={inquiriesOnly
         ? "mx-auto max-w-[1400px] px-4 py-6 md:px-6 md:py-8"
-        : "mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 py-5 lg:px-6 lg:py-8 xl:px-10 lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_260px] xl:gap-10"}>
+        : "mx-auto grid max-w-[1560px] grid-cols-1 gap-8 px-4 pb-5 pt-0 md:pt-5 lg:px-6 lg:py-8 xl:px-10 lg:grid-cols-[210px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_260px] xl:gap-10"}>
         {/* RIGHT — community spaces */}
         {!inquiriesOnly && <aside className="order-2 hidden lg:order-1 lg:block lg:sticky lg:top-24 lg:self-start">
           <nav className="space-y-5">
@@ -890,7 +890,7 @@ const CommunityBody = () => {
           </div>
 
           {/* filters */}
-          <div className={`sticky top-12 z-30 mb-1 flex items-center justify-between gap-2 border-b border-border/70 bg-background/95 py-2 backdrop-blur md:top-16 md:gap-4 md:py-3 ${!SHOW_FORUM_CATEGORY_STRIP && !pulseChip && !rotatingItems.length ? "md:hidden" : ""}`}>
+          <div className={`sticky top-12 z-30 -mx-4 mb-0 flex items-center justify-between gap-2 border-b border-border/70 bg-background px-4 py-2 md:mx-0 md:top-16 md:mb-1 md:gap-4 md:bg-background/95 md:px-0 md:py-3 md:backdrop-blur ${!SHOW_FORUM_CATEGORY_STRIP && !pulseChip && !rotatingItems.length ? "md:hidden" : ""}`}>
             {/* mobile: single chip opening a bottom drawer with all spaces */}
             <div className="flex min-w-0 items-center gap-2 md:hidden">
               <button

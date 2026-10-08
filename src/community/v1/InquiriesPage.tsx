@@ -143,7 +143,8 @@ const CreateDialog = ({ open, onOpenChange, profile, editing, onSaved }: { open:
     } catch { toast.error(editing ? "לא הצלחנו לעדכן את הבירור" : "לא הצלחנו לפרסם את הבירור"); } finally { setSaving(false); }
   };
   return <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-xl">
-    <div dir="rtl" className="popup-scroll px-8 pb-10 pt-6 md:px-12 md:pt-10">
+    <div dir="rtl" className="flex min-h-0 flex-1 flex-col">
+    <div className="popup-scroll px-8 pb-5 pt-6 md:px-12 md:pt-10">
        <div className="mb-6"><p className="text-[11px] text-primary">{editing ? "עריכת בירור" : "פתיחת בירור"}</p><h2 className="mt-1 text-[22px] font-light text-foreground">את מי תרצי לברר?</h2></div>
       <div className="space-y-5">
         <label className="block"><span className="mb-1.5 block text-[13px] text-foreground">שם מלא *</span><input autoFocus value={draft.boy_name} maxLength={100} onChange={(e) => set("boy_name", e.target.value)} placeholder="שם הבחור" className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-[15px] outline-none focus:border-primary" /></label>
@@ -154,7 +155,8 @@ const CreateDialog = ({ open, onOpenChange, profile, editing, onSaved }: { open:
          {!draft.as_nickname && <label className="block"><span className="mb-1.5 block text-[13px] text-foreground">השם המלא שלך (פרטי + משפחה) *</span><input value={draft.author_full_name} maxLength={100} onChange={(e) => set("author_full_name", e.target.value)} placeholder="למשל: חגית מועלם" className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-[15px] outline-none focus:border-primary" /><span className="mt-1 block text-[11px] text-muted-foreground">השם יוצג על הכרטיס כדי שמי שעונה תדע מי שאלה</span></label>}
          <div className="rounded-2xl bg-accent/55 p-4 text-center"><p className="text-[10.5px] text-accent-foreground/70">כך הכרטיס ייראה</p><p className="mt-2 text-[20px] font-semibold text-foreground">{draft.boy_name || "שם הבחור"}</p>{draft.details.trim() && <p className="mt-1 line-clamp-2 text-[12.5px] text-muted-foreground">{draft.details}</p>}</div>
       </div>
-       <div className="mt-7 flex justify-between"><Button variant="ghost" onClick={() => onOpenChange(false)}>ביטול</Button><Button onClick={submit} disabled={!validation.success || saving} className="rounded-full px-6">{saving && <Loader2 className="animate-spin" />}{editing ? "שמירת השינויים" : "פרסום הבירור"}</Button></div>
+    </div>
+       <div className="popup-footer flex justify-between px-8 py-4 md:px-12"><Button variant="ghost" onClick={() => onOpenChange(false)}>ביטול</Button><Button onClick={submit} disabled={!validation.success || saving} className="rounded-full px-6">{saving && <Loader2 className="animate-spin" />}{editing ? "שמירת השינויים" : "פרסום הבירור"}</Button></div>
     </div>
   </ResponsiveDialog>;
 };
@@ -164,7 +166,7 @@ export const HelpDialog = ({ inquiry, open, onOpenChange, onChanged }: { inquiry
   useEffect(() => { if (inquiry?.my_offer) { setConnection(inquiry.my_offer.connection_type); setMode(inquiry.my_offer.contact_mode); setVisible(inquiry.my_offer.visible); } }, [inquiry]);
   if (!inquiry) return null;
   const submit = async () => { setSaving(true); try { const q = await offerInquiryHelp(inquiry.id, connection, mode, visible); onChanged(q); void notifyInquiry("offered", inquiry.id).catch(() => undefined); onOpenChange(false); toast.success("העזרה שלך נשלחה"); } catch { toast.error("לא הצלחנו לשמור את ההצעה"); } finally { setSaving(false); } };
-  return <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-md"><div dir="rtl" className="overflow-y-auto px-8 pb-10 pt-6 md:px-12 md:pt-10"><HandHeart className="h-7 w-7 text-primary"/><h2 className="mt-3 text-[21px] font-light">איך תוכלי לעזור לגבי {inquiry.boy_name}?</h2><div className="mt-5 space-y-5"><div className="flex flex-wrap gap-2">{CONNECTIONS.map(([id,label]) => <Choice key={id} selected={connection===id} onClick={() => setConnection(id)}>{label}</Choice>)}</div><div><p className="mb-2 text-[13px]">איך תרצי לעזור?</p><div className="space-y-2"><Choice selected={mode==="share_details"} onClick={() => setMode("share_details")}>אפשר להעביר לפונה את פרטי הקשר שאישרתי בפרופיל</Choice><Choice selected={mode==="liba"} onClick={() => setMode("liba")}>אני מעדיפה לתקשר דרך ליבה</Choice></div></div><div><p className="mb-2 text-[13px]">מי תראה שאת יכולה לעזור?</p><div className="flex flex-wrap gap-2"><Choice selected={visible} onClick={() => setVisible(true)}>אפשר לראות שאני מכירה</Choice><Choice selected={!visible} onClick={() => setVisible(false)}>להישאר אנונימית</Choice></div></div><p className="rounded-2xl bg-muted/60 p-3 text-[11.5px] leading-relaxed text-muted-foreground">פרטי קשר אינם מוצגים בכרטיס. הם עוברים רק לפונה ורק אם בחרת בכך במפורש.</p></div><div className="mt-7 flex justify-between"><Button variant="ghost" onClick={() => onOpenChange(false)}>ביטול</Button><Button onClick={submit} disabled={saving} className="rounded-full px-6">{saving && <Loader2 className="animate-spin"/>}שליחת העזרה</Button></div></div></ResponsiveDialog>;
+  return <ResponsiveDialog open={open} onOpenChange={onOpenChange} desktopContentClassName="max-w-md"><div dir="rtl" className="flex min-h-0 flex-1 flex-col"><div className="popup-scroll px-8 pb-5 pt-6 md:px-12 md:pt-10"><HandHeart className="h-7 w-7 text-primary"/><h2 className="mt-3 text-[21px] font-light">איך תוכלי לעזור לגבי {inquiry.boy_name}?</h2><div className="mt-5 space-y-5"><div className="flex flex-wrap gap-2">{CONNECTIONS.map(([id,label]) => <Choice key={id} selected={connection===id} onClick={() => setConnection(id)}>{label}</Choice>)}</div><div><p className="mb-2 text-[13px]">איך תרצי לעזור?</p><div className="space-y-2"><Choice selected={mode==="share_details"} onClick={() => setMode("share_details")}>אפשר להעביר לפונה את פרטי הקשר שאישרתי בפרופיל</Choice><Choice selected={mode==="liba"} onClick={() => setMode("liba")}>אני מעדיפה לתקשר דרך ליבה</Choice></div></div><div><p className="mb-2 text-[13px]">מי תראה שאת יכולה לעזור?</p><div className="flex flex-wrap gap-2"><Choice selected={visible} onClick={() => setVisible(true)}>אפשר לראות שאני מכירה</Choice><Choice selected={!visible} onClick={() => setVisible(false)}>להישאר אנונימית</Choice></div></div><p className="rounded-2xl bg-muted/60 p-3 text-[11.5px] leading-relaxed text-muted-foreground">פרטי קשר אינם מוצגים בכרטיס. הם עוברים רק לפונה ורק אם בחרת בכך במפורש.</p></div></div><div className="popup-footer flex justify-between px-8 py-4 md:px-12"><Button variant="ghost" onClick={() => onOpenChange(false)}>ביטול</Button><Button onClick={submit} disabled={saving} className="rounded-full px-6">{saving && <Loader2 className="animate-spin"/>}שליחת העזרה</Button></div></div></ResponsiveDialog>;
 };
 
 const ThreadsDialog = ({ inquiry, open, onOpenChange }: { inquiry: Inquiry | null; open: boolean; onOpenChange: (v: boolean) => void }) => {
@@ -350,14 +352,15 @@ export default function InquiriesPage({ profile, isAdmin = false, initialQuery =
         <p>לפני פתיחת בירור כדאי לבדוק אם כבר קיימת בקשה על אותו בחור. אפשר לראות את כל הבירורים או רק בקשות שמחכות לעזרה שלך, ולסנן לפי עדה.</p>
       </DirectoryHeading>
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-nowrap items-center gap-2 md:flex-wrap">
           <DirectoryAdd onClick={() => setCreateOpen(true)} label="פתיחת בירור" />
-          <label className="relative w-56 max-w-full shrink-0">
+          <label className="relative min-w-0 flex-1 md:w-56 md:max-w-full md:flex-none md:shrink-0">
             <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/>
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="חיפוש לפי שם, עיר, ישיבה או פרט" className="h-9 w-full rounded-full border border-border bg-card py-2 pe-4 ps-10 text-[13px] outline-none focus:border-primary"/>
           </label>
           <DirectoryFilter label="בקשות" value={helpStatus} onChange={(value) => setHelpStatus(value as typeof helpStatus)} options={[{ value: "all", label: "הכול" }, { value: "waiting", label: "מחכות לעזרה שלך" }]} />
           <DirectoryFilter label="עדה" value={background} onChange={setBackground} options={[{ value: "all", label: "הכול" }, { value: "ashkenazi", label: "אשכנזים" }, { value: "sephardi", label: "ספרדים" }]} />
+          <Button variant="outline" size="icon" aria-label="סינון" onClick={() => setFiltersOpen(true)} className={`h-9 w-9 shrink-0 rounded-full md:hidden ${background !== "all" || helpStatus !== "all" ? "text-primary border-primary" : "text-muted-foreground"}`}><Filter className="h-4 w-4" /></Button>
           <div className="ms-auto"><DirectoryView value={view} onChange={setView} /></div>
         </div>
         <p className="text-right text-[12px] font-light text-muted-foreground">{countText}</p>

@@ -74,7 +74,7 @@ const CommunityJoinPopup = ({
       </button>
 
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="flex-1 overflow-y-auto px-8 py-10 md:px-12 md:py-12">
+        <div className="popup-scroll flex-1 overflow-y-auto px-8 py-10 md:px-12 md:py-12">
           <div className="text-center mb-8">
             <div className="w-12 h-px bg-primary mx-auto mb-5" />
             <h2 className="text-foreground text-2xl md:text-3xl font-light leading-tight tracking-tight mb-3">
@@ -137,7 +137,7 @@ const CommunityJoinPopup = ({
           </p>
         </div>
 
-        <div className="sticky bottom-0 px-8 md:px-12 py-4 bg-card border-t border-border/60 shadow-[0_-8px_24px_-12px_hsl(0_0%_0%_/_0.08)]">
+        <div className="popup-footer sticky bottom-0 px-8 md:px-12 py-4 bg-card border-t border-border/60 shadow-[0_-8px_24px_-12px_hsl(0_0%_0%_/_0.08)]">
           <button
             type="submit"
             form="community-join-form"

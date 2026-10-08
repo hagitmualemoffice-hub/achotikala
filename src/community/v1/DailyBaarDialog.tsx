@@ -494,7 +494,7 @@ export default function DailyBaarDialog({
       desktopContentClassName="max-w-xl"
       mobileContentClassName="h-[92dvh] max-h-[92dvh]"
     >
-      <div dir="rtl" className="popup-scroll flex min-h-0 flex-1 flex-col px-6 pb-0 pt-7 md:px-10">
+      <div dir="rtl" className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-0 pt-7 md:px-10">
         {phase === "loading" && (
           <div className="grid flex-1 place-items-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -503,7 +503,7 @@ export default function DailyBaarDialog({
 
         {/* 1 — the greeting */}
         {phase === "entry" && (
-          <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
+          <div className="popup-scroll flex flex-1 flex-col items-center py-8 text-center">
             <img
               src={dailyBaarEntryArt}
               alt=""
@@ -541,7 +541,7 @@ export default function DailyBaarDialog({
           <div className="flex min-h-0 flex-1 flex-col">
             {phase === "card" && (
               <>
-                <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
+                <div className="popup-scroll min-h-0 flex-1 overflow-y-auto rounded-2xl border border-primary/15 bg-card p-4 shadow-sm pe-1">
                   {boy && <DailyBoyCard boy={boy} onChat={chatWith} />}
                 </div>
                 <div className="popup-footer mt-4 -mx-6 px-6 pt-3 md:-mx-10 md:px-10">
@@ -826,7 +826,7 @@ export default function DailyBaarDialog({
 
         {/* 3 — the goodbye */}
         {(phase === "done" || phase === "empty" || phase === "filterEmpty" || phase === "unavailable" || phase === "paused") && (
-          <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
+          <div className="popup-scroll flex flex-1 flex-col items-center py-10 text-center">
             {phase === "done" && (
               <>
                 <img
