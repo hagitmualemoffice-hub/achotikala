@@ -34,10 +34,10 @@ export function DirectoryView({ value, onChange }: { value: "cards" | "list"; on
   </div>;
 }
 
-export function DirectoryFilter({ label, value, options, onChange }: { label: string; value: string; options: readonly { value: string; label: string }[]; onChange: (value: string) => void }) {
+export function DirectoryFilter({ label, value, options, onChange, inDrawer = false }: { label: string; value: string; options: readonly { value: string; label: string }[]; onChange: (value: string) => void; inDrawer?: boolean }) {
   const selected = options.find((option) => option.value === value);
   return <Select value={value} onValueChange={onChange} dir="rtl">
-    <SelectTrigger aria-label={label} className="hidden h-9 w-auto max-w-full shrink-0 gap-2 rounded-full border-border bg-card px-3 text-[13px] font-light md:flex"><span className="truncate">{label}: {selected?.label ?? "הכול"}</span></SelectTrigger>
+    <SelectTrigger aria-label={label} className={`${inDrawer ? "flex" : "hidden md:flex"} h-9 w-auto max-w-full shrink-0 gap-2 rounded-full border-border bg-card px-3 text-[13px] font-light`}><span className="truncate">{label}: {selected?.label ?? "הכול"}</span></SelectTrigger>
     <SelectContent>{options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
   </Select>;
 }

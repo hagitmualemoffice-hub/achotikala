@@ -475,8 +475,7 @@ const Apartments = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2 flex flex-wrap items-center gap-2 md:hidden">
-              <DirectoryFilter label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
-              <select aria-label="סוג מודעה" value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value as Filters["type"] }))} className="h-9 rounded-full border border-border bg-card px-3 text-sm"><option value="all">כל סוגי המודעות</option>{LISTING_TYPES.map((type) => <option key={type} value={type}>{TYPE_META[type].short}</option>)}</select>
+              <DirectoryFilter inDrawer label="סוג מודעה" value={filters.type} onChange={(value) => setFilters((f) => ({ ...f, type: value as Filters["type"] }))} options={[{ value: "all", label: "הכול" }, ...LISTING_TYPES.map((type) => ({ value: type, label: TYPE_META[type].short }))]} />
               <Button variant="outline" className="h-9 rounded-full" onClick={() => { setFiltersOpen(false); setMineOpen(true); }}>המודעות שלי</Button>
             </div>
             <div className="space-y-1.5">
