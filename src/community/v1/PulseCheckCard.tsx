@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, Check, Loader2, Lock, MoreHorizontal, RotateCcw, Trash2, User } from "lucide-react";
+import { Activity, Check, Loader2, Lock, MoreHorizontal, RotateCcw, Trash2, User, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   removePulseResponse,
@@ -26,7 +26,9 @@ export default function PulseCheckCard({
   pulse,
   onChange,
   onEdit,
+  onClose,
 }: {
+  onClose?: () => void;
   pulse: PulseCheck;
   onChange: (next: PulseCheck) => void;
   onEdit?: (p: PulseCheck) => void;
@@ -163,6 +165,16 @@ export default function PulseCheckCard({
         className="pointer-events-none absolute -top-24 start-1/2 h-56 w-[420px] -translate-x-1/2 rounded-full bg-primary/[0.13] blur-3xl"
       />
 
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="סגירה"
+          className="absolute left-4 top-4 z-30 grid h-8 w-8 place-items-center rounded-full bg-muted/80 text-foreground transition-colors hover:bg-muted"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
       <div className="relative px-6 py-8 sm:px-10 sm:py-11">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
