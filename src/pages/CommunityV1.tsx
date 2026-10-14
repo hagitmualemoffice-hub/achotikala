@@ -530,7 +530,7 @@ const CommunityBody = () => {
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     return pulses
       // stays reachable after she answered or after voting closed, so results remain visible
-      .filter((p) => p.status !== "archived" && (p.voted || (p.is_open && new Date(p.created_at).getTime() > cutoff) || new Date(p.created_at).getTime() > cutoff))
+      .filter((p) => p.status !== "archived" && (p.voted || new Date(p.created_at).getTime() > cutoff))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned));
   }, [pulses]);
   const hasPulse = visiblePulses.length > 0;

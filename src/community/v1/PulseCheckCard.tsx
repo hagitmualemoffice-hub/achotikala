@@ -202,7 +202,7 @@ export default function PulseCheckCard({
           </div>
 
           {pulse.can_moderate && (
-            <div className="relative shrink-0">
+            <div className={`relative shrink-0 ${onClose ? "ml-8" : ""}`}>
               <button
                 onClick={() => setMenu((m) => !m)}
                 aria-label="ניהול בדיקת הדופק"
