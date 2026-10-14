@@ -529,7 +529,8 @@ const CommunityBody = () => {
   const visiblePulses = useMemo(() => {
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     return pulses
-      .filter((p) => p.is_open && new Date(p.created_at).getTime() > cutoff)
+      // stays reachable after she answered or after voting closed, so results remain visible
+      .filter((p) => p.status !== "archived" && (p.voted || new Date(p.created_at).getTime() > cutoff))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned));
   }, [pulses]);
   const hasPulse = visiblePulses.length > 0;
@@ -975,6 +976,7 @@ const CommunityBody = () => {
               <div key={p.id} className="mt-4">
                 <PulseCheckCard
                   pulse={p}
+                  onClose={() => setPulseOnly(false)}
                   onChange={(next) =>
                     setPulses((list) => list.map((x) => (x.id === next.id ? next : x)))
                   }
