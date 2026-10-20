@@ -525,12 +525,11 @@ const CommunityBody = () => {
       alive = false;
     };
   }, []);
-  // a pulse-check lives 24 hours from the moment it was published, then it is gone
+  // a pulse-check is shown for two days from the moment it was published, then it is gone for everyone
   const visiblePulses = useMemo(() => {
-    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    const cutoff = Date.now() - 2 * 24 * 60 * 60 * 1000;
     return pulses
-      // stays reachable after she answered or after voting closed, so results remain visible
-      .filter((p) => p.status !== "archived" && (p.voted || new Date(p.created_at).getTime() > cutoff))
+      .filter((p) => p.status !== "archived" && new Date(p.created_at).getTime() > cutoff)
       .sort((a, b) => Number(b.pinned) - Number(a.pinned));
   }, [pulses]);
   const hasPulse = visiblePulses.length > 0;
