@@ -12,7 +12,7 @@ import { spaceById } from "@/community/v1/spaces";
 import { Button } from "@/components/ui/button";
 
 /** A pulse-check lives for 24 hours from the moment it was published. */
-const LIVE_MS = 24 * 60 * 60 * 1000;
+const LIVE_MS = 2 * 24 * 60 * 60 * 1000;
 const isLive = (p: PulseCheck) =>
   p.status === "open" && Date.now() - new Date(p.created_at).getTime() < LIVE_MS;
 
@@ -79,7 +79,7 @@ export default function AdminPulse() {
             בדיקת דופק
           </h1>
           <p className="mt-1 text-sm font-light text-muted-foreground">
-            כל בדיקת דופק מוצגת בקהילה 24 שעות מרגע הפרסום, ואז נעלמת מעצמה.
+            כל בדיקת דופק מוצגת בקהילה יומיים מרגע הפרסום, ואז נעלמת מעצמה.
           </p>
         </div>
         <Button
@@ -119,7 +119,7 @@ export default function AdminPulse() {
                       ? "מוצגת עכשיו בקהילה"
                       : p.status === "archived"
                         ? "בארכיון"
-                        : "לא מוצגת (נסגרה או עברו 24 שעות)"}
+                        : "לא מוצגת (נסגרה או עברו יומיים)"}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
