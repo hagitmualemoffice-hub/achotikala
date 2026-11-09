@@ -55,6 +55,7 @@ import AdminBlogEditor from "./admin/pages/AdminBlogEditor.tsx";
 import AdminEventsList from "./admin/pages/AdminEventsList.tsx";
 import AdminEventEditor from "./admin/pages/AdminEventEditor.tsx";
 import AdminEventTemplates from "./admin/pages/AdminEventTemplates.tsx";
+import AdminEventCommunications from "./admin/pages/AdminEventCommunications.tsx";
 import AdminPodcast from "./admin/pages/AdminPodcast.tsx";
 import AdminMedia from "./admin/pages/AdminMedia.tsx";
 import AdminLeads from "./admin/pages/AdminLeads.tsx";
@@ -147,6 +148,7 @@ const App = () => (
               <Route path="events/new" element={<AdminEventEditor />} />
               <Route path="events/templates" element={<AdminEventTemplates />} />
               <Route path="events/:id" element={<AdminEventEditor />} />
+              <Route path="events/:id/communications" element={<AdminEventCommunications />} />
               <Route path="podcast" element={<AdminPodcast />} />
               <Route path="media" element={<AdminMedia />} />
               <Route path="donation-texts" element={<AdminDonationArchive />} />
