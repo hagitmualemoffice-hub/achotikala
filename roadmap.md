@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Fix WhatsApp sharing hanging on image/clipboard requests: preload with cancellation, preserve native user activation, and provide an immediately accessible text/image fallback.
+
 - [x] Allow administrators to choose one email-test destination independently of the connected Gmail account; validate the address in the screen and sender, preserving the older-client default.
 
 - [x] Add admin-only event communication drafts, editable subject/title/body, branded event preview, compressed logos, direct Tickchak links and manual WhatsApp sharing; Gmail linked and test-only sender deployed. Three tests and authenticated draft save/reload/restore passed; no campaign sent.
