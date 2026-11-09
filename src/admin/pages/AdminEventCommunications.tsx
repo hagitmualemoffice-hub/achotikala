@@ -52,6 +52,20 @@ export default function AdminEventCommunications() {
     if (!draft) return null;
     if (!draft.subject.trim() || !draft.title.trim()) { toast.error("יש להזין נושא וכותרת"); return null; }
     const { id: draftId, ...fields } = draft;
+    if (fields.show_brand_logo && !fields.brand_logo_url) {
+      const response = await fetch(brandLogo);
+      if (!response.ok) throw new Error("הלוגו לא נטען");
+      const bitmap = await createImageBitmap(await response.blob());
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
+      canvas.width = Math.round(bitmap.width * scale); canvas.height = Math.round(bitmap.height * scale);
+      const context = canvas.getContext("2d");
+      if (!context) { bitmap.close(); throw new Error("הלוגו לא נטען"); }
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/webp", 0.86));
+      if (!blob || blob.size > 500000) throw new Error("הלוגו גדול מדי");
+      fields.brand_logo_url = (await uploadToMedia(blob, "achoti-kala-logo.webp", "אחותי כלה")).url;
+    }
     const payload = { ...fields, extra_logos: fields.extra_logos, status: "draft" };
     const query = draftId ? supabase.from("event_communications").update(payload).eq("id", draftId) : supabase.from("event_communications").insert(payload);
     const { data, error } = await query.select("*").single();
