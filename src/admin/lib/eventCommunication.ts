@@ -1,3 +1,6 @@
+import { safeRegistrationHref, registrationLabel } from '../../../supabase/functions/_shared/registration';
+export { registrationLabel };
+
 export type CommunicationDraft = {
   id?: string;
   event_id: string;
@@ -23,12 +26,12 @@ export function tickchakLink(value: string): boolean {
 
 /**
  * Registration is optional — not every event has an online registration link.
- * An empty value means "no button"; a filled one must still be a direct HTTPS Tickchak link.
+ * An empty value means "no button"; filled values accept Tickchak or a single mailto address.
  */
 export function registrationHref(value: string): string {
   const trimmed = (value ?? "").trim();
   if (!trimmed) return "";
-  return tickchakLink(trimmed) ? trimmed : "";
+  return safeRegistrationHref(trimmed) ?? "";
 }
 
 /**
@@ -68,7 +71,7 @@ export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body"
     [when, where].filter(Boolean).join("\n"),
     bodyToWhatsapp(draft.body),
     prices,
-    draft.registration_url ? `להרשמה בטיקצ׳אק:\n${draft.registration_url}` : "",
+    registrationHref(draft.registration_url) ? (draft.registration_url.startsWith('mailto:') ? registrationLabel(draft.registration_url) : `להרשמה בטיקצ׳אק:\n${draft.registration_url}`) : "",
   ].filter(Boolean).join("\n\n");
 }
 
