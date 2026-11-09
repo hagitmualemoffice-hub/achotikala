@@ -33,6 +33,7 @@ const navItems = [
   { to: "/admin/quiz", label: "הגרלת מה חדש בליבה", icon: Sparkles },
   { to: "/admin/inquiries", label: "בירורים", icon: HandHeart },
   { to: "/admin/leads", label: "נרשמות לתפוצה", icon: Mail },
+  { to: "/admin/donation-texts", label: "ארכיון טקסטים לתרומה", icon: FileText },
   { to: "/admin/users", label: "מנהלות המערכת", icon: Users },
 ];
 

@@ -5,7 +5,6 @@ import podcastCover from "@/assets/podcast-cover.png";
 import SiteHeader from "@/components/SiteHeader";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import logo from "@/assets/logo-achoti-kala.png";
-import DonationCTA from "@/components/DonationCTA";
 
 const SPOTIFY_SHOW =
   "https://open.spotify.com/show/2FIal7yOO7htlBkKUwCbxW?si=dtVPb1AQQomBBOTazo3hWA";
@@ -191,19 +190,6 @@ const Podcast = () => {
           </div>
         </div>
       </section>
-
-      <DonationCTA
-        id="donate"
-        title="יש מילים שעוד לא נאמרו. ואישה שמחכה לשמוע אותן."
-        paragraphs={[
-          "הפודקאסט שלנו מנגיש לנשים ידע על שימור פוריות בגיל שבו עוד אפשר לקבל החלטות מתוך בחירה. הוא פותח שיחות שכמעט לא התקיימו קודם, נותן מילים לחוויות שנשים נשארו איתן לבד, ולאט לאט יוצר שינוי אמיתי.",
-          "אנחנו שומעות מנשים שמחכות לפרק הבא. שכל פרק מלמד אותן משהו, פותח אפשרות חדשה, ולפעמים פשוט נותן כוח.",
-          "אבל כל פרק כזה עולה לנו הרבה כסף להפיק.",
-          "אנחנו עדיין לא יודעות אילו מילים ייאמרו בפרק הבא, ומי תהיה האישה שתצטרך לשמוע דווקא אותן.",
-          "**לכם יש אפשרות לעזור לנו להביא את המילים האלה לעולם.**",
-        ]}
-        buttonLabel="אני רוצה לעזור לפרק הבא לצאת"
-      />
 
       <MobileBottomNav />
     </div>

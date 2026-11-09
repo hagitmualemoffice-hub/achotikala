@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { EventItem } from "@/data/events";
 import { useEvents } from "@/hooks/useEvents";
 import { cn } from "@/lib/utils";
-import DonationCTA from "@/components/DonationCTA";
 import RegistrationButton from "@/components/EventRegistrationButton";
 import EventDetailsDialog from "@/components/EventDetailsDialog";
 import { eventOccurrenceDates, seriesSchedule } from "@/lib/eventSeries";
@@ -331,14 +330,9 @@ const Events = () => {
   const upcoming = kind === "series" ? [] : futureEvents.filter((e) => e.eventType !== "course");
 
   const oneMonthAgo = useMemo(() => subMonths(now, 1), [now]);
-  const recentPastEvents = useMemo(
-    () => pastEvents.filter((e) => eventEnd(e) >= oneMonthAgo),
-    [pastEvents, oneMonthAgo],
-  );
-  const olderPastEvents = useMemo(
-    () => pastEvents.filter((e) => eventEnd(e) < oneMonthAgo),
-    [pastEvents, oneMonthAgo],
-  );
+  const pastShown = Math.max(0, 10 - courses.length - upcoming.length);
+  const recentPastEvents = useMemo(() => pastEvents.slice(0, pastShown), [pastEvents, pastShown]);
+  const olderPastEvents = useMemo(() => pastEvents.slice(pastShown), [pastEvents, pastShown]);
 
   /* arriving from global search: /events#event-<id> */
   useEffect(() => {
@@ -524,18 +518,6 @@ const Events = () => {
           </aside>
         </div>
       </div>
-
-      <DonationCTA
-        id="donate"
-        title="אנחנו עושות המון עם מעט. אבל מעט לא צריך להיות המודל."
-        paragraphs={[
-          "כמעט 100 אירועים בשנה נוצרים באחותי כלה, רובם עם תקציב זעום והרבה מאוד יצירתיות, התנדבות ואנשים טובים בדרך.",
-          "לא כי לא צריך כסף כדי לעשות את כל זה, אלא כי עד היום בחרנו לא לחכות שיהיה.",
-          "עכשיו אנחנו רוצות לעשות יותר. להגיע לעוד נשים, ליצור עוד מענים, ולאפשר לעשייה הזו לגדול בלי שכל דבר יהיה מאבק.",
-          "**התרומה שלכם נותנת לנו כוח לעשות את זה.**",
-        ]}
-        buttonLabel="אני רוצה להיות חלק"
-      />
 
       <EventDetailsDialog event={openEvent} onClose={() => setOpenEvent(null)} />
       <MobileBottomNav />

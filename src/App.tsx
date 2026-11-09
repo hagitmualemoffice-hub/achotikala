@@ -63,6 +63,7 @@ import AdminPulse from "./admin/pages/AdminPulse.tsx";
 import AdminQuiz from "./admin/pages/AdminQuiz.tsx";
 import AdminRotatingContent from "./admin/pages/AdminRotatingContent.tsx";
 import AdminInquiries from "./admin/pages/AdminInquiries.tsx";
+import AdminDonationArchive from "./admin/pages/AdminDonationArchive.tsx";
 
 // Offline (file://) uses HashRouter: either a dedicated offline build
 // (VITE_OFFLINE_BUILD) or the shell marked us at runtime (ACHOTIKALA_OFFLINE_HOST).
@@ -148,6 +149,7 @@ const App = () => (
               <Route path="events/:id" element={<AdminEventEditor />} />
               <Route path="podcast" element={<AdminPodcast />} />
               <Route path="media" element={<AdminMedia />} />
+              <Route path="donation-texts" element={<AdminDonationArchive />} />
               <Route path="leads" element={<AdminLeads />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="pulse" element={<AdminPulse />} />
