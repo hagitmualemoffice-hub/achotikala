@@ -328,6 +328,8 @@ const Events = () => {
   const [kind, setKind] = useState<"all" | "events" | "series">("all");
   const courses = kind === "events" ? [] : futureEvents.filter((e) => e.eventType === "course");
   const upcoming = kind === "series" ? [] : futureEvents.filter((e) => e.eventType !== "course");
+  /* one mixed list: regular events first (registration matters most), series after them */
+  const upcomingList = useMemo(() => [...upcoming, ...courses], [upcoming, courses]);
 
   const oneMonthAgo = useMemo(() => subMonths(now, 1), [now]);
   const pastShown = Math.max(0, 10 - courses.length - upcoming.length);
@@ -365,8 +367,8 @@ const Events = () => {
       <div className="h-12 md:h-0" />
 
       {/* Hero */}
-      <section className="pt-24 md:pt-32 pb-6 md:pb-8 px-6 md:px-10 bg-gradient-to-b from-accent/50 to-background">
-        <div className="max-w-6xl mx-auto text-right">
+      <section className="pt-24 md:pt-32 pb-6 md:pb-8 bg-gradient-to-b from-accent/50 to-background">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 text-right">
           <h1 className="text-2xl md:text-4xl font-light text-foreground leading-tight">
             הזדמנויות להיפגש,{" "}
             <span className="font-semibold text-primary">להתחבר</span> ולנשום ביחד
