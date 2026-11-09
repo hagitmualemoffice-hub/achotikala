@@ -10,7 +10,7 @@ describe("event communications", () => {
   });
   it("manual WhatsApp shares the edited event and direct registration link", () => {
     expect(whatsappMessage({ title: "מפגש", body: "ההרשמה המוקדמת מסתיימת", registration_url: "https://tickchak.co.il/12345" }))
-      .toBe("מפגש\n\nההרשמה המוקדמת מסתיימת\n\nhttps://tickchak.co.il/12345");
+      .toBe("*מפגש*\n\nההרשמה המוקדמת מסתיימת\n\nלהרשמה בטיקצ׳אק:\nhttps://tickchak.co.il/12345");
   });
   it("retains the selected sending instant without changing it", () => {
     expect(plannedInstant("2026-11-09T20:00:00+02:00")).toBe("2026-11-09T18:00:00.000Z");
