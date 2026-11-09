@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { loadWhatsappImage } from "@/admin/lib/whatsappShare";
 import { uploadToMedia } from "@/admin/lib/media";
-import { tickchakLink, registrationHref, whatsappMessage, bodyToHtml, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
+import { registrationHref, registrationLabel, whatsappMessage, bodyToHtml, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
 import type { DbRow } from "@/hooks/useEvents";
 import brandLogo from "@/assets/logo-achoti-kala.png";
 
@@ -46,6 +46,7 @@ export default function AdminEventCommunications() {
   const [status, setStatus] = useState<SendStatus | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [testEmail, setTestEmail] = useState("");
+  const [registrationMode, setRegistrationMode] = useState<"tickchak" | "email" | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareFile, setShareFile] = useState<File | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -113,6 +114,7 @@ export default function AdminEventCommunications() {
 
   const save = async (): Promise<string | null> => {
     if (!draft) return null;
+    if (draft.registration_url.trim() && !registrationHref(draft.registration_url)) { toast.error("יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה"); return null; }
     if (!draft.subject.trim() || !draft.title.trim()) { toast.error("יש להזין נושא וכותרת"); return null; }
     const { id: draftId, ...fields } = draft;
     if (fields.show_brand_logo && !fields.brand_logo_url) {
@@ -149,7 +151,7 @@ export default function AdminEventCommunications() {
     const recipient = z.string().trim().email().max(254).safeParse(testEmail);
     if (!recipient.success) { toast.error("יש להזין כתובת מייל תקינה לבדיקה"); return; }
     if (!draft) return;
-    if (draft.registration_url.trim() && !tickchakLink(draft.registration_url)) { toast.error("יש להזין קישור HTTPS לטיקצ׳אק"); return; }
+    if (draft.registration_url.trim() && !registrationHref(draft.registration_url)) { toast.error("יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה"); return; }
     const draftId = await save();
     if (!draftId) return;
     const { data, error } = await supabase.functions.invoke("event-communication-test", { body: { draft_id: draftId, recipient: recipient.data } });
@@ -165,7 +167,7 @@ export default function AdminEventCommunications() {
   // Step 1: save and show where the list stands; nothing is sent until the dialog is confirmed.
   const prepareSend = async () => {
     if (!draft) return;
-    if (draft.registration_url.trim() && !tickchakLink(draft.registration_url)) { toast.error("יש להזין קישור HTTPS לטיקצ׳אק"); return; }
+    if (draft.registration_url.trim() && !registrationHref(draft.registration_url)) { toast.error("יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה"); return; }
     const draftId = await save();
     if (!draftId) return;
     setDirty(false);
@@ -200,6 +202,7 @@ export default function AdminEventCommunications() {
 
   if (failed) return <p role="alert">לא ניתן לפתוח את האירוע.</p>;
   if (!event || !draft) return <Loader2 aria-label="טוענת" className="h-6 w-6 animate-spin" />;
+  const mode = draft.registration_url ? (draft.registration_url.startsWith("mailto:") ? "email" : "tickchak") : registrationMode ?? "tickchak";
   return <div dir="rtl" className="space-y-6">
     <header className="flex flex-wrap items-center justify-between gap-3">
       <div><Button asChild variant="ghost" size="sm"><Link to="/admin/events"><ArrowRight className="h-4 w-4" />אירועים</Link></Button><h1 className="text-2xl font-medium">פרסום ותזכורות</h1><p className="text-sm text-muted-foreground">{event.title}</p></div>
@@ -212,7 +215,8 @@ export default function AdminEventCommunications() {
         <div className="space-y-2"><Label htmlFor="email-subject">נושא המייל</Label><Input id="email-subject" maxLength={255} value={draft.subject} onChange={e => change({ subject: e.target.value })} /></div>
         <div className="space-y-2"><Label htmlFor="message-title">כותרת בהודעה</Label><Input id="message-title" maxLength={500} value={draft.title} onChange={e => change({ title: e.target.value })} /></div>
         <div className="space-y-2"><div className="flex flex-wrap items-center justify-between gap-2"><Label htmlFor="message-body">טקסט</Label><div className="flex gap-1"><Button type="button" variant="outline" size="sm" onClick={() => mark("bold")} className="font-bold">הדגשה</Button><Button type="button" variant="outline" size="sm" onClick={() => mark("large")}>גופן גדול</Button></div></div><p className="text-xs text-muted-foreground">מסמנים מילים ולוחצים "הדגשה". "גופן גדול" מגדיל את כל השורה. אותו עיצוב יופיע במייל ובוואטסאפ (בוואטסאפ שורה גדולה מופיעה מודגשת).</p><Textarea ref={bodyRef} id="message-body" className="min-h-48" maxLength={20000} value={draft.body} onChange={e => change({ body: e.target.value })} /></div>
-        <div className="space-y-2"><Label htmlFor="registration-link">קישור לטיקצ׳אק — אפשר להשאיר ריק</Label><Input dir="ltr" id="registration-link" placeholder="https://tickchak.co.il/... (אופציונלי)" value={draft.registration_url} onChange={e => change({ registration_url: e.target.value })} />{draft.registration_url.trim() && !tickchakLink(draft.registration_url) ? <p className="text-sm text-destructive">יש להזין קישור HTTPS לטיקצ׳אק</p> : <p className="text-xs text-muted-foreground">אין קישור? השאירי ריק — בהודעה לא יופיע כפתור הרשמה.</p>}</div>
+        <div className="space-y-2"><Label htmlFor="registration-mode">אפשרות הרשמה</Label><Select value={mode} onValueChange={value => { setRegistrationMode(value === "email" ? "email" : "tickchak"); change({ registration_url: "" }); }}><SelectTrigger id="registration-mode"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="tickchak">הרשמה בטיקצ׳אק</SelectItem><SelectItem value="email">הרשמה במייל</SelectItem></SelectContent></Select></div>
+        <div className="space-y-2"><Label htmlFor="registration-link">{mode === "email" ? "כתובת מייל להרשמה" : "קישור לטיקצ׳אק"}</Label><Input dir="ltr" id="registration-link" type={mode === "email" ? "email" : "url"} maxLength={mode === "email" ? 254 : 4096} placeholder={mode === "email" ? "name@example.com" : "https://tickchak.co.il/..."} value={mode === "email" ? draft.registration_url.replace(/^mailto:/, "") : draft.registration_url} onChange={e => change({ registration_url: mode === "email" && e.target.value.trim() ? `mailto:${e.target.value.trim()}` : e.target.value })} />{draft.registration_url.trim() && !registrationHref(draft.registration_url) && <p className="text-sm text-destructive">{mode === "email" ? "יש להזין כתובת מייל תקינה להרשמה" : "יש להזין קישור HTTPS לטיקצ׳אק"}</p>}</div>
         <div className="flex items-center justify-between"><Label htmlFor="brand-logo">לוגו אחותי כלה מעל התמונה</Label><Switch id="brand-logo" checked={draft.show_brand_logo} onCheckedChange={show_brand_logo => change({ show_brand_logo })} /></div>
         <div className="space-y-2"><Label htmlFor="brand-logo-url">קישור ללוגו אחותי כלה במייל</Label><Input id="brand-logo-url" dir="ltr" placeholder="https://" value={draft.brand_logo_url} onChange={e => change({ brand_logo_url: e.target.value })} /></div>
         <div className="space-y-3"><div className="flex items-center justify-between"><Label>לוגואים נוספים</Label><Button asChild variant="outline" size="sm" disabled={busy || draft.extra_logos.length >= 8}><label className="cursor-pointer"><Upload className="h-4 w-4 me-2" />העלאת לוגו<input type="file" accept="image/*" className="sr-only" disabled={busy} onChange={e => { const file = e.target.files?.[0]; void run(() => uploadLogo(file)); e.target.value = ""; }} /></label></Button></div>{draft.extra_logos.map((logo, index) => <div key={index} className="flex items-center gap-2"><img src={logo.url} alt={logo.alt} className="h-12 w-16 object-contain" /><Input aria-label={`תיאור לוגו ${index + 1}`} value={logo.alt} onChange={e => change({ extra_logos: draft.extra_logos.map((item, i) => i === index ? { ...item, alt: e.target.value } : item) })} /><Button variant="ghost" size="icon" aria-label={`הסרת לוגו ${index + 1}`} onClick={() => change({ extra_logos: draft.extra_logos.filter((_, i) => i !== index) })}><Trash2 className="h-4 w-4" /></Button></div>)}</div>
@@ -261,7 +265,7 @@ export default function AdminEventCommunications() {
       <section className="min-w-0"><h2 className="mb-3 text-sm font-medium text-muted-foreground">תצוגה מקדימה</h2><article className="overflow-hidden rounded-lg border bg-background">
         <div className="flex flex-wrap items-center justify-center gap-4 p-5">{draft.show_brand_logo && <img src={draft.brand_logo_url || brandLogo} alt="אחותי כלה" className="h-16 w-28 object-contain" />}{draft.extra_logos.map((logo, i) => <img key={i} src={logo.url} alt={logo.alt} className="h-16 w-24 object-contain" />)}</div>
         {event.cover_image && <img src={event.cover_image} alt={event.title} className="w-full object-cover" />}
-        <div className="space-y-5 p-6"><h2 className="whitespace-pre-line break-words text-2xl font-semibold">{draft.title}</h2><p className="text-sm text-muted-foreground">{new Date(event.event_date).toLocaleDateString("he-IL")} · {event.event_time}<br />{event.location} {event.city}</p><p className="break-words text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: bodyToHtml(draft.body) }} /><div className="flex flex-wrap gap-4">{event.early_price != null && <p className="text-primary">רישום מוקדם: ₪{event.early_price}{event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}</p>}{event.regular_price != null && <p>רישום רגיל: ₪{event.regular_price}</p>}</div>{registrationHref(draft.registration_url) && <Button asChild className="w-full"><a href={registrationHref(draft.registration_url)} target="_blank" rel="noopener noreferrer">להרשמה בטיקצ׳אק</a></Button>}</div>
+        <div className="space-y-5 p-6"><h2 className="whitespace-pre-line break-words text-2xl font-semibold">{draft.title}</h2><p className="text-sm text-muted-foreground">{new Date(event.event_date).toLocaleDateString("he-IL")} · {event.event_time}<br />{event.location} {event.city}</p><p className="break-words text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: bodyToHtml(draft.body) }} /><div className="flex flex-wrap gap-4">{event.early_price != null && <p className="text-primary">רישום מוקדם: ₪{event.early_price}{event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}</p>}{event.regular_price != null && <p>רישום רגיל: ₪{event.regular_price}</p>}</div>{registrationHref(draft.registration_url) && <Button asChild className="h-auto min-h-10 w-full whitespace-normal break-all"><a href={registrationHref(draft.registration_url)} target="_blank" rel="noopener noreferrer">{registrationLabel(draft.registration_url)}</a></Button>}</div>
       </article></section>
     </div>
   </div>;

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Add Tickchak/email registration selection with a clickable email address on the registration button; test saved draft and sender validation, redeploy senders and release offline through the existing chain.
+
 - [x] Make the Tickchak registration link optional in event communications: no link means no registration button in the email preview, the sent email and the WhatsApp text, and sending/test sends are no longer blocked. Server still rejects a filled but invalid link. Nine tests passed, both senders redeployed, empty-link status check returned the full 623-name audience and an unconfirmed send stayed blocked at 409; temp draft removed.
 
 - [x] Fix WhatsApp sharing hanging on image/clipboard requests: preload with cancellation, preserve native user activation, and provide an immediately accessible text/image fallback.

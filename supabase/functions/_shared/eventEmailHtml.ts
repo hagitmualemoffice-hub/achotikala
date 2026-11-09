@@ -1,5 +1,6 @@
 // One email layout for test and list sends, matching the event window on the site:
 // card with rounded corners, title, date/place rows with pink icons, price boxes, full-width button.
+import { registrationLabel } from './registration.ts';
 const ICONS = 'https://achotikala.com/email-icons';
 
 const escape = (value: unknown) =>
@@ -54,7 +55,7 @@ export function eventEmailHtml({ title, body, registrationHref, logoHtml, coverU
 
   const cover = coverUrl ? `<tr><td><img src="${escape(coverUrl)}" alt="${escape(event.title)}" width="600" style="display:block;width:100%;height:auto"></td></tr>` : '';
   const button = registrationHref
-    ? `<table role="presentation" width="100%" style="margin:24px 0 0"><tr><td align="center" style="background:${palette.primary};border-radius:10px"><a href="${escape(registrationHref)}" style="display:block;color:${palette.background};padding:14px 0;text-decoration:none;font-size:16px;font-weight:600;text-align:center">להרשמה בטיקצ׳אק</a></td></tr></table>`
+    ? `<table role="presentation" width="100%" style="margin:24px 0 0"><tr><td align="center" style="background:${palette.primary};border-radius:10px"><a href="${escape(registrationHref)}" style="display:block;color:${palette.background};padding:14px 8px;overflow-wrap:anywhere;word-break:break-word;text-decoration:none;font-size:16px;font-weight:600;text-align:center">${escape(registrationLabel(registrationHref))}</a></td></tr></table>`
     : '';
   const footer = unsubscribeUrl
     ? `<tr><td style="padding:18px;border-top:1px solid ${palette.border};font-size:12px;color:${palette.muted};text-align:center"><a href="${unsubscribeUrl}" style="color:${palette.muted}">להסרה מרשימת התפוצה</a></td></tr>` : '';

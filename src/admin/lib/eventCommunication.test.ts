@@ -17,6 +17,18 @@ describe("event communications", () => {
     expect(safeRegistrationHref("javascript:alert(1)")).toBeNull();
     expect(safeRegistrationHref("https://tickchak.co.il/12345")).toBe("https://tickchak.co.il/12345");
   });
+  it("email registration opens the selected single address", () => {
+    expect(safeRegistrationHref("mailto:register@example.com")).toBe("mailto:register@example.com");
+    expect(registrationHref("mailto:register@example.com")).toBe("mailto:register@example.com");
+    expect(safeRegistrationHref("mailto:not-an-email")).toBeNull();
+    expect(safeRegistrationHref("mailto:a@example.com,b@example.com")).toBeNull();
+    expect(safeRegistrationHref("mailto:a@example.com?bcc=other@example.com")).toBeNull();
+    expect(safeRegistrationHref("mailto:a@example.com\r\nBcc:b@example.com")).toBeNull();
+  });
+  it("WhatsApp includes the email registration address", () => {
+    expect(whatsappMessage({ title: "מפגש", body: "נפגשות", registration_url: "mailto:register@example.com" }))
+      .toBe("*מפגש*\n\nנפגשות\n\nלהרשמה במייל: register@example.com");
+  });
   it("WhatsApp message leaves out the registration line when there is no link", () => {
     expect(whatsappMessage({ title: "מפגש", body: "נפגשות", registration_url: "" }))
       .toBe("*מפגש*\n\nנפגשות");

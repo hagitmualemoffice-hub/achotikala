@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     const { data: draft, error } = await caller.from('event_communications').select('*').eq('id', parsed.data.draft_id).single();
     if (error || !draft) return json({ error: 'Draft not found' }, 404);
     const registrationHref = safeRegistrationHref(draft.registration_url);
-    if (registrationHref === null) return json({ error: 'יש להזין קישור HTTPS לטיקצ׳אק' }, 400);
+    if (registrationHref === null) return json({ error: 'יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה' }, 400);
     if (!draft.subject.trim() || !draft.title.trim()) return json({ error: 'חסרה כותרת' }, 400);
     const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
     if (eventError || !event) return json({ error: 'Event not found' }, 404);
