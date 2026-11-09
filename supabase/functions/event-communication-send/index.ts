@@ -2,7 +2,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
 
-const schema = z.object({ draft_id: z.string().uuid() });
+const schema = z.object({ draft_id: z.string().uuid(), preview_to: z.string().trim().email().max(255).optional() });
 const UNSUBSCRIBE_URL = 'https://achotikala.com/unsubscribe';
 const WAVE_CAP = 450;
 const nextWaveSize = (remaining: number) =>
@@ -69,7 +69,9 @@ Deno.serve(async (req) => {
 
     const waveSize = nextWaveSize(audience.length);
     if (!waveSize) return json({ sent: 0, remaining: 0, wave: 0, message: 'כל הרשימה כבר קיבלה את ההודעה' });
-    const batch = audience.slice(0, waveSize);
+    // Admin-only preview: send this exact campaign to one address instead of the whole list.
+    const batch = parsed.data.preview_to ? [parsed.data.preview_to.toLowerCase()] : audience.slice(0, waveSize);
+    const remaining = parsed.data.preview_to ? audience.length : audience.length - batch.length;
 
     const { data: prior, error: priorError } = await service.from('event_communication_sends').select('wave').eq('communication_id', draftId);
     if (priorError) console.error(`Send history lookup failed: ${priorError.message}`);
@@ -123,7 +125,7 @@ Deno.serve(async (req) => {
     const { error: sendError } = await service.from('event_communication_sends').insert({ communication_id: draftId, wave, recipient_count: batch.length, message_id: result.id ?? null });
     if (sendError) console.error(`Send record failed: ${sendError.message}`);
 
-    return json({ sent: batch.length, remaining: audience.length - batch.length, wave, message_id: result.id ?? null });
+    return json({ sent: batch.length, remaining, wave, message_id: result.id ?? null });
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : String(error) }, 400);
   }
