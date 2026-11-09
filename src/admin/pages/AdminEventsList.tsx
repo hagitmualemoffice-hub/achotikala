@@ -6,7 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 type Ev = {
@@ -84,6 +84,7 @@ export default function AdminEventsList() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-left">
+                    <Button asChild size="sm" variant="ghost"><Link to={`/admin/events/${e.id}/communications`}><Mail className="h-4 w-4 me-1" />פרסום ותזכורות</Link></Button>
                     <Button asChild size="sm" variant="ghost"><Link to={`/admin/events/${e.id}`}><Pencil className="h-4 w-4" /></Link></Button>
                     <Button size="sm" variant="ghost" onClick={() => remove(e.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </TableCell>

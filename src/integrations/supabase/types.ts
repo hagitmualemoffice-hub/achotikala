@@ -2585,6 +2585,71 @@ export type Database = {
         }
         Relationships: []
       }
+      event_communications: {
+        Row: {
+          audience: string
+          body: string
+          brand_logo_url: string
+          created_at: string
+          event_id: string
+          extra_logos: Json
+          google_label: string
+          id: string
+          message_kind: string
+          planned_at: string | null
+          registration_url: string
+          show_brand_logo: boolean
+          status: string
+          subject: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          body?: string
+          brand_logo_url?: string
+          created_at?: string
+          event_id: string
+          extra_logos?: Json
+          google_label?: string
+          id?: string
+          message_kind?: string
+          planned_at?: string | null
+          registration_url?: string
+          show_brand_logo?: boolean
+          status?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          brand_logo_url?: string
+          created_at?: string
+          event_id?: string
+          extra_logos?: Json
+          google_label?: string
+          id?: string
+          message_kind?: string
+          planned_at?: string | null
+          registration_url?: string
+          show_brand_logo?: boolean
+          status?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_communications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_db"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_templates: {
         Row: {
           category: string | null

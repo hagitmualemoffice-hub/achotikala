@@ -162,6 +162,13 @@
       "when": 1794215524486,
       "tag": "0022_allow_course_event_type",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794221178470,
+      "tag": "0023_event_communication_drafts",
+      "breakpoints": true
     }
   ]
 }

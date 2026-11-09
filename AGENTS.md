@@ -9,3 +9,4 @@
 - Keep the forum/inquiries view synchronized with the existing birurim query parameter and explicit forum reset callback; same-path navigation must not leave the previous view active.
 - Use shared directory heading, add, filter and view controls across Baar, Places, Inquiries and Apartments; this keeps toolbar presentation consistent without changing access or filtering logic.
 - Store each recurring course as one existing events_db record and derive weekly calendar dates through the shared eventSeries helper; editing or unpublishing a series must affect every meeting without duplicate records.
+- Keep event communication drafts linked to existing events and admin-only; Gmail tests must resolve the recipient from the connected account server-side, and bulk/scheduled sends remain disabled until consent, unsubscribe and verified audiences are implemented.
