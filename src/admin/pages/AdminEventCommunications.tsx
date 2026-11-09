@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { uploadToMedia } from "@/admin/lib/media";
-import { tickchakLink, whatsappMessage, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
+import { tickchakLink, whatsappMessage, bodyToHtml, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
 import type { DbRow } from "@/hooks/useEvents";
 import brandLogo from "@/assets/logo-achoti-kala.png";
 
@@ -44,6 +44,33 @@ export default function AdminEventCommunications() {
   const [status, setStatus] = useState<SendStatus | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  // Wraps the selected text in a mark: bold (**…**) or a larger line (## …).
+  const mark = (kind: "bold" | "large") => {
+    const el = bodyRef.current;
+    if (!el || !draft) return;
+    const { selectionStart: a, selectionEnd: b, value } = el;
+    let next: string;
+    if (kind === "bold") next = value.slice(0, a) + "**" + (value.slice(a, b) || "טקסט מודגש") + "**" + value.slice(b);
+    else { const lineStart = value.lastIndexOf("\n", a - 1) + 1; next = value.startsWith("## ", lineStart) ? value.slice(0, lineStart) + value.slice(lineStart + 3) : value.slice(0, lineStart) + "## " + value.slice(lineStart); }
+    change({ body: next });
+    requestAnimationFrame(() => el.focus());
+  };
+  // WhatsApp: send the event picture itself with the text, so the chat shows the site image, not the Tickchak link preview.
+  const shareWhatsapp = async () => {
+    if (!draft || !event) return;
+    const text = whatsappMessage(draft, event);
+    let file: File | null = null;
+    if (event.cover_image) {
+      try { const res = await fetch(event.cover_image); if (res.ok) { const blob = await res.blob(); file = new File([blob], `event.${blob.type.split("/")[1] || "jpg"}`, { type: blob.type }); } } catch { file = null; }
+    }
+    if (file && navigator.canShare?.({ files: [file], text })) {
+      try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e instanceof DOMException && e.name === "AbortError") return; }
+    }
+    await navigator.clipboard.writeText(text).catch(() => undefined);
+    if (file) { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+    toast.success(file ? "הטקסט הועתק והתמונה ירדה למחשב — בוואטסאפ צרפי את התמונה והדביקי את הטקסט ככיתוב" : "הטקסט הועתק — הדביקי בוואטסאפ");
+  };
   const change = (patch: Partial<CommunicationDraft>) => { setDirty(true); setDraft(current => current ? { ...current, ...patch } : current); };
 
   useEffect(() => {
@@ -160,7 +187,7 @@ export default function AdminEventCommunications() {
         <div className="space-y-2"><Label htmlFor="message-kind">סוג הודעה</Label><Select value={draft.message_kind} onValueChange={message_kind => change({ message_kind })}><SelectTrigger id="message-kind"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="announcement">פרסום האירוע</SelectItem><SelectItem value="early_end">סיום הרשמה מוקדמת</SelectItem><SelectItem value="update">עדכון נוסף</SelectItem></SelectContent></Select></div>
         <div className="space-y-2"><Label htmlFor="email-subject">נושא המייל</Label><Input id="email-subject" maxLength={255} value={draft.subject} onChange={e => change({ subject: e.target.value })} /></div>
         <div className="space-y-2"><Label htmlFor="message-title">כותרת בהודעה</Label><Input id="message-title" maxLength={500} value={draft.title} onChange={e => change({ title: e.target.value })} /></div>
-        <div className="space-y-2"><Label htmlFor="message-body">טקסט</Label><Textarea id="message-body" className="min-h-48" maxLength={20000} value={draft.body} onChange={e => change({ body: e.target.value })} /></div>
+        <div className="space-y-2"><div className="flex flex-wrap items-center justify-between gap-2"><Label htmlFor="message-body">טקסט</Label><div className="flex gap-1"><Button type="button" variant="outline" size="sm" onClick={() => mark("bold")} className="font-bold">הדגשה</Button><Button type="button" variant="outline" size="sm" onClick={() => mark("large")}>גופן גדול</Button></div></div><p className="text-xs text-muted-foreground">מסמנים מילים ולוחצים "הדגשה". "גופן גדול" מגדיל את כל השורה. אותו עיצוב יופיע במייל ובוואטסאפ (בוואטסאפ שורה גדולה מופיעה מודגשת).</p><Textarea ref={bodyRef} id="message-body" className="min-h-48" maxLength={20000} value={draft.body} onChange={e => change({ body: e.target.value })} /></div>
         <div className="space-y-2"><Label htmlFor="registration-link">קישור לטיקצ׳אק</Label><Input dir="ltr" id="registration-link" value={draft.registration_url} onChange={e => change({ registration_url: e.target.value })} />{draft.registration_url && !tickchakLink(draft.registration_url) && <p className="text-sm text-destructive">יש להזין קישור HTTPS לטיקצ׳אק</p>}</div>
         <div className="flex items-center justify-between"><Label htmlFor="brand-logo">לוגו אחותי כלה מעל התמונה</Label><Switch id="brand-logo" checked={draft.show_brand_logo} onCheckedChange={show_brand_logo => change({ show_brand_logo })} /></div>
         <div className="space-y-2"><Label htmlFor="brand-logo-url">קישור ללוגו אחותי כלה במייל</Label><Input id="brand-logo-url" dir="ltr" placeholder="https://" value={draft.brand_logo_url} onChange={e => change({ brand_logo_url: e.target.value })} /></div>
@@ -168,7 +195,7 @@ export default function AdminEventCommunications() {
         <div className="space-y-2"><Label htmlFor="audience">נמענות</Label><Select value={draft.audience} onValueChange={audience => change({ audience })}><SelectTrigger id="audience"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="website">רשימת התפוצה באתר</SelectItem><SelectItem value="google">אנשי קשר בגוגל</SelectItem><SelectItem value="both">שתי הרשימות</SelectItem></SelectContent></Select></div>
         {draft.audience !== "website" && <div className="space-y-2"><Label htmlFor="google-label">תווית אנשי הקשר בגוגל</Label><Input id="google-label" value={draft.google_label} onChange={e => change({ google_label: e.target.value })} /><p className="text-xs text-muted-foreground">קריאת אנשי הקשר בגוגל עדיין אינה מחוברת.</p></div>}
         <div className="space-y-2"><Label htmlFor="planned-send">מועד שליחה מבוקש — טיוטה בלבד</Label><Input id="planned-send" type="datetime-local" value={localTime(draft.planned_at)} onChange={e => change({ planned_at: plannedInstant(e.target.value) })} /><p className="text-sm text-muted-foreground">המועד נשמר בטיוטה ולא מפעיל שליחה אוטומטית. השליחה עצמה נעשית בלחיצה על "שליחה לתפוצה".</p></div>
-        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button variant="outline" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת בדיקה לגימייל המחובר</Button><Button asChild variant="outline"><a target="_blank" rel="noopener noreferrer" href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage(draft))}`}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</a></Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
+        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button variant="outline" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת בדיקה לגימייל המחובר</Button><Button type="button" variant="outline" disabled={busy} onClick={() => void run(shareWhatsapp)}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
         <p className="text-xs text-muted-foreground">כל שליחה לתפוצה יוצאת תמיד בעותק מוסתר, אין אפשרות אחרת — אף נמענת לא רואה את הכתובות האחרות. כל מייל כולל קישור להסרה מרשימת התפוצה. הרשימה נשלחת בגלים: גל אחד היום, גל שני אחר כך, עד שהכול יצא.</p>
         {status && <div className="space-y-2 rounded-lg border bg-muted/40 p-3 text-sm" aria-live="polite">
           <p className="font-medium">מצב השליחה לתפוצה{dirty ? " (לפני השמירה של השינויים)" : ""}</p>
@@ -198,7 +225,7 @@ export default function AdminEventCommunications() {
       <section className="min-w-0"><h2 className="mb-3 text-sm font-medium text-muted-foreground">תצוגה מקדימה</h2><article className="overflow-hidden rounded-lg border bg-background">
         <div className="flex flex-wrap items-center justify-center gap-4 p-5">{draft.show_brand_logo && <img src={draft.brand_logo_url || brandLogo} alt="אחותי כלה" className="h-16 w-28 object-contain" />}{draft.extra_logos.map((logo, i) => <img key={i} src={logo.url} alt={logo.alt} className="h-16 w-24 object-contain" />)}</div>
         {event.cover_image && <img src={event.cover_image} alt={event.title} className="w-full object-cover" />}
-        <div className="space-y-5 p-6"><h2 className="whitespace-pre-line break-words text-2xl font-semibold">{draft.title}</h2><p className="text-sm text-muted-foreground">{new Date(event.event_date).toLocaleDateString("he-IL")} · {event.event_time}<br />{event.location} {event.city}</p><p className="whitespace-pre-line break-words text-base leading-relaxed">{draft.body}</p><div className="flex flex-wrap gap-4">{event.early_price != null && <p className="text-primary">רישום מוקדם: ₪{event.early_price}{event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}</p>}{event.regular_price != null && <p>רישום רגיל: ₪{event.regular_price}</p>}</div><Button asChild className="w-full" disabled={!tickchakLink(draft.registration_url)}><a href={tickchakLink(draft.registration_url) ? draft.registration_url : undefined} target="_blank" rel="noopener noreferrer">להרשמה בטיקצ׳אק</a></Button></div>
+        <div className="space-y-5 p-6"><h2 className="whitespace-pre-line break-words text-2xl font-semibold">{draft.title}</h2><p className="text-sm text-muted-foreground">{new Date(event.event_date).toLocaleDateString("he-IL")} · {event.event_time}<br />{event.location} {event.city}</p><p className="break-words text-base leading-relaxed" dangerouslySetInnerHTML={{ __html: bodyToHtml(draft.body) }} /><div className="flex flex-wrap gap-4">{event.early_price != null && <p className="text-primary">רישום מוקדם: ₪{event.early_price}{event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}</p>}{event.regular_price != null && <p>רישום רגיל: ₪{event.regular_price}</p>}</div><Button asChild className="w-full" disabled={!tickchakLink(draft.registration_url)}><a href={tickchakLink(draft.registration_url) ? draft.registration_url : undefined} target="_blank" rel="noopener noreferrer">להרשמה בטיקצ׳אק</a></Button></div>
       </article></section>
     </div>
   </div>;
