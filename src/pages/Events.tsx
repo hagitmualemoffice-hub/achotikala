@@ -422,27 +422,20 @@ const Events = () => {
                     <button key={k} onClick={() => setKind(k)} className={cn("rounded-full px-4 py-1.5 text-sm border transition-colors", kind === k ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground/70 border-border hover:border-primary")}>{label}</button>
                   ))}
                 </div>
-                {courses.length > 0 && <section><h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">סדרות חורף</h2><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{courses.map((event) => <EventCard key={event.id} event={event} onOpen={setOpenEvent} />)}</div></section>}
-                {/* Future events */}
-                <div>
-                  <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
-                    אירועים קרובים
-                  </h2>
-                  {upcoming.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {upcoming.map((event) => (
-                        <EventCard key={event.id} event={event} onOpen={setOpenEvent} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-3xl border border-dashed border-border p-10 text-center bg-muted/30">
-                      <CalendarIcon className="h-10 w-10 text-primary/40 mx-auto" />
-                      <p className="mt-3 text-foreground/70 font-light">
-                        אין אירועים קרובים. בקרוב נעדכן באירועים חדשים.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {upcomingList.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {upcomingList.map((event) => (
+                      <EventCard key={event.id} event={event} onOpen={setOpenEvent} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-3xl border border-dashed border-border p-10 text-center bg-muted/30">
+                    <CalendarIcon className="h-10 w-10 text-primary/40 mx-auto" />
+                    <p className="mt-3 text-foreground/70 font-light">
+                      אין אירועים קרובים. בקרוב נעדכן באירועים חדשים.
+                    </p>
+                  </div>
+                )}
 
                 {/* Past events */}
                 {pastEvents.length > 0 && (
