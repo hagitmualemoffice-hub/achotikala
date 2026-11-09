@@ -1,3 +1,4 @@
+import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
@@ -118,14 +119,7 @@ Deno.serve(async (req) => {
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos]
       .map((logo) => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
-    // **bold** and lines starting with "## " (larger), same marks as the admin editor.
-    const text = String(draft.body ?? '').split('\n').map((line: string) => {
-      const large = line.startsWith('## ');
-      const html = escape(large ? line.slice(3) : line).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      return large ? `<span style="font-size:22px;font-weight:bold;line-height:1.5">${html}</span>` : html;
-    }).join('<br>');
-    const cover = event.cover_image ? `<img src="${escape(absolute(event.cover_image))}" alt="${escape(event.title)}" width="600" style="display:block;width:100%;height:auto">` : '';
-    const html = `<!doctype html><html lang="he" dir="rtl"><body style="margin:0;background:${palette.background};color:${palette.foreground};font-family:Arial,sans-serif"><table role="presentation" width="100%"><tr><td align="center"><table role="presentation" width="600" style="width:100%;max-width:600px;direction:rtl;text-align:right;margin:24px auto;border:1px solid ${palette.border};border-radius:16px;overflow:hidden;border-collapse:separate"><tr><td style="text-align:center;padding:18px">${logoHtml}</td></tr><tr><td>${cover}</td></tr><tr><td style="padding:28px"><h1 style="font-size:26px;line-height:1.4">${escape(draft.title)}</h1><p style="font-size:14px;color:${palette.muted}">${escape(event.event_date)} ${escape(event.event_time)}<br>${escape(event.location)} ${escape(event.city)}</p><p style="font-size:16px;line-height:1.8">${text}</p>${event.early_price != null ? `<p>רישום מוקדם: ₪${escape(event.early_price)}${event.early_price_deadline ? ` עד ${escape(event.early_price_deadline)}` : ''}</p>` : ''}${event.regular_price != null ? `<p>רישום רגיל: ₪${escape(event.regular_price)}</p>` : ''}<table role="presentation" width="100%" style="margin:30px 0 0"><tr><td align="center" style="background:${palette.primary};border-radius:10px"><a href="${escape(registration.href)}" style="display:block;color:${palette.background};padding:14px 0;text-decoration:none;font-size:16px;text-align:center">להרשמה בטיקצ׳אק</a></td></tr></table></td></tr><tr><td style="padding:18px;border-top:1px solid ${palette.border};font-size:12px;color:${palette.muted};text-align:center"><a href="${UNSUBSCRIBE_URL}" style="color:${palette.muted}">להסרה מרשימת התפוצה</a></td></tr></table></td></tr></table></body></html>`;
+    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref: registration.href, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: UNSUBSCRIBE_URL });
 
     // Hidden copy: the batch goes out in Bcc so no reader sees the other addresses.
     const mime = [
