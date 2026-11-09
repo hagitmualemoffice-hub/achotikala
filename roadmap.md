@@ -1,7 +1,8 @@
 # Roadmap
 
 - [x] Add admin-only event communication drafts, editable subject/title/body, branded event preview, compressed logos, direct Tickchak links and manual WhatsApp sharing; Gmail linked and test-only sender deployed. Three tests and authenticated draft save/reload/restore passed; no campaign sent.
-- [ ] Activate actual scheduled/bulk event sends and verified audiences: blocked on Google Contacts read authorization and consent/unsubscribe handling. Requested dates and audience choices currently save as drafts only, never auto-send. Existing app-email service must not be used for promotional campaigns.
+- [x] Event emails now send to the site's verified mailing list in hidden copy (Bcc), capped at 450 per message and repeated in same-day waves until everyone has it; every email carries a remove-from-list link that only takes effect after the address confirms through its emailed link. Preview send to the connected mailbox, the full confirm flow and the wave math were verified, and test rows were removed.
+- [ ] Sending at a chosen clock time is still manual: the requested date saves on the draft but nothing fires automatically. Existing app-email service must not be used for promotional campaigns.
 
 - [x] Add winter course series within existing event management and calendar; published חופשיה לנוע with הודיה יהוד, Mondays 20:00–21:15, 2026-11-09 through 2027-01-09, supplied venue/phone and compressed cover. Three recurrence tests passed; public desktop/mobile/details, authenticated date save/reload/restore and rendered image verified; preview build OK.
 - [x] Events page: removed section headings, merged regular events and winter series into one mixed grid with regular events leading, and aligned the whole page flush right with the title. Verified card order and right-edge alignment at 1280/950/390; offline release not requested.

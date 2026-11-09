@@ -30,3 +30,16 @@ export function plannedInstant(value: string): string | null {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
+
+/** Gmail allows at most 500 recipients in one message; keep a safe margin. */
+export const WAVE_CAP = 450;
+
+/**
+ * Hidden-copy sending goes out in waves on the same day: the whole list when it
+ * already fits in one message, otherwise roughly half of what is left.
+ */
+export function nextWaveSize(remaining: number): number {
+  if (remaining <= 0) return 0;
+  if (remaining <= WAVE_CAP) return remaining;
+  return Math.min(WAVE_CAP, Math.ceil(remaining / 2));
+}
