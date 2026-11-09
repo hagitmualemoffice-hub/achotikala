@@ -1,0 +1,2 @@
+ALTER TABLE public.events_db DROP CONSTRAINT events_db_event_type_check;
+ALTER TABLE public.events_db ADD CONSTRAINT events_db_event_type_check CHECK (event_type IS NULL OR event_type IN ('meeting','event','workshop','save_the_date','course'));
