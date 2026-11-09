@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2 } from "lucide-react";
+import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { uploadToMedia } from "@/admin/lib/media";
 import { tickchakLink, whatsappMessage, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
@@ -28,6 +28,7 @@ export default function AdminEventCommunications() {
   const [history, setHistory] = useState<CommunicationDraft[]>([]);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [wave, setWave] = useState<{ sent: number; remaining: number; wave: number } | null>(null);
   const change = (patch: Partial<CommunicationDraft>) => setDraft(current => current ? { ...current, ...patch } : current);
 
   useEffect(() => {
@@ -92,6 +93,18 @@ export default function AdminEventCommunications() {
       throw new Error(detail);
     }
     toast.success(`מייל הבדיקה נשלח ל־${data.recipient}`);
+  };
+  const sendAll = async () => {
+    if (!draft || !tickchakLink(draft.registration_url)) { toast.error("יש להזין קישור HTTPS לטיקצ׳אק"); return; }
+    const draftId = await save();
+    if (!draftId) return;
+    const { data, error } = await supabase.functions.invoke("event-communication-send", { body: { draft_id: draftId } });
+    if (error) {
+      const detail = error instanceof FunctionsHttpError ? await error.context.text() : error.message;
+      throw new Error(detail);
+    }
+    setWave(data);
+    toast.success(`נשלח לגל ${data.wave}: ${data.sent} נמענות`);
   };
   const uploadLogo = async (file: File | undefined) => {
     if (!file || !draft) return;
