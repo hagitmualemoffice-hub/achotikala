@@ -1,7 +1,7 @@
 # Roadmap
 
 - [x] Add Tickchak/email registration selection with the email address on a mailto button. Nineteen tests passed; authenticated save/select/reload and deployed sender status verified, temporary drafts removed, no email sent; senders redeployed and preview build OK.
-- [ ] Complete offline v22 (supersedes v21): build/pack/local verification passed (452 unique parts, zero problems); network-blocked fresh installer rendered. Primary GitHub push succeeded (8030a1959960fdee9e65435f9ae29ba8963e89a3), but publisher timed out during CDN purge, so STOPPED per release policy. Both CDN channels, legacy sync, four Drive replacements/download verification and upgrade checks remain undone. Drive files unchanged.
+- [ ] Complete offline v22 (supersedes v21): build/pack/local verification passed (452 unique parts, zero problems); the network-blocked installer check was invalid because the mounted file displayed as source text. Primary GitHub push succeeded (8030a1959960fdee9e65435f9ae29ba8963e89a3), but publisher timed out during CDN purge, so STOPPED per release policy. Both CDN channels, legacy sync, four Drive replacements/download verification and upgrade checks remain undone. Drive files unchanged.
 
 - [x] Make the Tickchak registration link optional in event communications: no link means no registration button in the email preview, the sent email and the WhatsApp text, and sending/test sends are no longer blocked. Server still rejects a filled but invalid link. Nine tests passed, both senders redeployed, empty-link status check returned the full 623-name audience and an unconfirmed send stayed blocked at 409; temp draft removed.
 
