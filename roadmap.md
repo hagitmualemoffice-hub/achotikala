@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Add winter course series within existing event management and calendar; first series: חופשיה לנוע with הודיה יהוד, Mondays 20:00–21:15. Waiting for series dates and venue/registration details before publishing.
+
 - [x] Mobile directories: floating add, one-row search/filter icon/view; fixed drawer actions; balanced forum spacing and flush sticky header. Authenticated mobile screens and add/filter drawers checked; action bounds stayed unchanged after scrolling in Baar, Places, Inquiries and Apartments; five identity tests passed and preview build OK.
 - [ ] Release mobile fixes as offline v20. Build, pack, local verification (436 unique parts, zero problems) and network-blocked fresh install passed; dedicated repository publish completed (0e35bf12135a33f98d0e86f82809ec428c8722a7). STOPPED: primary jsDelivr full verifier exceeded command time limit without a result. Both-channel CDN/hash checks, Drive uploads/download checks and rev13/rev14 upgrades remain unverified; Drive files were not changed.
 
