@@ -11,7 +11,9 @@ describe('WhatsApp event image', () => {
   });
   it('allows text sharing when image loading is cancelled', async () => {
     const controller = new AbortController();
-    vi.stubGlobal('fetch', vi.fn((_url, { signal }) => new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(new Error('aborted')))));
+    vi.stubGlobal('fetch', vi.fn((_url, { signal }) => new Promise((_resolve, reject) => {
+      signal.addEventListener('abort', () => reject(new Error('aborted')));
+    })));
     const result = loadWhatsappImage('/event.webp', controller.signal);
     controller.abort();
     expect(await result).toBeNull();
