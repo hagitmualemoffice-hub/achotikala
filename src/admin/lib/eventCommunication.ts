@@ -21,8 +21,45 @@ export function tickchakLink(value: string): boolean {
   } catch { return false; }
 }
 
-export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body" | "registration_url">): string {
-  return [draft.title, draft.body, draft.registration_url].filter(Boolean).join("\n\n");
+/**
+ * Simple text marks shared by the email and WhatsApp:
+ * **מילים** = bold, a line starting with "## " = larger text.
+ */
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char));
+
+export function bodyToHtml(body: string): string {
+  return body.split("\n").map((line) => {
+    const large = line.startsWith("## ");
+    const html = escapeHtml(large ? line.slice(3) : line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    return large ? `<span style="font-size:22px;font-weight:bold;line-height:1.5">${html}</span>` : html;
+  }).join("<br>");
+}
+
+export function bodyToWhatsapp(body: string): string {
+  return body.split("\n").map((line) => {
+    const large = line.startsWith("## ");
+    const text = (large ? line.slice(3) : line).replace(/\*\*(.+?)\*\*/g, "*$1*");
+    return large && text.trim() ? `*${text.replace(/\*/g, "")}*` : text;
+  }).join("\n");
+}
+
+type WhatsappEvent = { event_date?: string | null; event_time?: string | null; location?: string | null; city?: string | null; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
+
+export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body" | "registration_url">, event?: WhatsappEvent): string {
+  const when = event ? [event.event_date ? new Date(event.event_date).toLocaleDateString("he-IL") : "", event.event_time].filter(Boolean).join(" · ") : "";
+  const where = event ? [event.location, event.city].filter(Boolean).join(" ") : "";
+  const prices = event ? [
+    event.early_price != null ? `רישום מוקדם: ₪${event.early_price}${event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}` : "",
+    event.regular_price != null ? `רישום רגיל: ₪${event.regular_price}` : "",
+  ].filter(Boolean).join("\n") : "";
+  return [
+    draft.title ? `*${draft.title.replace(/\*/g, "")}*` : "",
+    [when, where].filter(Boolean).join("\n"),
+    bodyToWhatsapp(draft.body),
+    prices,
+    draft.registration_url ? `להרשמה בטיקצ׳אק:\n${draft.registration_url}` : "",
+  ].filter(Boolean).join("\n\n");
 }
 
 export function plannedInstant(value: string): string | null {
