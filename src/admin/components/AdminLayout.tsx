@@ -40,6 +40,7 @@ const navItems = [
 export default function AdminLayout() {
   const { loading, session, isAdmin, user } = useAdminAuth();
   const location = useLocation();
+  const isCommunicationEditor = /\/admin\/events\/[^/]+\/communications$/.test(location.pathname);
 
   if (loading) {
     return (
@@ -72,7 +73,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-row-reverse" dir="rtl">
-      <aside className="w-64 shrink-0 border-l bg-background flex flex-col">
+      <aside className={cn("w-64 shrink-0 border-l bg-background flex flex-col", isCommunicationEditor && "hidden md:flex")}>
         <div className="p-5 border-b">
           <div className="text-lg font-medium">אחותי כלה</div>
           <div className="text-xs text-muted-foreground mt-0.5">ניהול תוכן</div>
