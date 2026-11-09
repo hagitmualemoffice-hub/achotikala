@@ -2,7 +2,12 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
 
-const schema = z.object({ draft_id: z.string().uuid(), preview_to: z.string().trim().email().max(255).optional() });
+const schema = z.object({
+  draft_id: z.string().uuid(),
+  mode: z.enum(['status', 'send']).default('send'),
+  confirm_wave: z.number().int().min(1).optional(),
+  preview_to: z.string().trim().email().max(255).optional(),
+});
 const UNSUBSCRIBE_URL = 'https://achotikala.com/unsubscribe';
 const WAVE_CAP = 450;
 const nextWaveSize = (remaining: number) =>
@@ -53,10 +58,15 @@ Deno.serve(async (req) => {
     const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
     if (eventError || !event) return json({ error: 'Event not found' }, 404);
 
+    // Content version: a changed text is a new message; the same text never reaches anyone twice.
+    const fingerprint = JSON.stringify([draft.subject, draft.title, draft.body, draft.registration_url, draft.show_brand_logo, draft.extra_logos]);
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprint));
+    const contentHash = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+
     const service = createClient(url, serviceKey, { auth: { persistSession: false } });
     const [{ data: authorized, error: audienceError }, { data: already, error: alreadyError }] = await Promise.all([
       service.from('authorized_emails').select('email').eq('authorized', true),
-      service.from('event_communication_recipients').select('email').eq('communication_id', draftId),
+      service.from('event_communication_recipients').select('email').eq('communication_id', draftId).eq('content_hash', contentHash),
     ]);
     if (audienceError || alreadyError) {
       const details = audienceError?.message ?? alreadyError?.message ?? 'Audience lookup failed';
@@ -67,15 +77,32 @@ Deno.serve(async (req) => {
     const audience = [...new Set((authorized ?? []).map((row) => String(row.email).trim().toLowerCase()))]
       .filter((address) => email.safeParse(address).success && !sent.has(address));
 
+    const { data: sends, error: sendsError } = await service.from('event_communication_sends')
+      .select('wave, recipient_count, created_at, content_hash').eq('communication_id', draftId).order('created_at');
+    if (sendsError) return json({ error: 'Send history lookup failed', details: sendsError.message }, 502);
+    const currentWaves = (sends ?? []).filter((row) => row.content_hash === contentHash);
+    const olderVersionSent = (sends ?? []).some((row) => row.content_hash !== contentHash);
+    const nextWave = currentWaves.length + 1;
+    const status = {
+      total: audience.length + sent.size,
+      sent: sent.size,
+      remaining: audience.length,
+      next_wave: nextWave,
+      next_wave_size: nextWaveSize(audience.length),
+      waves: currentWaves.map((row) => ({ wave: row.wave, count: row.recipient_count, at: row.created_at })),
+      older_version_sent: olderVersionSent,
+    };
+    if (parsed.data.mode === 'status') return json(status);
+
     const waveSize = nextWaveSize(audience.length);
-    if (!waveSize) return json({ sent: 0, remaining: 0, wave: 0, message: 'כל הרשימה כבר קיבלה את ההודעה' });
+    if (!waveSize) return json({ ...status, error: 'כל הרשימה כבר קיבלה את ההודעה הזאת' }, 409);
+    if (parsed.data.confirm_wave !== nextWave)
+      return json({ ...status, error: 'המצב השתנה — יש לאשר מחדש את הגל הבא' }, 409);
     // Admin-only preview: send this exact campaign to one address instead of the whole list.
     const batch = parsed.data.preview_to ? [parsed.data.preview_to.toLowerCase()] : audience.slice(0, waveSize);
     const remaining = parsed.data.preview_to ? audience.length : audience.length - batch.length;
 
-    const { data: prior, error: priorError } = await service.from('event_communication_sends').select('wave').eq('communication_id', draftId);
-    if (priorError) console.error(`Send history lookup failed: ${priorError.message}`);
-    const wave = (prior?.length ?? 0) + 1;
+    const wave = nextWave;
 
     const headers = { Authorization: `Bearer ${gatewayKey}`, 'X-Connection-Api-Key': gmailKey };
     const base = 'https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me';
@@ -93,7 +120,7 @@ Deno.serve(async (req) => {
       .map((logo) => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
     const text = escape(draft.body).replace(/\n/g, '<br>');
     const cover = event.cover_image ? `<img src="${escape(absolute(event.cover_image))}" alt="${escape(event.title)}" width="600" style="display:block;width:100%;height:auto">` : '';
-    const html = `<!doctype html><html lang="he" dir="rtl"><body style="margin:0;background:${palette.background};color:${palette.foreground};font-family:Arial,sans-serif"><table role="presentation" width="100%"><tr><td align="center"><table role="presentation" width="600" style="width:100%;max-width:600px;direction:rtl;text-align:right"><tr><td style="text-align:center;padding:18px">${logoHtml}</td></tr><tr><td>${cover}</td></tr><tr><td style="padding:28px"><h1 style="font-size:26px;line-height:1.4">${escape(draft.title)}</h1><p style="font-size:14px;color:${palette.muted}">${escape(event.event_date)} ${escape(event.event_time)}<br>${escape(event.location)} ${escape(event.city)}</p><p style="font-size:16px;line-height:1.8">${text}</p>${event.early_price != null ? `<p>רישום מוקדם: ₪${escape(event.early_price)}${event.early_price_deadline ? ` עד ${escape(event.early_price_deadline)}` : ''}</p>` : ''}${event.regular_price != null ? `<p>רישום רגיל: ₪${escape(event.regular_price)}</p>` : ''}<p style="text-align:center;margin:30px 0"><a href="${escape(registration.href)}" style="display:inline-block;background:${palette.primary};color:${palette.background};padding:14px 32px;text-decoration:none;border-radius:6px">להרשמה בטיקצ׳אק</a></p></td><tr><td style="padding:18px;border-top:1px solid ${palette.border};font-size:12px;color:${palette.muted};text-align:center"><a href="${UNSUBSCRIBE_URL}" style="color:${palette.muted}">להסרה מרשימת התפוצה</a></td></tr></table></td></tr></table></body></html>`;
+    const html = `<!doctype html><html lang="he" dir="rtl"><body style="margin:0;background:${palette.background};color:${palette.foreground};font-family:Arial,sans-serif"><table role="presentation" width="100%"><tr><td align="center"><table role="presentation" width="600" style="width:100%;max-width:600px;direction:rtl;text-align:right;margin:24px auto;border:1px solid ${palette.border};border-radius:16px;overflow:hidden;border-collapse:separate"><tr><td style="text-align:center;padding:18px">${logoHtml}</td></tr><tr><td>${cover}</td></tr><tr><td style="padding:28px"><h1 style="font-size:26px;line-height:1.4">${escape(draft.title)}</h1><p style="font-size:14px;color:${palette.muted}">${escape(event.event_date)} ${escape(event.event_time)}<br>${escape(event.location)} ${escape(event.city)}</p><p style="font-size:16px;line-height:1.8">${text}</p>${event.early_price != null ? `<p>רישום מוקדם: ₪${escape(event.early_price)}${event.early_price_deadline ? ` עד ${escape(event.early_price_deadline)}` : ''}</p>` : ''}${event.regular_price != null ? `<p>רישום רגיל: ₪${escape(event.regular_price)}</p>` : ''}<table role="presentation" width="100%" style="margin:30px 0 0"><tr><td align="center" style="background:${palette.primary};border-radius:10px"><a href="${escape(registration.href)}" style="display:block;color:${palette.background};padding:14px 0;text-decoration:none;font-size:16px;text-align:center">להרשמה בטיקצ׳אק</a></td></tr></table></td></tr><tr><td style="padding:18px;border-top:1px solid ${palette.border};font-size:12px;color:${palette.muted};text-align:center"><a href="${UNSUBSCRIBE_URL}" style="color:${palette.muted}">להסרה מרשימת התפוצה</a></td></tr></table></td></tr></table></body></html>`;
 
     // Hidden copy: the batch goes out in Bcc so no reader sees the other addresses.
     const mime = [
@@ -120,9 +147,9 @@ Deno.serve(async (req) => {
     }
     const result = await response.json();
 
-    const { error: recordError } = await service.from('event_communication_recipients').insert(batch.map((address) => ({ communication_id: draftId, email: address, wave })));
+    const { error: recordError } = await service.from('event_communication_recipients').insert(batch.map((address) => ({ communication_id: draftId, email: address, wave, content_hash: contentHash })));
     if (recordError) console.error(`Recipient record failed: ${recordError.message}`);
-    const { error: sendError } = await service.from('event_communication_sends').insert({ communication_id: draftId, wave, recipient_count: batch.length, message_id: result.id ?? null });
+    const { error: sendError } = await service.from('event_communication_sends').insert({ communication_id: draftId, wave, recipient_count: batch.length, content_hash: contentHash, message_id: result.id ?? null });
     if (sendError) console.error(`Send record failed: ${sendError.message}`);
 
     return json({ sent: batch.length, remaining, wave, message_id: result.id ?? null });
