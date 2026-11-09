@@ -1,6 +1,7 @@
 # Roadmap
 
-- [ ] Add Tickchak/email registration selection with a clickable email address on the registration button; test saved draft and sender validation, redeploy senders and release offline through the existing chain.
+- [x] Add Tickchak/email registration selection with the email address on a mailto button. Nineteen tests passed; authenticated save/select/reload and deployed sender status verified, temporary drafts removed, no email sent; senders redeployed and preview build OK.
+- [ ] Complete offline v22 (supersedes v21): build/pack/local verification passed (452 unique parts, zero problems); network-blocked fresh installer rendered. Primary GitHub push succeeded (8030a1959960fdee9e65435f9ae29ba8963e89a3), but publisher timed out during CDN purge, so STOPPED per release policy. Both CDN channels, legacy sync, four Drive replacements/download verification and upgrade checks remain undone. Drive files unchanged.
 
 - [x] Make the Tickchak registration link optional in event communications: no link means no registration button in the email preview, the sent email and the WhatsApp text, and sending/test sends are no longer blocked. Server still rejects a filled but invalid link. Nine tests passed, both senders redeployed, empty-link status check returned the full 623-name audience and an unconfirmed send stayed blocked at 409; temp draft removed.
 
@@ -15,7 +16,7 @@
 - [x] Add winter course series within existing event management and calendar; published חופשיה לנוע with הודיה יהוד, Mondays 20:00–21:15, 2026-11-09 through 2027-01-09, supplied venue/phone and compressed cover. Three recurrence tests passed; public desktop/mobile/details, authenticated date save/reload/restore and rendered image verified; preview build OK.
 - [x] Events page: removed section headings, merged regular events and winter series into one mixed grid with regular events leading, and aligned the whole page flush right with the title. Verified card order and right-edge alignment at 1280/950/390; offline release not requested.
 
-- [ ] Complete offline v21: build/pack/local verification (447 unique parts, zero problems), network-blocked fresh-install course/image/dates and primary GitHub/jsDelivr all-part verification passed (commit 58c5217814aff282871774b3181b9471455e80e5). STOPPED: legacy GitHub manifest blob SHA differs from local v21 (expected f58c3ecb3e692c10e0d7f75e871fc195a5078f83, actual 5d83c2a9684ec6efe696233aac3287c41f67a719); automatic sync awaits turn completion. Legacy CDN verification, final installer rebuild, all four Drive uploads/download verification and rev13/rev14 upgrade checks remain undone. Drive files unchanged. Supersedes unfinished v20 release.
+- [x] Offline v21 attempt superseded by v22 above; v21 Drive files were never updated.
 
 - [x] Mobile directories: floating add, one-row search/filter icon/view; fixed drawer actions; balanced forum spacing and flush sticky header. Authenticated mobile screens and add/filter drawers checked; action bounds stayed unchanged after scrolling in Baar, Places, Inquiries and Apartments; five identity tests passed and preview build OK.
 - [x] Offline v20 attempt superseded by v21 above; v20 Drive files were never updated.
