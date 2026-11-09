@@ -16,4 +16,14 @@ describe("event communications", () => {
     expect(plannedInstant("2026-11-09T20:00:00+02:00")).toBe("2026-11-09T18:00:00.000Z");
     expect(plannedInstant("")).toBe(null);
   });
+  it("sends a 623-name list in two same-day hidden-copy waves", () => {
+    expect(nextWaveSize(623)).toBe(312);
+    expect(nextWaveSize(623 - 312)).toBe(311);
+  });
+  it("keeps every wave inside the Gmail recipient ceiling", () => {
+    expect(WAVE_CAP).toBe(450);
+    expect(nextWaveSize(450)).toBe(450);
+    expect(nextWaveSize(900)).toBe(450);
+    expect(nextWaveSize(0)).toBe(0);
+  });
 });
