@@ -35,6 +35,7 @@ import SearchPage from "./pages/SearchPage";
 import PersonalArea from "./pages/PersonalArea.tsx";
 import LibaMessagesPage from "./pages/LibaMessagesPage.tsx";
 import AuthBridge from "./pages/AuthBridge.tsx";
+import Unsubscribe from "./pages/Unsubscribe.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ScrollToTop from "./components/ScrollToTop";
 import AwarenessFloatingButton from "./components/AwarenessFloatingButton";
@@ -134,6 +135,7 @@ const App = () => (
             <Route path="/luach-dirot" element={<Apartments />} />
             <Route path="/hadassah" element={<Hadassah />} />
             <Route path="/auth-bridge" element={<AuthBridge />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
 
 
             <Route path="/admin/login" element={<AdminLogin />} />
