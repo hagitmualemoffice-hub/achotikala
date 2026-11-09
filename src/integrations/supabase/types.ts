@@ -2585,6 +2585,70 @@ export type Database = {
         }
         Relationships: []
       }
+      event_communication_recipients: {
+        Row: {
+          communication_id: string
+          email: string
+          sent_at: string
+          wave: number
+        }
+        Insert: {
+          communication_id: string
+          email: string
+          sent_at?: string
+          wave?: number
+        }
+        Update: {
+          communication_id?: string
+          email?: string
+          sent_at?: string
+          wave?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_communication_recipients_communication_id_fkey"
+            columns: ["communication_id"]
+            isOneToOne: false
+            referencedRelation: "event_communications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_communication_sends: {
+        Row: {
+          communication_id: string
+          created_at: string
+          id: string
+          message_id: string | null
+          recipient_count: number
+          wave: number
+        }
+        Insert: {
+          communication_id: string
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          recipient_count: number
+          wave: number
+        }
+        Update: {
+          communication_id?: string
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          recipient_count?: number
+          wave?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_communication_sends_communication_id_fkey"
+            columns: ["communication_id"]
+            isOneToOne: false
+            referencedRelation: "event_communications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_communications: {
         Row: {
           audience: string

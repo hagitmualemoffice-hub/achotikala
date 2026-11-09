@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tickchakLink, whatsappMessage, plannedInstant } from "./eventCommunication";
+import { tickchakLink, whatsappMessage, plannedInstant, nextWaveSize, WAVE_CAP } from "./eventCommunication";
 
 describe("event communications", () => {
   it("registration goes directly to HTTPS Tickchak", () => {
