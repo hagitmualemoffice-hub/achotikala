@@ -27,3 +27,14 @@ describe("event communications", () => {
     expect(nextWaveSize(0)).toBe(0);
   });
 });
+import { bodyToHtml, bodyToWhatsapp } from "./eventCommunication";
+describe("text marks", () => {
+  it("bold becomes strong in email and stars in WhatsApp", () => {
+    expect(bodyToHtml("שלום **חברות**")).toBe("שלום <strong>חברות</strong>");
+    expect(bodyToWhatsapp("שלום **חברות**")).toBe("שלום *חברות*");
+  });
+  it("large line is bigger in email and bold in WhatsApp", () => {
+    expect(bodyToHtml("## כותרת")).toContain("font-size:22px");
+    expect(bodyToWhatsapp("## כותרת")).toBe("*כותרת*");
+  });
+});

@@ -44,7 +44,7 @@ export function bodyToWhatsapp(body: string): string {
   }).join("\n");
 }
 
-type WhatsappEvent = { event_date?: string; event_time?: string; location?: string; city?: string; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
+type WhatsappEvent = { event_date?: string | null; event_time?: string | null; location?: string | null; city?: string | null; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
 
 export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body" | "registration_url">, event?: WhatsappEvent): string {
   const when = event ? [event.event_date ? new Date(event.event_date).toLocaleDateString("he-IL") : "", event.event_time].filter(Boolean).join(" · ") : "";
