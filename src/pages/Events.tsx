@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import DonationCTA from "@/components/DonationCTA";
 import RegistrationButton from "@/components/EventRegistrationButton";
 import EventDetailsDialog from "@/components/EventDetailsDialog";
+import { eventOccurrenceDates, seriesSchedule } from "@/lib/eventSeries";
 
 const openFromCard = (e: React.MouseEvent, open: () => void) => {
   if ((e.target as HTMLElement).closest("a,button")) return;
@@ -26,6 +27,22 @@ const EventCard = ({ event, onOpen }: { event: EventItem; onOpen: (e: EventItem)
   const weekday = format(d, "EEEE", { locale: he });
   const isSaveTheDate = event.eventType === "save_the_date";
   const isPoster = isSaveTheDate && !!event.image;
+  if (event.eventType === "course") {
+    return <article id={`event-${event.id}`} onClick={(e) => openFromCard(e, () => onOpen(event))} className="group cursor-pointer rounded-lg overflow-hidden border border-border bg-card flex flex-col" dir="rtl">
+      {event.image && <img src={event.image} alt={event.title} className="w-full aspect-[4/3] object-cover" loading="lazy" />}
+      <div className="p-5 flex flex-col flex-1 gap-3">
+        <Badge variant="secondary" className="self-start">{event.tag || "סדרת מפגשים"}</Badge>
+        <h3 className="text-2xl font-semibold">{event.title}</h3>
+        {event.instructor && <p className="text-sm text-muted-foreground">עם {event.instructor}</p>}
+        <p className="font-medium text-primary text-sm">{seriesSchedule(event)}</p>
+        <p className="text-sm text-muted-foreground">{format(d, "d.M.yy")}{event.endDate ? ` – ${format(parseISO(event.endDate), "d.M.yy")}` : ""}</p>
+        <p className="text-sm">{event.location}{event.city ? ` · ${event.city}` : ""}</p>
+        {event.description && <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>}
+        <Button variant="link" className="self-start p-0 h-auto" onClick={() => onOpen(event)}>כל מפגשי הסדרה <ArrowLeft className="h-3 w-3" /></Button>
+        <div className="mt-auto pt-2"><RegistrationButton event={event} /></div>
+      </div>
+    </article>;
+  }
 
   // Default early-price deadline: midnight (00:00) of the day before the event
   const defaultDeadline = new Date(d);
@@ -288,7 +305,7 @@ const Events = () => {
     return d;
   };
 
-  const eventDates = useMemo(() => events.map((e) => parseISO(e.date)), [events]);
+  const eventDates = useMemo(() => events.flatMap(eventOccurrenceDates).map((date) => parseISO(date)), [events]);
 
   const sortedEvents = useMemo(
     () => [...events].sort((a, b) => a.date.localeCompare(b.date)),
@@ -304,6 +321,8 @@ const Events = () => {
     () => sortedEvents.filter((e) => eventEnd(e) < now).sort((a, b) => b.date.localeCompare(a.date)),
     [sortedEvents, now],
   );
+  const courses = futureEvents.filter((e) => e.eventType === "course");
+  const upcoming = futureEvents.filter((e) => e.eventType !== "course");
 
   const oneMonthAgo = useMemo(() => subMonths(now, 1), [now]);
   const recentPastEvents = useMemo(
@@ -326,7 +345,7 @@ const Events = () => {
 
   const selectedDateEvents = useMemo(() => {
     if (!selected) return null;
-    return sortedEvents.filter((e) => isSameDay(parseISO(e.date), selected));
+    return sortedEvents.filter((e) => eventOccurrenceDates(e).some((date) => isSameDay(parseISO(date), selected)));
   }, [sortedEvents, selected]);
 
   return (
@@ -396,14 +415,15 @@ const Events = () => {
               )
             ) : (
               <div className="space-y-12">
+                {courses.length > 0 && <section><h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">קורסי חורף וסדרות</h2><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{courses.map((event) => <EventCard key={event.id} event={event} onOpen={setOpenEvent} />)}</div></section>}
                 {/* Future events */}
                 <div>
                   <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
                     אירועים קרובים
                   </h2>
-                  {futureEvents.length > 0 ? (
+                  {upcoming.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {futureEvents.map((event) => (
+                      {upcoming.map((event) => (
                         <EventCard key={event.id} event={event} onOpen={setOpenEvent} />
                       ))}
                     </div>

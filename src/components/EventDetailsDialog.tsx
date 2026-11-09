@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon, MapPin, Utensils, Users } from "lucide-react"
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import RegistrationButton from "@/components/EventRegistrationButton";
 import type { EventItem } from "@/data/events";
+import { eventOccurrenceDates, seriesSchedule } from "@/lib/eventSeries";
 
 const dateLabel = (event: EventItem) => {
   const d = parseISO(event.date);
@@ -36,6 +37,7 @@ export default function EventDetailsDialog({
           <div className="space-y-4 px-6 pb-10 pt-5 md:px-10">
             {kicker && <p className="text-[12px] font-medium text-primary">{kicker}</p>}
             <h2 className="whitespace-pre-line text-2xl font-semibold leading-snug text-foreground">{event.title}</h2>
+            {event.eventType === "course" && <div className="space-y-2"><p className="font-medium text-primary">{event.tag || "סדרת מפגשים"}{event.instructor ? ` · עם ${event.instructor}` : ""}</p><p className="text-sm">{seriesSchedule(event)}</p><div className="flex flex-wrap gap-2">{eventOccurrenceDates(event).map((date) => <span key={date} className="text-xs bg-accent text-accent-foreground rounded-md px-2 py-1">{format(parseISO(date), "d.M.yy")}</span>)}</div></div>}
 
             <div className="space-y-2.5 text-sm text-foreground/80">
               <div className="flex items-start gap-2">

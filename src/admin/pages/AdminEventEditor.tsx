@@ -15,6 +15,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import type { EventType } from "@/data/events";
+import { weekdayNames } from "@/lib/eventSeries";
 
 const MECHOLELOT_LOGO_URL = "/__l5e/assets-v1/c55f08c4-64dd-4c6a-af41-247164517830/mecholelot-kehila.png";
 import levHairLogo from "@/assets/lev-hair-logo.png.asset.json";
@@ -27,8 +29,9 @@ const empty = {
   capacity: "", early_price: "", regular_price: "", early_price_deadline: "",
   registration_type: "tickchak", registration_url: "", registration_email: "",
   registration_whatsapp: "", registration_label: "",
+  registration_phone: "", recurrence_weekday: "1", instructor: "",
   tag: "", featured: false, status: "draft", registration_status: "open",
-  event_type: "" as "" | "meeting" | "event" | "workshop" | "save_the_date",
+  event_type: "" as "" | EventType,
   menu: "",
   partner_logo_url: "",
   partner_logo_alt: "",
@@ -49,7 +52,7 @@ export default function AdminEventEditor() {
   const isNew = !id || id === "new";
   const navigate = useNavigate();
 
-  const [ev, setEv] = useState<State>(empty);
+  const [ev, setEv] = useState<State>({ ...empty, ...(search.get("type") === "course" ? { event_type: "course" as const, tag: "קורסי חורף" } : {}) });
   const [loading, setLoading] = useState(!isNew || !!templateId);
   const [saving, setSaving] = useState(false);
   const [templates, setTemplates] = useState<{ id: string; name: string }[]>([]);
@@ -73,7 +76,8 @@ export default function AdminEventEditor() {
         return;
       }
       if (isNew) { setLoading(false); return; }
-      const { data, error } = await supabase.from("events_db").select("*").eq("id", id!).single();
+      if (!id) return;
+      const { data, error } = await supabase.from("events_db").select("*").eq("id", id).single();
       if (error) toast.error(error.message);
       else if (data) {
         const r = (data.registration ?? {}) as Record<string, string>;
@@ -94,11 +98,14 @@ export default function AdminEventEditor() {
           registration_url: r.url ?? "",
           registration_email: r.email ?? "",
           registration_whatsapp: r.whatsapp ?? "",
+          registration_phone: r.phone ?? "",
+          recurrence_weekday: String(data.recurrence_weekday ?? 1),
+          instructor: data.instructor ?? "",
           registration_label: r.label ?? "",
           tag: data.tag ?? "", featured: data.featured ?? false,
           status: data.status,
           registration_status: (data as { registration_status?: string }).registration_status ?? "open",
-          event_type: ((data as { event_type?: string }).event_type ?? "") as "" | "meeting" | "event" | "workshop" | "save_the_date",
+          event_type: (data.event_type ?? "") as "" | EventType,
           menu: (data as { menu?: string }).menu ?? "",
           partner_logo_url: pLogo?.url ?? "",
           partner_logo_alt: pLogo?.alt ?? "",
@@ -137,6 +144,7 @@ export default function AdminEventEditor() {
         ...(ev.registration_url && { url: ev.registration_url }),
         ...(ev.registration_email && { email: ev.registration_email }),
         ...(ev.registration_whatsapp && { whatsapp: ev.registration_whatsapp }),
+        ...(ev.registration_phone && { phone: ev.registration_phone }),
         ...(ev.registration_label && { label: ev.registration_label }),
       },
       tag: ev.tag || null,
@@ -144,6 +152,8 @@ export default function AdminEventEditor() {
       status: ev.status,
       registration_status: ev.registration_status,
       event_type: ev.event_type || null,
+      recurrence_weekday: ev.event_type === "course" ? Number(ev.recurrence_weekday) : null,
+      instructor: ev.event_type === "course" ? ev.instructor.trim() || null : null,
       menu: ev.menu || null,
       partner_logo: logoUrl ? { url: logoUrl, alt: logoAlt || "לוגו שותף" } : null,
       poster_style: ev.event_type === "save_the_date" ? {
@@ -158,6 +168,7 @@ export default function AdminEventEditor() {
 
   const save = async (statusOverride?: string) => {
     if (!ev.title || !ev.event_date) return toast.error("חסרים כותרת ותאריך");
+    if (ev.event_type === "course" && (!ev.end_date || ev.end_date < ev.event_date)) return toast.error("יש לבחור תאריך סיום לסדרה שאינו מוקדם מתאריך ההתחלה");
     setSaving(true);
     try {
       const payload = { ...buildPayload(), ...(statusOverride && { status: statusOverride }) };
@@ -168,8 +179,10 @@ export default function AdminEventEditor() {
         void syncOfflineContent();
         navigate(`/admin/events/${data.id}`, { replace: true });
       } else {
-        const { error } = await supabase.from("events_db").update(payload).eq("id", id!);
+        if (!id) return;
+        const { error } = await supabase.from("events_db").update(payload).eq("id", id);
         if (error) throw error;
+        setEv((current) => ({ ...current, status: statusOverride ?? current.status }));
         toast.success("נשמר");
         void syncOfflineContent();
       }
@@ -218,7 +231,7 @@ export default function AdminEventEditor() {
           <Button variant="ghost" size="sm" onClick={() => navigate("/admin/events")}>
             <ArrowRight className="h-4 w-4 me-1" />חזרה
           </Button>
-          <h1 className="text-xl font-medium">{isNew ? "אירוע חדש" : "עריכת אירוע"}</h1>
+          <h1 className="text-xl font-medium">{ev.event_type === "course" ? (isNew ? "סדרה חדשה" : "עריכת סדרה") : (isNew ? "אירוע חדש" : "עריכת אירוע")}</h1>
         </div>
         <div className="flex gap-2 flex-wrap">
           <a
@@ -242,7 +255,7 @@ export default function AdminEventEditor() {
             </Select>
           )}
           <Button variant="outline" onClick={saveAsTemplate}>שמירה כתבנית</Button>
-          <Button variant="outline" onClick={() => save("draft")} disabled={saving}>טיוטה</Button>
+          <Button variant="outline" onClick={() => save("draft")} disabled={saving}>{!isNew && ev.status === "published" ? "הסרה מהאתר" : "טיוטה"}</Button>
           <Button onClick={() => save("published")} disabled={saving}>
             {saving && <Loader2 className="h-4 w-4 animate-spin me-1" />}
             <Save className="h-4 w-4 me-1" />פרסום
@@ -254,9 +267,15 @@ export default function AdminEventEditor() {
         <div className="lg:col-span-2 space-y-4">
           <Field label="כותרת"><Input value={ev.title} onChange={(e) => setEv({ ...ev, title: e.target.value })} /></Field>
           <Field label="תיאור"><Textarea rows={6} value={ev.description} onChange={(e) => setEv({ ...ev, description: e.target.value })} /></Field>
+          {ev.event_type === "course" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="מנחה"><Input value={ev.instructor} onChange={(e) => setEv({ ...ev, instructor: e.target.value })} /></Field>
+              <Field label="יום קבוע בשבוע"><Select value={ev.recurrence_weekday} onValueChange={(v) => setEv({ ...ev, recurrence_weekday: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{weekdayNames.map((day, i) => <SelectItem key={day} value={String(i)}>{day}</SelectItem>)}</SelectContent></Select></Field>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
-            <Field label="תאריך"><Input type="date" value={ev.event_date} onChange={(e) => setEv({ ...ev, event_date: e.target.value })} /></Field>
-            <Field label="תאריך סיום (אירוע רב־יומי, אופציונלי)"><Input type="date" value={ev.end_date} onChange={(e) => setEv({ ...ev, end_date: e.target.value })} /></Field>
+            <Field label={ev.event_type === "course" ? "תחילת הסדרה" : "תאריך"}><Input type="date" value={ev.event_date} onChange={(e) => setEv({ ...ev, event_date: e.target.value })} /></Field>
+            <Field label={ev.event_type === "course" ? "סיום הסדרה" : "תאריך סיום (אירוע רב־יומי, אופציונלי)"}><Input type="date" value={ev.end_date} onChange={(e) => setEv({ ...ev, end_date: e.target.value })} /></Field>
             <Field label="תאריך עברי"><Input value={ev.hebrew_date} onChange={(e) => setEv({ ...ev, hebrew_date: e.target.value })} placeholder='ה" באב' /></Field>
             <Field label="שעת התחלה"><Input value={ev.event_time} onChange={(e) => setEv({ ...ev, event_time: e.target.value })} placeholder="19:30" /></Field>
             <Field label="שעת סיום"><Input value={ev.end_time} onChange={(e) => setEv({ ...ev, end_time: e.target.value })} placeholder="22:00" /></Field>
@@ -283,6 +302,7 @@ export default function AdminEventEditor() {
                   <SelectItem value="email">מייל</SelectItem>
                   <SelectItem value="whatsapp">וואטסאפ</SelectItem>
                   <SelectItem value="external">קישור חיצוני</SelectItem>
+                  <SelectItem value="phone">טלפון</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
@@ -292,6 +312,7 @@ export default function AdminEventEditor() {
             {ev.registration_type === "email" && (
               <Field label="כתובת מייל"><Input dir="ltr" value={ev.registration_email} onChange={(e) => setEv({ ...ev, registration_email: e.target.value })} /></Field>
             )}
+            {ev.registration_type === "phone" && <Field label="מספר טלפון"><Input dir="ltr" value={ev.registration_phone} onChange={(e) => setEv({ ...ev, registration_phone: e.target.value })} /></Field>}
             {ev.registration_type === "whatsapp" && (
               <Field label="מספר וואטסאפ"><Input dir="ltr" value={ev.registration_whatsapp} onChange={(e) => setEv({ ...ev, registration_whatsapp: e.target.value })} /></Field>
             )}
@@ -313,7 +334,7 @@ export default function AdminEventEditor() {
             <h3 className="font-medium text-sm">סוג</h3>
             <Select
               value={ev.event_type || "none"}
-              onValueChange={(v) => setEv({ ...ev, event_type: (v === "none" ? "" : v) as "" | "meeting" | "event" | "workshop" | "save_the_date" })}
+              onValueChange={(v) => setEv({ ...ev, event_type: (v === "none" ? "" : v) as "" | EventType })}
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -321,6 +342,7 @@ export default function AdminEventEditor() {
                 <SelectItem value="meeting">מפגש</SelectItem>
                 <SelectItem value="event">אירוע</SelectItem>
                 <SelectItem value="workshop">סדנה</SelectItem>
+                <SelectItem value="course">קורס / סדרה שבועית</SelectItem>
                 <SelectItem value="save_the_date">Save the Date (שמרו תאריך)</SelectItem>
               </SelectContent>
             </Select>

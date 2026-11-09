@@ -4,13 +4,15 @@ import roniCafeImg from "@/assets/roni-cafe.jpg.asset.json";
 import mecholelotLogo from "@/assets/events/mecholelot-kehila.png.asset.json";
 import levHairLogo from "@/assets/lev-hair-logo.png.asset.json";
 
-export type RegistrationType = "tickchak" | "email" | "whatsapp" | "external";
+export type RegistrationType = "tickchak" | "email" | "whatsapp" | "external" | "phone";
 export type RegistrationStatus = "not_open" | "open" | "closed_full" | "closed";
-export type EventType = "meeting" | "event" | "workshop" | "save_the_date";
+export type EventType = "meeting" | "event" | "workshop" | "save_the_date" | "course";
 
 export interface EventItem {
   registrationStatus?: RegistrationStatus;
   eventType?: EventType;
+  recurrenceWeekday?: number;
+  instructor?: string;
   id: string;
   title: string;
   description: string;
@@ -38,6 +40,7 @@ export interface EventItem {
     url?: string;
     email?: string;
     whatsapp?: string;
+    phone?: string;
     label?: string;
   };
   tag?: string;
