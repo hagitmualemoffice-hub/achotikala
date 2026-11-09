@@ -32,12 +32,12 @@ export default function EventDetailsDialog({
         <div dir="rtl" className="flex min-h-0 flex-1 flex-col text-right">
           <div className="popup-scroll">
           {event.image && (
-            <img src={event.image} alt={event.title} className="max-h-[42vh] w-full bg-muted object-contain" />
+            <img src={event.image} alt={event.title} className="h-[42vh] w-full object-cover" />
           )}
           <div className="space-y-4 px-6 pb-10 pt-5 md:px-10">
             {kicker && <p className="text-[12px] font-medium text-primary">{kicker}</p>}
             <h2 className="whitespace-pre-line text-2xl font-semibold leading-snug text-foreground">{event.title}</h2>
-            {event.eventType === "course" && <div className="space-y-2"><p className="font-medium text-primary">{event.tag || "סדרת מפגשים"}{event.instructor ? ` · עם ${event.instructor}` : ""}</p><p className="text-sm">{seriesSchedule(event)}</p><div className="flex flex-wrap gap-2">{eventOccurrenceDates(event).map((date) => <span key={date} className="text-xs bg-accent text-accent-foreground rounded-md px-2 py-1">{format(parseISO(date), "d.M.yy")}</span>)}</div></div>}
+            {event.eventType === "course" && <div className="space-y-2"><span className="inline-block rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">סדרת חורף</span><p className="font-medium text-primary">{event.tag || "סדרת מפגשים"}{event.instructor ? ` · עם ${event.instructor}` : ""}</p><p className="text-sm">{seriesSchedule(event)}</p><div className="flex flex-wrap gap-2">{eventOccurrenceDates(event).map((date) => <span key={date} className="text-xs bg-accent text-accent-foreground rounded-md px-2 py-1">{format(parseISO(date), "d.M.yy")}</span>)}</div></div>}
 
             <div className="space-y-2.5 text-sm text-foreground/80">
               <div className="flex items-start gap-2">
