@@ -305,7 +305,7 @@ const Events = () => {
     return d;
   };
 
-  const eventDates = useMemo(() => events.flatMap(eventOccurrenceDates).map(parseISO), [events]);
+  const eventDates = useMemo(() => events.flatMap(eventOccurrenceDates).map((date) => parseISO(date)), [events]);
 
   const sortedEvents = useMemo(
     () => [...events].sort((a, b) => a.date.localeCompare(b.date)),
