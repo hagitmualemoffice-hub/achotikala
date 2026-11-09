@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
     if (parsed.data.action === 'request') {
       const address = parsed.data.email.toLowerCase();
-      const { data: rows, error } = await service.from('authorized_emails').select('email, authorized').lower('email').eq(address);
+      const { data: rows, error } = await service.from('authorized_emails').select('email, authorized').eq('email', address);
       if (error) {
         console.error(`Unsubscribe lookup failed: ${error.message}`);
         return json({ error: 'Lookup failed', details: error.message }, 502);
