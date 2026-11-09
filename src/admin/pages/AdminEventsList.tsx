@@ -15,6 +15,8 @@ type Ev = {
   event_date: string;
   city: string | null;
   status: string;
+  event_type: string | null;
+  end_date: string | null;
 };
 
 export default function AdminEventsList() {
@@ -23,7 +25,7 @@ export default function AdminEventsList() {
   const load = async () => {
     const { data, error } = await supabase
       .from("events_db")
-      .select("id,title,event_date,city,status")
+      .select("id,title,event_date,end_date,city,status,event_type")
       .order("event_date", { ascending: false });
     if (error) toast.error(error.message);
     setItems((data as Ev[]) ?? []);
@@ -45,6 +47,7 @@ export default function AdminEventsList() {
           <p className="text-sm text-muted-foreground">ניהול אירועים</p>
         </div>
         <div className="flex gap-2">
+          <Button asChild variant="outline"><Link to="/admin/events/new?type=course"><Plus className="h-4 w-4 me-1" />סדרה חדשה</Link></Button>
           <Button asChild variant="outline">
             <Link to="/admin/events/templates">תבניות</Link>
           </Button>
@@ -72,8 +75,8 @@ export default function AdminEventsList() {
             <TableBody>
               {items.map((e) => (
                 <TableRow key={e.id}>
-                  <TableCell className="font-medium">{e.title}</TableCell>
-                  <TableCell>{new Date(e.event_date).toLocaleDateString("he-IL")}</TableCell>
+                  <TableCell className="font-medium">{e.title}{e.event_type === "course" && <Badge variant="secondary" className="ms-2">סדרה</Badge>}</TableCell>
+                  <TableCell>{new Date(e.event_date).toLocaleDateString("he-IL")}{e.event_type === "course" && e.end_date ? ` – ${new Date(e.end_date).toLocaleDateString("he-IL")}` : ""}</TableCell>
                   <TableCell>{e.city ?? "-"}</TableCell>
                   <TableCell>
                     <Badge variant={e.status === "published" ? "default" : "secondary"}>

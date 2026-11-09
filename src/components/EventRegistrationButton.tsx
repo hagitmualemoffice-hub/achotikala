@@ -1,4 +1,5 @@
-import { Mail, Ticket } from "lucide-react";
+import { Mail, Ticket, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { EventItem } from "@/data/events";
 
 const WhatsAppIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
@@ -37,6 +38,10 @@ const RegistrationButton = ({ event }: { event: EventItem }) => {
         {label}
       </a>
     );
+  }
+
+  if (registration.type === "phone" && registration.phone) {
+    return <Button asChild className="w-full h-auto py-3"><a href={`tel:${registration.phone.replace(/[^\d+]/g, "")}`}><Phone className="h-4 w-4" />{label}</a></Button>;
   }
 
   if (registration.type === "whatsapp" && registration.whatsapp) {
