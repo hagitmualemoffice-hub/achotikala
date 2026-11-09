@@ -163,7 +163,7 @@ const EventCard = ({ event, onOpen }: { event: EventItem; onOpen: (e: EventItem)
             <Sparkles className="h-14 w-14" />
           </div>
         )}
-        {event.eventType === "course" && (
+        {(event.eventType as string) === "course" && (
           <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-sm">
             סדרת חורף
           </div>
