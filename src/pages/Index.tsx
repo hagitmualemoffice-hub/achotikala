@@ -36,7 +36,6 @@ import { useEvents } from "@/hooks/useEvents";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { format, parseISO } from "date-fns";
 import { he } from "date-fns/locale";
-import DonationCTA from "@/components/DonationCTA";
 
 const podcastEpisodes = [
   {
@@ -1265,32 +1264,7 @@ const Index = () => {
       <MailingListPopup open={popupOpen} onOpenChange={setPopupOpen} />
       <ContactPopup open={contactOpen} onOpenChange={setContactOpen} defaultTab={contactTab} />
       <HostingPopup open={hostingOpen} onOpenChange={setHostingOpen} />
-      <DonationCTA
-        id="donate"
-        variant="soft"
-        title="אם הגעת עד לכאן, אולי התרשמת שאנחנו מסתדרות לבד."
-        paragraphs={[
-          "ככה זה הרבה פעמים גם ברווקות מתמשכת. נשים חזקות, עצמאיות, כאלה שאפשר לסמוך עליהן. הן עובדות, מחזיקות, עוזרות לאחרים וממשיכות קדימה. ומבחוץ נדמה שהן מסתדרות.",
-          "אולי לא במקרה גם אחותי כלה חווה משהו דומה.",
-          "אנחנו יוצרות המון, מגיעות למאות נשים, מפיקות אירועים, יוצרות תוכן ובונות עוד ועוד מענים. מבחוץ זה יכול להיראות כאילו אנחנו מסתדרות לבד.",
-          "אבל האמת היא אחרת.",
-          "אנחנו מצליחות לעשות כל כך הרבה כי אנחנו עובדות קשה, נשענות על התנדבות ומוצאות שוב ושוב דרכים לעשות הרבה עם מעט.",
-          "לא כי מעט מספיק. אלא כי עד היום בחרנו לא לחכות שיהיה יותר.",
-          "כדי שנוכל להמשיך, לגדול ולהגיע לעוד נשים, אנחנו צריכות גם את העזרה שלך.",
-        ]}
-        buttonLabel="אני רוצה לתת לכן כוח להמשיך"
-      />
 
-      <DonationCTA
-        variant="gradient"
-        title="כל מה שיש כאן התחיל מצורך שלא היה לו מענה."
-        paragraphs={[
-          "אחותי כלה נבנתה מתוך הקשבה לנשים ומתוך החלטה לא לחכות שמישהו אחר יעשה. מאז נולדו כאן קהילה, אירועים, תוכן, יוזמות ומענים חדשים שמגיעים למאות נשים.",
-          "עד היום עשינו המון עם מעט. לא כי מעט מספיק, אלא כי בחרנו לא לחכות שיהיה כדי לפעול.",
-          "התרומה שלכם מאפשרת לנו להמשיך לבנות את הדבר הבא שנשים עדיין מחכות לו.",
-        ]}
-        buttonLabel="אני רוצה להיות חלק"
-      />
 
       <MobileBottomNav />
     </div>

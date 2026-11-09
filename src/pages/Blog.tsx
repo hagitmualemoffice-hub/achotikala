@@ -5,7 +5,6 @@ import logo from "@/assets/logo-achoti-kala.png";
 import yotzotYearImg from "@/assets/yotzot-laor-year.jpg";
 import { blogPosts, getPostsBySection, SECTION_META, type BlogSection, type BlogPostData } from "@/data/blogPosts";
 import { useDbPosts, dbPostsForSection } from "@/hooks/useDbPosts";
-import DonationCTA from "@/components/DonationCTA";
 
 const sectionsOrder: BlogSection[] = ["torim", "shirim", "tochen"];
 
@@ -173,18 +172,6 @@ const Blog = () => {
           </div>
         </div>
       </section>
-
-      <DonationCTA
-        id="donate"
-        title="יש דברים שמשתנים ברגע שמתחילים לדבר עליהם."
-        paragraphs={[
-          "אנחנו כותבות על החיים ברווקות מתמשכת. על הדברים הגדולים, ועל הרגעים הקטנים שאף אחד כמעט לא מדבר עליהם. נותנות מילים לחוויות שנשים רבות מכירות, אבל לא תמיד יודעות איך להסביר.",
-          "כל פוסט כזה יכול להגיע לאישה שפתאום מרגישה שמישהו רואה אותה. אבל הוא יכול להגיע גם למשפחה, לאנשי מקצוע ולמקבלי החלטות, ולעזור להם לראות מציאות שלא הכירו קודם.",
-          "אנחנו רוצות להמשיך לכתוב, ליצור ולהכניס עוד קולות לשיח.",
-          "**התרומה שלכם מאפשרת לנו להמשיך לתת מילים למה שעד היום נשאר בשקט.**",
-        ]}
-        buttonLabel="אני רוצה לתת למילים האלה מקום"
-      />
 
       <MobileBottomNav />
     </div>
