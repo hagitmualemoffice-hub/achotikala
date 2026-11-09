@@ -309,7 +309,15 @@ const Events = () => {
     return d;
   };
 
-  const eventDates = useMemo(() => events.flatMap(eventOccurrenceDates).map((date) => parseISO(date)), [events]);
+  const eventCountByDay = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const event of events) {
+      for (const date of eventOccurrenceDates(event)) {
+        counts.set(date, (counts.get(date) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [events]);
 
   const sortedEvents = useMemo(
     () => [...events].sort((a, b) => a.date.localeCompare(b.date)),
@@ -484,16 +492,36 @@ const Events = () => {
                 onMonthChange={setMonth}
                 selected={selected}
                 onSelect={setSelected}
-                modifiers={{ hasEvent: eventDates }}
-                modifiersClassNames={{
-                  hasEvent:
-                    "relative after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-primary",
+                components={{
+                  DayContent: ({ date }) => {
+                    const key = format(date, "yyyy-MM-dd");
+                    const count = eventCountByDay.get(key) ?? 0;
+                    const isSelected = selected ? format(selected, "yyyy-MM-dd") === key : false;
+                    return (
+                      <>
+                        {date.getDate()}
+                        {count > 0 && (
+                          <span className="pointer-events-none absolute bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-[3px]">
+                            {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
+                              <span
+                                key={i}
+                                className={cn(
+                                  "h-1.5 w-1.5 rounded-full",
+                                  isSelected ? "bg-background" : "bg-primary",
+                                )}
+                              />
+                            ))}
+                          </span>
+                        )}
+                      </>
+                    );
+                  },
                 }}
                 className={cn("p-0 pointer-events-auto")}
               />
               <div className="mt-4 pt-4 border-t border-border flex items-center gap-2 text-xs text-foreground/60">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                יום עם אירוע
+                נקודה לכל אירוע
               </div>
             </div>
 
