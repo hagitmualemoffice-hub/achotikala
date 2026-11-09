@@ -27,6 +27,7 @@ export type DbRow = {
     url?: string;
     email?: string;
     whatsapp?: string;
+    phone?: string;
     label?: string;
   } | null;
   tag: string | null;
@@ -34,6 +35,8 @@ export type DbRow = {
   featured: boolean;
   registration_status: RegistrationStatus;
   event_type: EventType | null;
+  recurrence_weekday?: number | null;
+  instructor?: string | null;
   menu: string | null;
   poster_style: EventItem["posterStyle"] | null;
 };
@@ -63,6 +66,8 @@ export const rowToEvent = (r: DbRow): EventItem => ({
   featured: r.featured,
   registrationStatus: r.registration_status ?? "open",
   eventType: r.event_type ?? undefined,
+  recurrenceWeekday: r.recurrence_weekday ?? undefined,
+  instructor: r.instructor ?? undefined,
   menu: r.menu ?? undefined,
   posterStyle: r.poster_style ?? undefined,
 });
