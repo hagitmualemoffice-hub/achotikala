@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2, Users } from "lucide-react";
@@ -14,6 +15,18 @@ import { uploadToMedia } from "@/admin/lib/media";
 import { tickchakLink, whatsappMessage, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
 import type { DbRow } from "@/hooks/useEvents";
 import brandLogo from "@/assets/logo-achoti-kala.png";
+
+type SendStatus = { total: number; sent: number; remaining: number; next_wave: number; next_wave_size: number; waves: { wave: number; count: number; at: string }[]; older_version_sent: boolean };
+
+const invokeSend = async (body: Record<string, unknown>): Promise<SendStatus & { error?: string }> => {
+  const { data, error } = await supabase.functions.invoke("event-communication-send", { body });
+  if (error) {
+    const detail = error instanceof FunctionsHttpError ? await error.context.text() : error.message;
+    try { const parsed = JSON.parse(detail); if (parsed?.total != null) return parsed; throw new Error(parsed?.error ?? detail); }
+    catch (e) { if (e instanceof SyntaxError) throw new Error(detail); throw e; }
+  }
+  return data;
+};
 
 const localTime = (value: string | null) => {
   if (!value) return "";
@@ -28,8 +41,10 @@ export default function AdminEventCommunications() {
   const [history, setHistory] = useState<CommunicationDraft[]>([]);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [wave, setWave] = useState<{ sent: number; remaining: number; wave: number } | null>(null);
-  const change = (patch: Partial<CommunicationDraft>) => setDraft(current => current ? { ...current, ...patch } : current);
+  const [status, setStatus] = useState<SendStatus | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const change = (patch: Partial<CommunicationDraft>) => { setDirty(true); setDraft(current => current ? { ...current, ...patch } : current); };
 
   useEffect(() => {
     if (!id) return;
@@ -94,17 +109,27 @@ export default function AdminEventCommunications() {
     }
     toast.success(`מייל הבדיקה נשלח ל־${data.recipient}`);
   };
-  const sendAll = async () => {
+  const refreshStatus = async (draftId: string) => setStatus(await invokeSend({ draft_id: draftId, mode: "status" }));
+  useEffect(() => { setStatus(null); setDirty(false); if (draft?.id) void refreshStatus(draft.id).catch(() => undefined); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft?.id]);
+  // Step 1: save and show where the list stands; nothing is sent until the dialog is confirmed.
+  const prepareSend = async () => {
     if (!draft || !tickchakLink(draft.registration_url)) { toast.error("יש להזין קישור HTTPS לטיקצ׳אק"); return; }
     const draftId = await save();
     if (!draftId) return;
-    const { data, error } = await supabase.functions.invoke("event-communication-send", { body: { draft_id: draftId } });
-    if (error) {
-      const detail = error instanceof FunctionsHttpError ? await error.context.text() : error.message;
-      throw new Error(detail);
-    }
-    setWave(data);
-    toast.success(`נשלח לגל ${data.wave}: ${data.sent} נמענות`);
+    setDirty(false);
+    const current = await invokeSend({ draft_id: draftId, mode: "status" });
+    setStatus(current);
+    if (!current.remaining) { toast.info("כל הרשימה כבר קיבלה את ההודעה הזאת"); return; }
+    setConfirming(true);
+  };
+  const confirmSend = async () => {
+    if (!draft?.id || !status) return;
+    setConfirming(false);
+    const result = await invokeSend({ draft_id: draft.id, mode: "send", confirm_wave: status.next_wave });
+    if (result.error) { setStatus(result); throw new Error(result.error); }
+    await refreshStatus(draft.id);
+    toast.success(`גל ${status.next_wave} נשלח`);
   };
   const uploadLogo = async (file: File | undefined) => {
     if (!file || !draft) return;
@@ -143,9 +168,32 @@ export default function AdminEventCommunications() {
         <div className="space-y-2"><Label htmlFor="audience">נמענות</Label><Select value={draft.audience} onValueChange={audience => change({ audience })}><SelectTrigger id="audience"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="website">רשימת התפוצה באתר</SelectItem><SelectItem value="google">אנשי קשר בגוגל</SelectItem><SelectItem value="both">שתי הרשימות</SelectItem></SelectContent></Select></div>
         {draft.audience !== "website" && <div className="space-y-2"><Label htmlFor="google-label">תווית אנשי הקשר בגוגל</Label><Input id="google-label" value={draft.google_label} onChange={e => change({ google_label: e.target.value })} /><p className="text-xs text-muted-foreground">קריאת אנשי הקשר בגוגל עדיין אינה מחוברת.</p></div>}
         <div className="space-y-2"><Label htmlFor="planned-send">מועד שליחה מבוקש — טיוטה בלבד</Label><Input id="planned-send" type="datetime-local" value={localTime(draft.planned_at)} onChange={e => change({ planned_at: plannedInstant(e.target.value) })} /><p className="text-sm text-muted-foreground">המועד נשמר בטיוטה ולא מפעיל שליחה אוטומטית. השליחה עצמה נעשית בלחיצה על "שליחה לתפוצה".</p></div>
-        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button variant="outline" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת בדיקה לגימייל המחובר</Button><Button asChild variant="outline"><a target="_blank" rel="noopener noreferrer" href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage(draft))}`}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</a></Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendAll)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
+        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button variant="outline" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת בדיקה לגימייל המחובר</Button><Button asChild variant="outline"><a target="_blank" rel="noopener noreferrer" href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage(draft))}`}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</a></Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
         <p className="text-xs text-muted-foreground">כל שליחה לתפוצה יוצאת תמיד בעותק מוסתר, אין אפשרות אחרת — אף נמענת לא רואה את הכתובות האחרות. כל מייל כולל קישור להסרה מרשימת התפוצה. הרשימה נשלחת בגלים: גל אחד היום, גל שני אחר כך, עד שהכול יצא.</p>
-        {wave && <p className="rounded-lg border bg-muted/40 p-3 text-sm">{wave.remaining > 0 ? `גל ${wave.wave} נשלח ל־${wave.sent} נמענות. נשארו ${wave.remaining} — לחצי שוב לשליחת הגל הבא.` : `גל ${wave.wave} נשלח ל־${wave.sent} נמענות. כל הרשימה קיבלה את ההודעה.`}</p>}
+        {status && <div className="space-y-2 rounded-lg border bg-muted/40 p-3 text-sm" aria-live="polite">
+          <p className="font-medium">מצב השליחה לתפוצה{dirty ? " (לפני השמירה של השינויים)" : ""}</p>
+          {status.older_version_sent && <p className="text-primary">גרסה קודמת של ההודעה כבר נשלחה. הטקסט שונה, ולכן זו הודעה חדשה שתישלח מההתחלה לכל הרשימה.</p>}
+          <div className="h-2 overflow-hidden rounded-full bg-border"><div className="h-full bg-primary" style={{ width: `${status.total ? (status.sent / status.total) * 100 : 0}%` }} /></div>
+          <p>נשלח ל־{status.sent} מתוך {status.total} · עוד לא נשלח ל־{status.remaining}</p>
+          {status.waves.length === 0 ? <p className="text-muted-foreground">עוד לא נשלח לאף אחת.</p> : <ul className="space-y-1">{status.waves.map(w => <li key={w.wave}>✓ גל {w.wave} נשלח ל־{w.count} נמענות · {new Date(w.at).toLocaleString("he-IL")}</li>)}</ul>}
+          {status.remaining > 0 ? <p>הגל הבא: גל {status.next_wave} ל־{status.next_wave_size} נמענות.</p> : status.sent > 0 && <p className="font-medium">כל הרשימה קיבלה את ההודעה. אי אפשר לשלוח אותה שוב בלי לשנות את הטקסט.</p>}
+        </div>}
+        <AlertDialog open={confirming} onOpenChange={setConfirming}>
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>לשלוח את גל {status?.next_wave}?</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2 text-right">
+                {status?.waves.map(w => <span key={w.wave} className="block">✓ גל {w.wave} כבר נשלח ל־{w.count} נמענות ({new Date(w.at).toLocaleString("he-IL")}).</span>)}
+                <span className="block">עכשיו יישלח בעותק מוסתר ל־{status?.next_wave_size} נמענות שעוד לא קיבלו. מי שכבר קיבלה לא תקבל שוב.</span>
+                {status && status.remaining > status.next_wave_size && <span className="block">אחרי הגל הזה יישארו {status.remaining - status.next_wave_size} לגל הבא.</span>}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="gap-2">
+              <AlertDialogCancel>ביטול</AlertDialogCancel>
+              <AlertDialogAction onClick={() => void run(confirmSend)}>{status?.waves.length ? `מאשרת: הגל הקודם נשלח — שלחי את גל ${status.next_wave}` : "מאשרת — שלחי את גל 1"}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </section>
       <section className="min-w-0"><h2 className="mb-3 text-sm font-medium text-muted-foreground">תצוגה מקדימה</h2><article className="overflow-hidden rounded-lg border bg-background">
         <div className="flex flex-wrap items-center justify-center gap-4 p-5">{draft.show_brand_logo && <img src={draft.brand_logo_url || brandLogo} alt="אחותי כלה" className="h-16 w-28 object-contain" />}{draft.extra_logos.map((logo, i) => <img key={i} src={logo.url} alt={logo.alt} className="h-16 w-24 object-contain" />)}</div>
