@@ -330,14 +330,9 @@ const Events = () => {
   const upcoming = kind === "series" ? [] : futureEvents.filter((e) => e.eventType !== "course");
 
   const oneMonthAgo = useMemo(() => subMonths(now, 1), [now]);
-  const recentPastEvents = useMemo(
-    () => pastEvents.filter((e) => eventEnd(e) >= oneMonthAgo),
-    [pastEvents, oneMonthAgo],
-  );
-  const olderPastEvents = useMemo(
-    () => pastEvents.filter((e) => eventEnd(e) < oneMonthAgo),
-    [pastEvents, oneMonthAgo],
-  );
+  const pastShown = Math.max(0, 10 - courses.length - upcoming.length);
+  const recentPastEvents = useMemo(() => pastEvents.slice(0, pastShown), [pastEvents, pastShown]);
+  const olderPastEvents = useMemo(() => pastEvents.slice(pastShown), [pastEvents, pastShown]);
 
   /* arriving from global search: /events#event-<id> */
   useEffect(() => {
