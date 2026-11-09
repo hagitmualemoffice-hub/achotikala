@@ -2639,10 +2639,12 @@ export type Database = {
           featured: boolean
           hebrew_date: string | null
           id: string
+          instructor: string | null
           location: string | null
           menu: string | null
           partner_logo: Json | null
           poster_style: Json | null
+          recurrence_weekday: number | null
           registration: Json | null
           registration_status: string
           regular_price: number | null
@@ -2670,10 +2672,12 @@ export type Database = {
           featured?: boolean
           hebrew_date?: string | null
           id?: string
+          instructor?: string | null
           location?: string | null
           menu?: string | null
           partner_logo?: Json | null
           poster_style?: Json | null
+          recurrence_weekday?: number | null
           registration?: Json | null
           registration_status?: string
           regular_price?: number | null
@@ -2701,10 +2705,12 @@ export type Database = {
           featured?: boolean
           hebrew_date?: string | null
           id?: string
+          instructor?: string | null
           location?: string | null
           menu?: string | null
           partner_logo?: Json | null
           poster_style?: Json | null
+          recurrence_weekday?: number | null
           registration?: Json | null
           registration_status?: string
           regular_price?: number | null
