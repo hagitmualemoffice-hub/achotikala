@@ -1,4 +1,5 @@
 import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
+import { safeRegistrationHref } from '../_shared/registration.ts';
 import { testRecipient } from './recipient.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -34,8 +35,8 @@ Deno.serve(async (req) => {
     if (!parsed.success) return json({ error: parsed.error.flatten().fieldErrors }, 400);
     const { data: draft, error } = await caller.from('event_communications').select('*').eq('id', parsed.data.draft_id).single();
     if (error || !draft) return json({ error: 'Draft not found' }, 404);
-    const registration = new URL(draft.registration_url);
-    if (registration.protocol !== 'https:' || !(registration.hostname === 'tickchak.co.il' || registration.hostname.endsWith('.tickchak.co.il'))) return json({ error: 'יש להזין קישור HTTPS לטיקצ׳אק' }, 400);
+    const registrationHref = safeRegistrationHref(draft.registration_url);
+    if (registrationHref === null) return json({ error: 'יש להזין קישור HTTPS לטיקצ׳אק' }, 400);
     if (!draft.subject.trim() || !draft.title.trim()) return json({ error: 'חסרה כותרת' }, 400);
     const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
     if (eventError || !event) return json({ error: 'Event not found' }, 404);
@@ -53,7 +54,7 @@ Deno.serve(async (req) => {
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [ ...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos ]
       .map(logo => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
-    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref: registration.href, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: undefined });
+    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: undefined });
     // Admin-only tests go to one validated address, independently of campaign recipients.
     const mime = [`To: ${to}`, `Subject: =?UTF-8?B?${b64(`[בדיקה] ${draft.subject.replace(/[\r\n]/g, ' ')}`)}?=`, 'MIME-Version: 1.0', 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', b64(html)].join('\r\n');
     const response = await fetch(`${base}/messages/send`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw: b64(mime).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }) });

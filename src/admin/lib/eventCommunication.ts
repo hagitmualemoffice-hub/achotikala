@@ -22,6 +22,16 @@ export function tickchakLink(value: string): boolean {
 }
 
 /**
+ * Registration is optional — not every event has an online registration link.
+ * An empty value means "no button"; a filled one must still be a direct HTTPS Tickchak link.
+ */
+export function registrationHref(value: string): string {
+  const trimmed = (value ?? "").trim();
+  if (!trimmed) return "";
+  return tickchakLink(trimmed) ? trimmed : "";
+}
+
+/**
  * Simple text marks shared by the email and WhatsApp:
  * **מילים** = bold, a line starting with "## " = larger text.
  */

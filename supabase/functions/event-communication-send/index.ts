@@ -1,4 +1,5 @@
 import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
+import { safeRegistrationHref } from '../_shared/registration.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
@@ -53,9 +54,8 @@ Deno.serve(async (req) => {
     const { data: draft, error: draftError } = await caller.from('event_communications').select('*').eq('id', draftId).single();
     if (draftError || !draft) return json({ error: 'Draft not found' }, 404);
     if (!draft.subject.trim() || !draft.title.trim()) return json({ error: 'חסרה כותרת' }, 400);
-    const registration = new URL(draft.registration_url);
-    if (registration.protocol !== 'https:' || !(registration.hostname === 'tickchak.co.il' || registration.hostname.endsWith('.tickchak.co.il')))
-      return json({ error: 'יש להזין קישור HTTPS לטיקצ׳אק' }, 400);
+    const registrationHref = safeRegistrationHref(draft.registration_url);
+    if (registrationHref === null) return json({ error: 'יש להזין קישור HTTPS לטיקצ׳אק' }, 400);
     const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
     if (eventError || !event) return json({ error: 'Event not found' }, 404);
 
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos]
       .map((logo) => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
-    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref: registration.href, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: UNSUBSCRIBE_URL });
+    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: UNSUBSCRIBE_URL });
 
     // Hidden copy: the batch goes out in Bcc so no reader sees the other addresses.
     const mime = [
