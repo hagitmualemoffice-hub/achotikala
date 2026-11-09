@@ -11,3 +11,4 @@
 - Store each recurring course as one existing events_db record and derive weekly calendar dates through the shared eventSeries helper; editing or unpublishing a series must affect every meeting without duplicate records.
 - Keep event communication sends admin-only and hidden-copy (Bcc), capped at 450 recipients per message and repeated in waves until the list is done; every email must carry the remove-from-list link, and a removal only takes effect after the address confirms through its emailed link.
 - Event test sends accept one validated admin-selected recipient, separate from campaign audiences; omitted recipients retain the connected-mailbox default for older clients.
+- Preload WhatsApp event media with a cancellable timeout and invoke native sharing directly from the click; provide an explicit text/image fallback without blocking the editor on clipboard or network requests.

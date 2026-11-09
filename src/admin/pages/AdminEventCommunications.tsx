@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { loadWhatsappImage } from "@/admin/lib/whatsappShare";
 import { uploadToMedia } from "@/admin/lib/media";
 import { tickchakLink, whatsappMessage, bodyToHtml, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
 import type { DbRow } from "@/hooks/useEvents";
@@ -45,6 +46,8 @@ export default function AdminEventCommunications() {
   const [status, setStatus] = useState<SendStatus | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [testEmail, setTestEmail] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareFile, setShareFile] = useState<File | null>(null);
   const [dirty, setDirty] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   // Wraps the selected text in a mark: bold (**…**) or a larger line (## …).
@@ -59,19 +62,34 @@ export default function AdminEventCommunications() {
     requestAnimationFrame(() => el.focus());
   };
   // WhatsApp: send the event picture itself with the text, so the chat shows the site image, not the Tickchak link preview.
-  const shareWhatsapp = async () => {
+  useEffect(() => {
+    setShareFile(null);
+    const cover = event?.cover_image;
+    if (!cover) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    void loadWhatsappImage(cover, controller.signal).then(file => {
+      if (!controller.signal.aborted) setShareFile(file);
+    });
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [event?.cover_image]);
+  const shareWhatsapp = () => {
     if (!draft || !event) return;
     const text = whatsappMessage(draft, event);
-    let file: File | null = null;
-    if (event.cover_image) {
-      try { const res = await fetch(event.cover_image); if (res.ok) { const blob = await res.blob(); file = new File([blob], `event.${blob.type.split("/")[1] || "jpg"}`, { type: blob.type }); } } catch { file = null; }
+    if (shareFile && navigator.canShare?.({ files: [shareFile], text })) {
+      // Invoke from the click itself: awaiting a download loses mobile share permission.
+      void navigator.share({ files: [shareFile], text }).catch(error => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) setShareOpen(true);
+      });
+      return;
     }
-    if (file && navigator.canShare?.({ files: [file], text })) {
-      try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e instanceof DOMException && e.name === "AbortError") return; }
-    }
-    await navigator.clipboard.writeText(text).catch(() => undefined);
-    if (file) { const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
-    toast.success(file ? "הטקסט הועתק והתמונה ירדה למחשב — בוואטסאפ צרפי את התמונה והדביקי את הטקסט ככיתוב" : "הטקסט הועתק — הדביקי בוואטסאפ");
+    setShareOpen(true);
+  };
+  const downloadShareImage = () => {
+    if (!shareFile) return;
+    const url = URL.createObjectURL(shareFile);
+    const a = document.createElement("a"); a.href = url; a.download = shareFile.name; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
   };
   const change = (patch: Partial<CommunicationDraft>) => { setDirty(true); setDraft(current => current ? { ...current, ...patch } : current); };
 
@@ -200,7 +218,7 @@ export default function AdminEventCommunications() {
         {draft.audience !== "website" && <div className="space-y-2"><Label htmlFor="google-label">תווית אנשי הקשר בגוגל</Label><Input id="google-label" value={draft.google_label} onChange={e => change({ google_label: e.target.value })} /><p className="text-xs text-muted-foreground">קריאת אנשי הקשר בגוגל עדיין אינה מחוברת.</p></div>}
         <div className="space-y-2"><Label htmlFor="planned-send">מועד שליחה מבוקש — טיוטה בלבד</Label><Input id="planned-send" type="datetime-local" value={localTime(draft.planned_at)} onChange={e => change({ planned_at: plannedInstant(e.target.value) })} /><p className="text-sm text-muted-foreground">המועד נשמר בטיוטה ולא מפעיל שליחה אוטומטית. השליחה עצמה נעשית בלחיצה על "שליחה לתפוצה".</p></div>
         <div className="space-y-2"><Label htmlFor="test-email">כתובת מייל לבדיקה</Label><div className="flex flex-wrap gap-2"><Input id="test-email" type="email" dir="ltr" maxLength={254} placeholder="name@example.com" className="min-w-0 flex-1 basis-56" value={testEmail} disabled={busy} onChange={e => setTestEmail(e.target.value)} /><Button variant="outline" disabled={busy || !z.string().trim().email().max(254).safeParse(testEmail).success || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת מייל בדיקה</Button></div></div>
-        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button type="button" variant="outline" disabled={busy} onClick={() => void run(shareWhatsapp)}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
+        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button type="button" variant="outline" disabled={busy} onClick={shareWhatsapp}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
         <p className="text-xs text-muted-foreground">כל שליחה לתפוצה יוצאת תמיד בעותק מוסתר, אין אפשרות אחרת — אף נמענת לא רואה את הכתובות האחרות. כל מייל כולל קישור להסרה מרשימת התפוצה. הרשימה נשלחת בגלים: גל אחד היום, גל שני אחר כך, עד שהכול יצא.</p>
         {status && <div className="space-y-2 rounded-lg border bg-muted/40 p-3 text-sm" aria-live="polite">
           <p className="font-medium">מצב השליחה לתפוצה{dirty ? " (לפני השמירה של השינויים)" : ""}</p>
@@ -210,6 +228,17 @@ export default function AdminEventCommunications() {
           {status.waves.length === 0 ? <p className="text-muted-foreground">עוד לא נשלח לאף אחת.</p> : <ul className="space-y-1">{status.waves.map(w => <li key={w.wave}>✓ גל {w.wave} נשלח ל־{w.count} נמענות · {new Date(w.at).toLocaleString("he-IL")}</li>)}</ul>}
           {status.remaining > 0 ? <p>הגל הבא: גל {status.next_wave} ל־{status.next_wave_size} נמענות.</p> : status.sent > 0 && <p className="font-medium">כל הרשימה קיבלה את ההודעה. אי אפשר לשלוח אותה שוב בלי לשנות את הטקסט.</p>}
         </div>}
+        <AlertDialog open={shareOpen} onOpenChange={setShareOpen}>
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader><AlertDialogTitle>שיתוף בוואטסאפ</AlertDialogTitle><AlertDialogDescription>{shareFile ? "תמונת האירוע והטקסט מוכנים לשיתוף בנפרד." : "התמונה אינה מוכנה לשיתוף כרגע; אפשר לפתוח את ההודעה בוואטסאפ ללא תמונה."}</AlertDialogDescription></AlertDialogHeader>
+            <Textarea aria-label="טקסט לשיתוף בוואטסאפ" readOnly value={whatsappMessage(draft, event)} className="max-h-64" />
+            <AlertDialogFooter className="flex-wrap gap-2">
+              <AlertDialogCancel>סגירה</AlertDialogCancel>
+              {shareFile && <Button variant="outline" onClick={downloadShareImage}>הורדת תמונת האירוע</Button>}
+              <Button asChild><a href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage(draft, event))}`} target="_blank" rel="noopener noreferrer">פתיחת הטקסט בוואטסאפ</a></Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <AlertDialog open={confirming} onOpenChange={setConfirming}>
           <AlertDialogContent dir="rtl">
             <AlertDialogHeader>
