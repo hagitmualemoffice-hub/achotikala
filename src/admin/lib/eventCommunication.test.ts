@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { tickchakLink, whatsappMessage, plannedInstant, nextWaveSize, WAVE_CAP } from "./eventCommunication";
+import { tickchakLink, registrationHref, whatsappMessage, plannedInstant, nextWaveSize, WAVE_CAP } from "./eventCommunication";
+import { safeRegistrationHref } from '../../../supabase/functions/_shared/registration';
 
 describe("event communications", () => {
   it("registration goes directly to HTTPS Tickchak", () => {
@@ -7,6 +8,18 @@ describe("event communications", () => {
     expect(tickchakLink("https://tickchak.co.il.example.com/12345")).toBe(false);
     expect(tickchakLink("javascript:alert(1)")).toBe(false);
     expect(tickchakLink("http://tickchak.co.il/12345")).toBe(false);
+  });
+  it("an event with no registration link sends without one", () => {
+    expect(registrationHref("")).toBe("");
+    expect(registrationHref("   ")).toBe("");
+    expect(safeRegistrationHref("")).toBe("");
+    expect(safeRegistrationHref(null)).toBe("");
+    expect(safeRegistrationHref("javascript:alert(1)")).toBeNull();
+    expect(safeRegistrationHref("https://tickchak.co.il/12345")).toBe("https://tickchak.co.il/12345");
+  });
+  it("WhatsApp message leaves out the registration line when there is no link", () => {
+    expect(whatsappMessage({ title: "מפגש", body: "נפגשות", registration_url: "" }))
+      .toBe("*מפגש*\n\nנפגשות");
   });
   it("manual WhatsApp shares the edited event and direct registration link", () => {
     expect(whatsappMessage({ title: "מפגש", body: "ההרשמה המוקדמת מסתיימת", registration_url: "https://tickchak.co.il/12345" }))
