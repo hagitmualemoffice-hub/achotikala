@@ -163,6 +163,11 @@ const EventCard = ({ event, onOpen }: { event: EventItem; onOpen: (e: EventItem)
             <Sparkles className="h-14 w-14" />
           </div>
         )}
+        {(event.eventType as string) === "course" && (
+          <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-sm">
+            סדרת חורף
+          </div>
+        )}
         {isSaveTheDate && (
           <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[11px] font-semibold tracking-wide shadow-sm">
             SAVE THE DATE
@@ -321,8 +326,9 @@ const Events = () => {
     () => sortedEvents.filter((e) => eventEnd(e) < now).sort((a, b) => b.date.localeCompare(a.date)),
     [sortedEvents, now],
   );
-  const courses = futureEvents.filter((e) => e.eventType === "course");
-  const upcoming = futureEvents.filter((e) => e.eventType !== "course");
+  const [kind, setKind] = useState<"all" | "events" | "series">("all");
+  const courses = kind === "events" ? [] : futureEvents.filter((e) => e.eventType === "course");
+  const upcoming = kind === "series" ? [] : futureEvents.filter((e) => e.eventType !== "course");
 
   const oneMonthAgo = useMemo(() => subMonths(now, 1), [now]);
   const recentPastEvents = useMemo(
@@ -415,7 +421,12 @@ const Events = () => {
               )
             ) : (
               <div className="space-y-12">
-                {courses.length > 0 && <section><h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">קורסי חורף וסדרות</h2><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{courses.map((event) => <EventCard key={event.id} event={event} onOpen={setOpenEvent} />)}</div></section>}
+                <div className="flex flex-wrap gap-2 -mb-6">
+                  {([["all", "הכל"], ["events", "אירועים"], ["series", "סדרות חורף"]] as const).map(([k, label]) => (
+                    <button key={k} onClick={() => setKind(k)} className={cn("rounded-full px-4 py-1.5 text-sm border transition-colors", kind === k ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground/70 border-border hover:border-primary")}>{label}</button>
+                  ))}
+                </div>
+                {courses.length > 0 && <section><h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">סדרות חורף</h2><div className="grid grid-cols-1 md:grid-cols-2 gap-6">{courses.map((event) => <EventCard key={event.id} event={event} onOpen={setOpenEvent} />)}</div></section>}
                 {/* Future events */}
                 <div>
                   <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
