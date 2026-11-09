@@ -2588,18 +2588,21 @@ export type Database = {
       event_communication_recipients: {
         Row: {
           communication_id: string
+          content_hash: string
           email: string
           sent_at: string
           wave: number
         }
         Insert: {
           communication_id: string
+          content_hash?: string
           email: string
           sent_at?: string
           wave?: number
         }
         Update: {
           communication_id?: string
+          content_hash?: string
           email?: string
           sent_at?: string
           wave?: number
@@ -2617,6 +2620,7 @@ export type Database = {
       event_communication_sends: {
         Row: {
           communication_id: string
+          content_hash: string
           created_at: string
           id: string
           message_id: string | null
@@ -2625,6 +2629,7 @@ export type Database = {
         }
         Insert: {
           communication_id: string
+          content_hash?: string
           created_at?: string
           id?: string
           message_id?: string | null
@@ -2633,6 +2638,7 @@ export type Database = {
         }
         Update: {
           communication_id?: string
+          content_hash?: string
           created_at?: string
           id?: string
           message_id?: string | null
