@@ -1,9 +1,10 @@
 import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
+import { testRecipient } from './recipient.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
 
-const schema = z.object({ draft_id: z.string().uuid() });
+const schema = z.object({ draft_id: z.string().uuid(), recipient: z.string().trim().email().max(254).optional() });
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] ?? char));
 const absolute = (value: string) => {
@@ -47,13 +48,13 @@ Deno.serve(async (req) => {
       return json({ error: 'Gmail request failed', status: profile.status, details }, profile.status);
     }
     const account = await profile.json();
-    const to = z.string().email().parse(account.emailAddress);
+    const to = testRecipient(parsed.data.recipient, z.string().email().parse(account.emailAddress));
     const logos = z.array(z.object({ url: z.string().max(4096), alt: z.string().max(200) })).max(8).parse(draft.extra_logos);
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [ ...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos ]
       .map(logo => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
     const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref: registration.href, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: undefined });
-    // Test emails only go to the connected account; clients cannot select a recipient.
+    // Admin-only tests go to one validated address, independently of campaign recipients.
     const mime = [`To: ${to}`, `Subject: =?UTF-8?B?${b64(`[בדיקה] ${draft.subject.replace(/[\r\n]/g, ' ')}`)}?=`, 'MIME-Version: 1.0', 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', b64(html)].join('\r\n');
     const response = await fetch(`${base}/messages/send`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw: b64(mime).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }) });
     if (!response.ok) {

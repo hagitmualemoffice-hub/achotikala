@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Allow administrators to choose one email-test destination independently of the connected Gmail account; validate the address in the screen and sender, preserving the older-client default.
+
 - [x] Add admin-only event communication drafts, editable subject/title/body, branded event preview, compressed logos, direct Tickchak links and manual WhatsApp sharing; Gmail linked and test-only sender deployed. Three tests and authenticated draft save/reload/restore passed; no campaign sent.
 - [x] Event emails now send to the site's verified mailing list in hidden copy (Bcc), capped at 450 per message and repeated in same-day waves until everyone has it; every email carries a remove-from-list link that only takes effect after the address confirms through its emailed link. Preview send to the connected mailbox, the full confirm flow and the wave math were verified, and test rows were removed.
 - [ ] Sending at a chosen clock time is still manual: the requested date saves on the draft but nothing fires automatically. Existing app-email service must not be used for promotional campaigns.

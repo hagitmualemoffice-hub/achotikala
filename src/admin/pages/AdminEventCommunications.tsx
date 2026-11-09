@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, Save, Send, MessageCircle, Plus, Trash2, Upload, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { uploadToMedia } from "@/admin/lib/media";
 import { tickchakLink, whatsappMessage, bodyToHtml, plannedInstant, type CommunicationDraft } from "@/admin/lib/eventCommunication";
 import type { DbRow } from "@/hooks/useEvents";
@@ -43,6 +44,7 @@ export default function AdminEventCommunications() {
   const [failed, setFailed] = useState(false);
   const [status, setStatus] = useState<SendStatus | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
   const [dirty, setDirty] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   // Wraps the selected text in a mark: bold (**…**) or a larger line (## …).
@@ -126,10 +128,12 @@ export default function AdminEventCommunications() {
     finally { setBusy(false); }
   };
   const sendTest = async () => {
+    const recipient = z.string().trim().email().max(254).safeParse(testEmail);
+    if (!recipient.success) { toast.error("יש להזין כתובת מייל תקינה לבדיקה"); return; }
     if (!draft || !tickchakLink(draft.registration_url)) { toast.error("יש להזין קישור HTTPS לטיקצ׳אק"); return; }
     const draftId = await save();
     if (!draftId) return;
-    const { data, error } = await supabase.functions.invoke("event-communication-test", { body: { draft_id: draftId } });
+    const { data, error } = await supabase.functions.invoke("event-communication-test", { body: { draft_id: draftId, recipient: recipient.data } });
     if (error) {
       const detail = error instanceof FunctionsHttpError ? await error.context.text() : error.message;
       throw new Error(detail);
@@ -195,7 +199,8 @@ export default function AdminEventCommunications() {
         <div className="space-y-2"><Label htmlFor="audience">נמענות</Label><Select value={draft.audience} onValueChange={audience => change({ audience })}><SelectTrigger id="audience"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="website">רשימת התפוצה באתר</SelectItem><SelectItem value="google">אנשי קשר בגוגל</SelectItem><SelectItem value="both">שתי הרשימות</SelectItem></SelectContent></Select></div>
         {draft.audience !== "website" && <div className="space-y-2"><Label htmlFor="google-label">תווית אנשי הקשר בגוגל</Label><Input id="google-label" value={draft.google_label} onChange={e => change({ google_label: e.target.value })} /><p className="text-xs text-muted-foreground">קריאת אנשי הקשר בגוגל עדיין אינה מחוברת.</p></div>}
         <div className="space-y-2"><Label htmlFor="planned-send">מועד שליחה מבוקש — טיוטה בלבד</Label><Input id="planned-send" type="datetime-local" value={localTime(draft.planned_at)} onChange={e => change({ planned_at: plannedInstant(e.target.value) })} /><p className="text-sm text-muted-foreground">המועד נשמר בטיוטה ולא מפעיל שליחה אוטומטית. השליחה עצמה נעשית בלחיצה על "שליחה לתפוצה".</p></div>
-        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button variant="outline" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת בדיקה לגימייל המחובר</Button><Button type="button" variant="outline" disabled={busy} onClick={() => void run(shareWhatsapp)}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
+        <div className="space-y-2"><Label htmlFor="test-email">כתובת מייל לבדיקה</Label><div className="flex flex-wrap gap-2"><Input id="test-email" type="email" dir="ltr" maxLength={254} placeholder="name@example.com" className="min-w-0 flex-1 basis-56" value={testEmail} disabled={busy} onChange={e => setTestEmail(e.target.value)} /><Button variant="outline" disabled={busy || !z.string().trim().email().max(254).safeParse(testEmail).success || !tickchakLink(draft.registration_url)} onClick={() => void run(sendTest)}><Send className="h-4 w-4 me-2" />שליחת מייל בדיקה</Button></div></div>
+        <div className="flex flex-wrap gap-2"><Button disabled={busy} onClick={() => void run(save)}><Save className="h-4 w-4 me-2" />שמירת טיוטה</Button><Button type="button" variant="outline" disabled={busy} onClick={() => void run(shareWhatsapp)}><MessageCircle className="h-4 w-4 me-2" />שיתוף בוואטסאפ</Button><Button variant="secondary" disabled={busy || !tickchakLink(draft.registration_url)} onClick={() => void run(prepareSend)}><Users className="h-4 w-4 me-2" />שליחה לתפוצה</Button></div>
         <p className="text-xs text-muted-foreground">כל שליחה לתפוצה יוצאת תמיד בעותק מוסתר, אין אפשרות אחרת — אף נמענת לא רואה את הכתובות האחרות. כל מייל כולל קישור להסרה מרשימת התפוצה. הרשימה נשלחת בגלים: גל אחד היום, גל שני אחר כך, עד שהכול יצא.</p>
         {status && <div className="space-y-2 rounded-lg border bg-muted/40 p-3 text-sm" aria-live="polite">
           <p className="font-medium">מצב השליחה לתפוצה{dirty ? " (לפני השמירה של השינויים)" : ""}</p>
