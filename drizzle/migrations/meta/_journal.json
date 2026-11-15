@@ -183,6 +183,20 @@
       "when": 1794222789199,
       "tag": "0025_event_send_content_version",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794768993858,
+      "tag": "0026_tighten_open_access_rules",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794769005500,
+      "tag": "0027_relax_blog_slug_check",
+      "breakpoints": true
     }
   ]
 }
