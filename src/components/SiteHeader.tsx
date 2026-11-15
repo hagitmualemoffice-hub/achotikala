@@ -66,7 +66,7 @@ const SiteHeader = () => {
           </Link>
 
 
-          <nav className="flex items-center gap-3.5 xl:gap-6">
+          <nav className="flex items-center gap-2 xl:gap-4">
             {navItems.map((item) => {
               if (item.type === "page") {
               if (item.highlight) {

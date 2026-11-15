@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Medicine fridge step 1: public row directory, anonymous upload/request/private manage link, reviewed draft catalog and fuzzy matching, admin queue/listings/catalog, separate RLS-protected data and approved hashed abuse limits. Verify anonymous denial and real TEST_ browser flows, delete all test data; do not publish or touch offline/scripts.
+- [x] Medicine fridge step 1: public row directory, anonymous upload/request/private manage link, 17 review-pending draft catalog entries and fuzzy matching, admin queue/listings/catalog, separate RLS-protected data and approved hashed abuse limits. Verified anonymous private reads return [] and direct writes/RPC fail 401, real TEST_ upload/request/admin reserve/remove/catalog/handle/manage-close, 360/390 mobile rows and fixed form actions. Eighteen client and ten server tests pass; test listings/contacts/requests/catalog name/counters all deleted and verified zero. Preview build OK; no publish or offline/scripts changes. Real NetFree and external WhatsApp app handoff remain unverified.
 
 - [x] Prevent old static blog posts flashing before live posts load in the homepage link and blog lists. Two loading lifecycle tests passed; delayed real requests verified on homepage, blog and personal listing, with no old title before current content; preview build OK. Offline release remains blocked by stale stored content below.
 
