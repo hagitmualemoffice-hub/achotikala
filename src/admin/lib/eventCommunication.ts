@@ -59,11 +59,23 @@ export function bodyToWhatsapp(body: string): string {
 
 type WhatsappEvent = { event_date?: string | null; event_time?: string | null; location?: string | null; city?: string | null; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
 
+/** Same Hebrew date wording as the email: weekday, day and month. */
+const hebrewDay = (iso: string | null | undefined, withWeekday = true) => {
+  if (!iso) return "";
+  const date = new Date(`${String(iso).slice(0, 10)}T12:00:00Z`);
+  if (Number.isNaN(date.getTime())) return String(iso);
+  return date.toLocaleDateString("he-IL", { ...(withWeekday ? { weekday: "long" } : {}), day: "numeric", month: "long", timeZone: "UTC" });
+};
+
+/**
+ * WhatsApp layout mirrors the email card: bold title on top, the date/day/time
+ * and place right under it, then the details, prices and registration at the bottom.
+ */
 export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body" | "registration_url">, event?: WhatsappEvent): string {
-  const when = event ? [event.event_date ? new Date(event.event_date).toLocaleDateString("he-IL") : "", event.event_time].filter(Boolean).join(" · ") : "";
-  const where = event ? [event.location, event.city].filter(Boolean).join(" ") : "";
+  const when = event ? [hebrewDay(event.event_date), event.event_time].filter(Boolean).join(" · ") : "";
+  const where = event ? [event.location, event.city].filter(Boolean).join(" · ") : "";
   const prices = event ? [
-    event.early_price != null ? `רישום מוקדם: ₪${event.early_price}${event.early_price_deadline ? ` · עד ${new Date(event.early_price_deadline).toLocaleDateString("he-IL")}` : ""}` : "",
+    event.early_price != null ? `רישום מוקדם: ₪${event.early_price}${event.early_price_deadline ? ` · עד ${hebrewDay(event.early_price_deadline, false)}` : ""}` : "",
     event.regular_price != null ? `רישום רגיל: ₪${event.regular_price}` : "",
   ].filter(Boolean).join("\n") : "";
   return [
