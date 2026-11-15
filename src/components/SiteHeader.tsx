@@ -18,6 +18,7 @@ const navItems: NavItem[] = [
   { label: "שנדבר חששות?", type: "anchor", to: "/#concerns" },
   { label: "בלוג", type: "page", to: "/blog" },
   { label: "פודקאסט", type: "page", to: "/podcast" },
+  { label: "מקרר התרופות", type: "page", to: "/medicine-fridge" },
   { label: "שימור פוריות", type: "page", to: "https://shimurporiut.com/", highlight: true },
 
   { label: "דברי איתנו", type: "action", action: "contact" },

@@ -8,6 +8,7 @@ import { useLang } from "@/i18n/LanguageContext";
 const contentLinks: { label: string; to: string; icon: typeof BookOpen }[] = [
   { label: "בלוג", to: "/blog", icon: BookOpen },
   { label: "פודקאסט", to: "/podcast", icon: Mic },
+  { label: "מקרר התרופות", to: "/medicine-fridge", icon: Heart },
 ];
 
 const MobileBottomNav = () => {

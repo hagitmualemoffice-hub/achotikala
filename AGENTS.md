@@ -14,3 +14,4 @@
 - Preload WhatsApp event media with a cancellable timeout and invoke native sharing directly from the click; provide an explicit text/image fallback without blocking the editor on clipboard or network requests.
 - Store email registration as a validated single-address mailto in the existing communication registration_url and share validation/labels across preview and senders; this avoids duplicate registration storage and preserves older drafts.
 - Expose blog loading separately from its post array and defer static fallbacks until the live request settles; this prevents old posts flashing before current content arrives.
+- Keep medicine-fridge public rows separate from admin-only contacts, requests and token hashes; allow anonymous writes only through the validating edge function and service-only atomic RPCs, so public reads never expose private data or account links.

@@ -3040,6 +3040,201 @@ export type Database = {
         }
         Relationships: []
       }
+      medicine_abuse_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          ip_hash: string
+          phone_hash: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: never
+          ip_hash: string
+          phone_hash: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: never
+          ip_hash?: string
+          phone_hash?: string
+        }
+        Relationships: []
+      }
+      medicine_catalog: {
+        Row: {
+          aliases: string[]
+          brand_name: string
+          created_at: string
+          drug_type: string
+          generic_name: string
+          hebrew_name: string
+          id: string
+          needs_review: boolean
+        }
+        Insert: {
+          aliases?: string[]
+          brand_name?: string
+          created_at?: string
+          drug_type?: string
+          generic_name?: string
+          hebrew_name: string
+          id?: string
+          needs_review?: boolean
+        }
+        Update: {
+          aliases?: string[]
+          brand_name?: string
+          created_at?: string
+          drug_type?: string
+          generic_name?: string
+          hebrew_name?: string
+          id?: string
+          needs_review?: boolean
+        }
+        Relationships: []
+      }
+      medicine_contacts: {
+        Row: {
+          email: string
+          listing_id: string
+          manage_hash: string
+          name: string
+          opened_note: string
+          opened_on: string | null
+          phone: string
+          refrigerated: string
+        }
+        Insert: {
+          email?: string
+          listing_id: string
+          manage_hash: string
+          name?: string
+          opened_note?: string
+          opened_on?: string | null
+          phone: string
+          refrigerated: string
+        }
+        Update: {
+          email?: string
+          listing_id?: string
+          manage_hash?: string
+          name?: string
+          opened_note?: string
+          opened_on?: string | null
+          phone?: string
+          refrigerated?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_contacts_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "medicine_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicine_listings: {
+        Row: {
+          area: string
+          catalog_id: string | null
+          city: string
+          contact_mode: string
+          created_at: string
+          dose: string
+          drug_name: string
+          expiry_month: string
+          id: string
+          nickname: string
+          quantity: string
+          sealed: boolean
+          status: string
+          volunteer_transfer: boolean
+        }
+        Insert: {
+          area: string
+          catalog_id?: string | null
+          city?: string
+          contact_mode?: string
+          created_at?: string
+          dose?: string
+          drug_name: string
+          expiry_month: string
+          id?: string
+          nickname: string
+          quantity: string
+          sealed: boolean
+          status?: string
+          volunteer_transfer?: boolean
+        }
+        Update: {
+          area?: string
+          catalog_id?: string | null
+          city?: string
+          contact_mode?: string
+          created_at?: string
+          dose?: string
+          drug_name?: string
+          expiry_month?: string
+          id?: string
+          nickname?: string
+          quantity?: string
+          sealed?: boolean
+          status?: string
+          volunteer_transfer?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_listings_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicine_requests: {
+        Row: {
+          created_at: string
+          handled: boolean
+          id: string
+          listing_id: string
+          name: string
+          note: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          handled?: boolean
+          id?: string
+          listing_id: string
+          name?: string
+          note?: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          handled?: boolean
+          id?: string
+          listing_id?: string
+          name?: string
+          note?: string
+          phone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_requests_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "medicine_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offline_sync_state: {
         Row: {
           content_version: number
@@ -3766,6 +3961,20 @@ export type Database = {
         Returns: string
       }
       liba_threads: { Args: { _limit?: number }; Returns: Json }
+      medicine_is_admin: { Args: never; Returns: boolean }
+      medicine_manage: {
+        Args: { next_status: string; token_hash: string }
+        Returns: boolean
+      }
+      medicine_submit: {
+        Args: {
+          ip_key: string
+          p: Json
+          phone_key: string
+          token_hash?: string
+        }
+        Returns: string
+      }
       my_apartment_access: { Args: never; Returns: boolean }
       normalize_email: { Args: { _e: string }; Returns: string }
       places_admin_queue: { Args: never; Returns: Json }

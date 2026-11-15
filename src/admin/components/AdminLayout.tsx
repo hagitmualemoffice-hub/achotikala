@@ -35,6 +35,7 @@ const navItems = [
   { to: "/admin/leads", label: "נרשמות לתפוצה", icon: Mail },
   { to: "/admin/donation-texts", label: "ארכיון טקסטים לתרומה", icon: FileText },
   { to: "/admin/users", label: "מנהלות המערכת", icon: Users },
+  { to: "/admin/medicine-fridge", label: "מקרר התרופות", icon: HandHeart },
 ];
 
 export default function AdminLayout() {

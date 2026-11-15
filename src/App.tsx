@@ -12,6 +12,9 @@ import BlogSection from "./pages/BlogSection.tsx";
 import BlogPost from "./pages/BlogPost.tsx";
 import Podcast from "./pages/Podcast.tsx";
 import Events from "./pages/Events.tsx";
+import MedicineFridge from "./pages/MedicineFridge";
+import MedicineManage from "./pages/MedicineManage";
+import AdminMedicine from "./admin/pages/AdminMedicine";
 import FertilityPreservation from "./pages/FertilityPreservation.tsx";
 import LifneyHashiava from "./pages/LifneyHashiava.tsx";
 import MidaaLehachlata from "./pages/MidaaLehachlata.tsx";
@@ -110,6 +113,8 @@ const App = () => (
             <Route path="/download" element={<Download />} />
             <Route path="/install" element={<Install />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/medicine-fridge" element={<MedicineFridge />} />
+            <Route path="/medicine-fridge/manage" element={<MedicineManage />} />
             <Route path="/shimur-poriut" element={<FertilityPreservation />} />
             <Route path="/lifney-hashiava" element={<LifneyHashiava />} />
             <Route path="/midaa-lehachlata" element={<MidaaLehachlata />} />
@@ -156,6 +161,7 @@ const App = () => (
               <Route path="donation-texts" element={<AdminDonationArchive />} />
               <Route path="leads" element={<AdminLeads />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="medicine-fridge" element={<AdminMedicine />} />
               <Route path="pulse" element={<AdminPulse />} />
               <Route path="rotating-content" element={<AdminRotatingContent />} />
               <Route path="quiz" element={<AdminQuiz />} />

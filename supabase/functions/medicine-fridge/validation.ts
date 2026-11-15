@@ -1,0 +1,9 @@
+import { z } from 'npm:zod@3.25.76';
+const text=(max:number,required=false)=>z.string().transform(v=>v.replace(/<[^>]*>/g,'').trim()).pipe(z.string().min(required?1:0).max(max).refine(v=>!/(https?:|www\.|\b[\w-]+\.(?:com|co\.il|org|net|me)\b)/i.test(v)));
+const publicText=(max:number,required=false)=>text(max,required).refine(v=>!/@|[0-9][0-9 ()+-]{6,}[0-9]|רחוב|רח׳|דירה|קומה|בניין/.test(v));
+const phone=z.string().transform(v=>v.replace(/[\s()-]/g,'')).pipe(z.string().regex(/^(?:0[2-9]\d{7,8}|\+972[2-9]\d{7,8})$/));
+const region=z.enum(['ירושלים והסביבה','ביתר עילית','גוש עציון','בני ברק','תל אביב / רמת גן / גבעתיים / יפו','חולון','המרכז','השפלה','השרון','הדרום / אשקלון','הצפון / צפת','אחר']);
+export const createSchema=z.object({action:z.literal('create'),drug_name:publicText(80,true),dose:publicText(80),quantity:publicText(80,true),expiry_month:z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).refine(v=>v>=new Date().toISOString().slice(0,7)),sealed:z.boolean(),opened_on:z.string().refine(v=>!v || /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v)) && v<=new Date().toISOString().slice(0,10)),opened_note:text(300),refrigerated:z.enum(['yes','no','unsure']),area:region,city:publicText(60).refine(v=>!/[0-9]/.test(v)),volunteer_transfer:z.boolean(),nickname:publicText(20,true),contact_mode:z.enum(['mediator','direct']),phone,name:text(80),email:z.union([z.literal(''),z.string().trim().email().max(254)]),declaration:z.literal(true)});
+export const requestSchema=z.object({action:z.literal('request'),listing_id:z.string().uuid(),name:text(80),phone,note:text(300)});
+export const manageSchema=z.object({action:z.literal('manage'),token:z.string().regex(/^[a-f0-9]{64}$/),status:z.enum(['delivered','removed'])});
+export const gateSchema=z.object({challenge:z.string().max(300),website:z.literal('')});

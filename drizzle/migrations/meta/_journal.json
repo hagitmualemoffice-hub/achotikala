@@ -204,6 +204,27 @@
       "when": 1794774437030,
       "tag": "0028_restrict_media_read",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794776789275,
+      "tag": "0029_medicine_fridge_step_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794777021220,
+      "tag": "0030_medicine_field_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794777049857,
+      "tag": "0031_medicine_anonymous_read_guard",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Medicine fridge step 1: public row directory, anonymous upload/request/private manage link, reviewed draft catalog and fuzzy matching, admin queue/listings/catalog, separate RLS-protected data and approved hashed abuse limits. Verify anonymous denial and real TEST_ browser flows, delete all test data; do not publish or touch offline/scripts.
+
 - [x] Prevent old static blog posts flashing before live posts load in the homepage link and blog lists. Two loading lifecycle tests passed; delayed real requests verified on homepage, blog and personal listing, with no old title before current content; preview build OK. Offline release remains blocked by stale stored content below.
 
 - [x] Create and publish a matching watercolor sukkah illustration for the existing Sukkot personal post (72KB WebP); verified cover loading and rendering at 1280px and 360px. Offline content release remains blocked below and has not been resumed.
