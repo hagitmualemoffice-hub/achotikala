@@ -222,19 +222,21 @@ const HeroQuickLinksCard = ({
     "text-[9px] md:text-[11px] uppercase tracking-[0.14em] md:tracking-[0.18em] text-primary font-medium mb-0 md:mb-1";
   const titleCls =
     "text-foreground text-[11px] md:text-[15px] font-light leading-snug line-clamp-1 md:line-clamp-2";
-  const latestSong = useDbPosts().find((p) => p.section === "shirim");
+  const dbPosts = useDbPosts();
+  const latestSong = dbPosts.find((p) => p.section === "shirim");
+  const personalPost = dbPosts.find((p) => p.slug === "toldot-rivka") ?? latestPost;
   const iconWrap =
     "shrink-0 w-7 h-7 md:w-9 md:h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center md:mt-0.5";
 
   return (
     <div className="group bg-card rounded-2xl shadow-[0_15px_50px_-10px_hsl(0_0%_0%_/_0.25)] hover:shadow-[0_25px_70px_-10px_hsl(0_0%_0%_/_0.4)] transition-shadow duration-300 px-2.5 py-4 md:px-6 md:py-6 flex flex-col md:flex-row items-stretch gap-2.5 md:gap-3">
-      <Link to="/blog/sukkot-simcha" className={itemBase}>
+      <Link to={`/blog/${personalPost.slug}`} className={itemBase}>
         <span className={iconWrap} aria-label="פוסט אחרון">
           <FileText className="w-4 h-4" />
         </span>
         <span className="min-w-0">
           <p className={eyebrow}>פוסט אחרון</p>
-          <span className={titleCls}>חג סוכות, שמחה ואיפה אני בתוך כל זה 🩷</span>
+          <span className={titleCls}>{personalPost.title}</span>
         </span>
       </Link>
 

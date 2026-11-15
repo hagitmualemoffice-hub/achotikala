@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Publish the full supplied Toldot/Rivka personal post in the existing CMS with a 41KB WebP copy of the existing growth illustration; feature it in the homepage quick link. Verified full text, image loading, personal listing and homepage navigation at 1280px and 360px; preview build OK.
+- [ ] Release the Rivka post offline: v23 build/pack/local chunk checks passed, but content verification found the existing offline snapshot omitted toldot-rivka. STOPPED before publishing to either GitHub channel or replacing Drive files; generated release outputs discarded to preserve the previous channel. Blocker: the stored offline content must be refreshed before rebuilding and verifying fresh-install/runtime/CDN/Drive/upgrades.
+
 - [x] Add Tickchak/email registration selection with the email address on a mailto button. Nineteen tests passed; authenticated save/select/reload and deployed sender status verified, temporary drafts removed, no email sent; senders redeployed and preview build OK.
 - [ ] Complete offline v22 (supersedes v21): build/pack/local verification passed (452 unique parts, zero problems); the network-blocked installer check was invalid because the mounted file displayed as source text. Primary GitHub push succeeded (8030a1959960fdee9e65435f9ae29ba8963e89a3), but publisher timed out during CDN purge, so STOPPED per release policy. Both CDN channels, legacy sync, four Drive replacements/download verification and upgrade checks remain undone. Drive files unchanged.
 
