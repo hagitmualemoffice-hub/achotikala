@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Create and publish a matching watercolor sukkah illustration for the existing Sukkot personal post (72KB WebP); verified cover loading and rendering at 1280px and 360px. Offline content release remains blocked below and has not been resumed.
+
 - [x] Publish the full supplied Toldot/Rivka personal post in the existing CMS with a 41KB WebP copy of the existing growth illustration; feature it in the homepage quick link. Verified full text, image loading, personal listing and homepage navigation at 1280px and 360px; preview build OK.
 - [ ] Release the Rivka post offline: v23 build/pack/local chunk checks passed, but content verification found the existing offline snapshot omitted toldot-rivka. STOPPED before publishing to either GitHub channel or replacing Drive files; generated release outputs discarded to preserve the previous channel. Blocker: the stored offline content must be refreshed before rebuilding and verifying fresh-install/runtime/CDN/Drive/upgrades.
 
