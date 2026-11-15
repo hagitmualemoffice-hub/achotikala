@@ -72,8 +72,9 @@ const mapRow = (row: Row): BlogPostData => {
 };
 
 /** Published posts coming from the admin CMS (Lovable Cloud). */
-export const useDbPosts = () => {
+export const useDbPostsState = () => {
   const [posts, setPosts] = useState<BlogPostData[]>([]);
+  const [loading, setLoading] = useState(true);
   const offlineRows = useOfflineRows("posts");
 
   useEffect(() => {
@@ -89,6 +90,7 @@ export const useDbPosts = () => {
           .map(mapRow);
       const cached = readLiveCache<Row & { status?: string }>("posts");
       setPosts(visible(cached ?? (offlineRows as (Row & { status?: string })[])));
+      setLoading(false);
       fetchLiveRows<Row>(() =>
         supabase
           .from("blog_posts")
@@ -107,6 +109,7 @@ export const useDbPosts = () => {
       };
     }
     (async () => {
+      try {
       const { data, error } = await supabase
         .from("blog_posts")
         .select(
@@ -120,6 +123,9 @@ export const useDbPosts = () => {
           .filter((r) => !r.publish_at || new Date(r.publish_at).getTime() <= now)
           .map(mapRow),
       );
+      } finally {
+        if (active) setLoading(false);
+      }
     })();
     return () => {
       active = false;
@@ -127,8 +133,10 @@ export const useDbPosts = () => {
   }, [offlineRows]);
 
 
-  return posts;
+  return { posts, loading };
 };
+
+export const useDbPosts = () => useDbPostsState().posts;
 
 export const dbPostsForSection = (posts: BlogPostData[], section: BlogSection) =>
   posts.filter((p) => p.section === section);

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Prevent old static blog posts flashing before live posts load in the homepage link and blog lists. Two loading lifecycle tests passed; delayed real requests verified on homepage, blog and personal listing, with no old title before current content; preview build OK. Offline release remains blocked by stale stored content below.
+
 - [x] Create and publish a matching watercolor sukkah illustration for the existing Sukkot personal post (72KB WebP); verified cover loading and rendering at 1280px and 360px. Offline content release remains blocked below and has not been resumed.
 
 - [x] Publish the full supplied Toldot/Rivka personal post in the existing CMS with a 41KB WebP copy of the existing growth illustration; feature it in the homepage quick link. Verified full text, image loading, personal listing and homepage navigation at 1280px and 360px; preview build OK.

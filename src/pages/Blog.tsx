@@ -4,7 +4,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import logo from "@/assets/logo-achoti-kala.png";
 import yotzotYearImg from "@/assets/yotzot-laor-year.jpg";
 import { blogPosts, getPostsBySection, SECTION_META, type BlogSection, type BlogPostData } from "@/data/blogPosts";
-import { useDbPosts, dbPostsForSection } from "@/hooks/useDbPosts";
+import { useDbPostsState, dbPostsForSection } from "@/hooks/useDbPosts";
 
 const sectionsOrder: BlogSection[] = ["torim", "shirim", "tochen"];
 
@@ -112,7 +112,7 @@ const SectionRow = ({ section, dbPosts }: { section: BlogSection; dbPosts: BlogP
 };
 
 const Blog = () => {
-  const dbPosts = useDbPosts();
+  const { posts: dbPosts, loading } = useDbPostsState();
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0" dir="rtl">
       <div className="hidden lg:block">
@@ -143,7 +143,7 @@ const Blog = () => {
         </div>
       </section>
 
-      {sectionsOrder.map((s) => (
+      {loading ? <div className="mx-auto max-w-5xl px-[30px] py-12" aria-busy="true" aria-label="טוענת פוסטים"><div className="h-52 rounded-xl bg-muted animate-pulse motion-reduce:animate-none" /></div> : sectionsOrder.map((s) => (
         <SectionRow key={s} section={s} dbPosts={dbPosts} />
       ))}
 

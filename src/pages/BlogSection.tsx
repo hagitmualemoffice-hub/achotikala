@@ -10,7 +10,7 @@ import {
   type BlogSection as Section,
   type PoemTopic,
 } from "@/data/blogPosts";
-import { useDbPosts, dbPostsForSection } from "@/hooks/useDbPosts";
+import { useDbPostsState, dbPostsForSection } from "@/hooks/useDbPosts";
 import { cn } from "@/lib/utils";
 
 const validSections: Section[] = ["torim", "shirim", "tochen"];
@@ -19,14 +19,14 @@ const topicOrder: PoemTopic[] = ["ravakot", "etgarim", "optimi"];
 const BlogSectionPage = () => {
   const { section } = useParams<{ section: string }>();
   const [activeTopic, setActiveTopic] = useState<PoemTopic | "all">("all");
-  const dbPosts = useDbPosts();
+  const { posts: dbPosts, loading } = useDbPostsState();
 
   if (!section || !validSections.includes(section as Section)) {
     return <Navigate to="/blog" replace />;
   }
   const sec = section as Section;
   const meta = SECTION_META[sec];
-  const allPosts = [...dbPostsForSection(dbPosts, sec), ...getPostsBySection(sec)];
+  const allPosts = loading ? [] : [...dbPostsForSection(dbPosts, sec), ...getPostsBySection(sec)];
 
   const posts = useMemo(() => {
     if (sec !== "shirim" || activeTopic === "all") return allPosts;
