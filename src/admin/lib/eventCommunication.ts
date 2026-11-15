@@ -57,7 +57,7 @@ export function bodyToWhatsapp(body: string): string {
   }).join("\n");
 }
 
-type WhatsappEvent = { event_date?: string | null; event_time?: string | null; location?: string | null; city?: string | null; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
+type WhatsappEvent = { event_date?: string | null; event_time?: string | null; location?: string | null; city?: string | null; capacity?: number | null; early_price?: number | null; early_price_deadline?: string | null; regular_price?: number | null };
 
 /** Same Hebrew date wording as the email: weekday, day and month. */
 const hebrewDay = (iso: string | null | undefined, withWeekday = true) => {
@@ -68,19 +68,26 @@ const hebrewDay = (iso: string | null | undefined, withWeekday = true) => {
 };
 
 /**
- * WhatsApp layout mirrors the email card: bold title on top, the date/day/time
- * and place right under it, then the details, prices and registration at the bottom.
+ * WhatsApp layout mirrors the email card: bold title on top, the date/day/time,
+ * place and seats with the same icons as the email right under it, then the
+ * details, prices and registration at the bottom.
  */
 export function whatsappMessage(draft: Pick<CommunicationDraft, "title" | "body" | "registration_url">, event?: WhatsappEvent): string {
   const when = event ? [hebrewDay(event.event_date), event.event_time].filter(Boolean).join(" · ") : "";
   const where = event ? [event.location, event.city].filter(Boolean).join(" · ") : "";
+  const seats = event?.capacity != null ? `${event.capacity} מקומות` : "";
+  const facts = [
+    when ? `📅 ${when}` : "",
+    where ? `📍 ${where}` : "",
+    seats ? `👥 ${seats}` : "",
+  ].filter(Boolean).join("\n");
   const prices = event ? [
     event.early_price != null ? `רישום מוקדם: ₪${event.early_price}${event.early_price_deadline ? ` · עד ${hebrewDay(event.early_price_deadline, false)}` : ""}` : "",
     event.regular_price != null ? `רישום רגיל: ₪${event.regular_price}` : "",
   ].filter(Boolean).join("\n") : "";
   return [
     draft.title ? `*${draft.title.replace(/\*/g, "")}*` : "",
-    [when, where].filter(Boolean).join("\n"),
+    facts,
     bodyToWhatsapp(draft.body),
     prices,
     registrationHref(draft.registration_url) ? (draft.registration_url.startsWith('mailto:') ? registrationLabel(draft.registration_url) : `להרשמה בטיקצ׳אק:\n${draft.registration_url}`) : "",

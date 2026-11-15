@@ -40,10 +40,10 @@ describe("event communications", () => {
   it("WhatsApp message puts title first, date and time under it, details at the bottom", () => {
     const message = whatsappMessage(
       { title: "מפגש עומק", body: "ערב של למידה", registration_url: "https://tickchak.co.il/12345" },
-      { event_date: "2026-11-19", event_time: "20:30", location: "בבית של חגית", city: "ירושלים", early_price: 100, early_price_deadline: "2026-11-10", regular_price: 150 },
+      { event_date: "2026-11-19", event_time: "20:30", location: "בבית של חגית", city: "ירושלים", capacity: 30, early_price: 100, early_price_deadline: "2026-11-10", regular_price: 150 },
     );
     expect(message).toBe(
-      "*מפגש עומק*\n\nיום חמישי, 19 בנובמבר · 20:30\nבבית של חגית · ירושלים\n\nערב של למידה\n\nרישום מוקדם: ₪100 · עד 10 בנובמבר\nרישום רגיל: ₪150\n\nלהרשמה בטיקצ׳אק:\nhttps://tickchak.co.il/12345",
+      "*מפגש עומק*\n\n📅 יום חמישי, 19 בנובמבר · 20:30\n📍 בבית של חגית · ירושלים\n👥 30 מקומות\n\nערב של למידה\n\nרישום מוקדם: ₪100 · עד 10 בנובמבר\nרישום רגיל: ₪150\n\nלהרשמה בטיקצ׳אק:\nhttps://tickchak.co.il/12345",
     );
   });
   it("retains the selected sending instant without changing it", () => {
