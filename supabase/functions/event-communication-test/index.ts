@@ -1,3 +1,4 @@
+import { communicationSource } from '../_shared/communicationSource.ts';
 import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
 import { safeRegistrationHref } from '../_shared/registration.ts';
 import { testRecipient } from './recipient.ts';
@@ -38,8 +39,13 @@ Deno.serve(async (req) => {
     const registrationHref = safeRegistrationHref(draft.registration_url);
     if (registrationHref === null) return json({ error: 'יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה' }, 400);
     if (!draft.subject.trim() || !draft.title.trim()) return json({ error: 'חסרה כותרת' }, 400);
-    const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
-    if (eventError || !event) return json({ error: 'Event not found' }, 404);
+    let sourceEvent: Record<string, unknown> | null = null;
+    if (draft.communication_kind !== 'system') {
+      const result = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
+      if (result.error || !result.data) return json({ error: 'Event not found' }, 404);
+      sourceEvent = result.data;
+    }
+    const { event, coverUrl } = communicationSource(draft, sourceEvent);
     const headers = { Authorization: `Bearer ${gatewayKey}`, 'X-Connection-Api-Key': gmailKey };
     const base = 'https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me';
     const profile = await fetch(`${base}/profile`, { headers });
@@ -54,7 +60,7 @@ Deno.serve(async (req) => {
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [ ...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos ]
       .map(logo => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
-    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: undefined });
+    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: coverUrl ? absolute(coverUrl) : '', event, unsubscribeUrl: undefined });
     // Admin-only tests go to one validated address, independently of campaign recipients.
     const mime = [`To: ${to}`, `Subject: =?UTF-8?B?${b64(`[בדיקה] ${draft.subject.replace(/[\r\n]/g, ' ')}`)}?=`, 'MIME-Version: 1.0', 'Content-Type: text/html; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', b64(html)].join('\r\n');
     const response = await fetch(`${base}/messages/send`, { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw: b64(mime).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }) });

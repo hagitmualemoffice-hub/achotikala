@@ -30,6 +30,7 @@ const navItems = [
   { to: "/admin/media", label: "ספריית מדיה", icon: ImageIcon },
   { to: "/admin/pulse", label: "בדיקת דופק", icon: Activity },
   { to: "/admin/rotating-content", label: "תוכן מתחלף בליבה", icon: Megaphone },
+  { to: "/admin/system-messages", label: "הודעות מערכת", icon: Mail },
   { to: "/admin/quiz", label: "הגרלת מה חדש בליבה", icon: Sparkles },
   { to: "/admin/inquiries", label: "בירורים", icon: HandHeart },
   { to: "/admin/leads", label: "נרשמות לתפוצה", icon: Mail },
@@ -41,7 +42,7 @@ const navItems = [
 export default function AdminLayout() {
   const { loading, session, isAdmin, user } = useAdminAuth();
   const location = useLocation();
-  const isCommunicationEditor = /\/admin\/events\/[^/]+\/communications$/.test(location.pathname);
+  const isCommunicationEditor = /\/admin\/events\/[^/]+\/communications$/.test(location.pathname) || location.pathname === "/admin/system-messages";
 
   if (loading) {
     return (

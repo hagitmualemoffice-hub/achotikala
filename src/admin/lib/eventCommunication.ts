@@ -3,7 +3,11 @@ export { registrationLabel };
 
 export type CommunicationDraft = {
   id?: string;
-  event_id: string;
+  event_id: string | null;
+  communication_kind?: 'event' | 'system';
+  cover_image?: string;
+  system_post_id?: string | null;
+  published_at?: string | null;
   subject: string;
   title: string;
   body: string;

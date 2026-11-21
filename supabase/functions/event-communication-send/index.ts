@@ -1,3 +1,4 @@
+import { communicationSource } from '../_shared/communicationSource.ts';
 import { eventEmailHtml } from '../_shared/eventEmailHtml.ts';
 import { safeRegistrationHref } from '../_shared/registration.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
@@ -56,11 +57,16 @@ Deno.serve(async (req) => {
     if (!draft.subject.trim() || !draft.title.trim()) return json({ error: 'חסרה כותרת' }, 400);
     const registrationHref = safeRegistrationHref(draft.registration_url);
     if (registrationHref === null) return json({ error: 'יש להזין קישור טיקצ׳אק או כתובת מייל תקינים להרשמה' }, 400);
-    const { data: event, error: eventError } = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
-    if (eventError || !event) return json({ error: 'Event not found' }, 404);
+    let sourceEvent: Record<string, unknown> | null = null;
+    if (draft.communication_kind !== 'system') {
+      const result = await caller.from('events_db').select('*').eq('id', draft.event_id).single();
+      if (result.error || !result.data) return json({ error: 'Event not found' }, 404);
+      sourceEvent = result.data;
+    }
+    const { event, coverUrl } = communicationSource(draft, sourceEvent);
 
     // Content version: a changed text is a new message; the same text never reaches anyone twice.
-    const fingerprint = JSON.stringify([draft.subject, draft.title, draft.body, draft.registration_url, draft.show_brand_logo, draft.extra_logos]);
+    const fingerprint = JSON.stringify([draft.subject, draft.title, draft.body, draft.registration_url, draft.show_brand_logo, draft.extra_logos, ...(draft.communication_kind === 'system' ? [draft.cover_image] : [])]);
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprint));
     const contentHash = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
 
@@ -119,7 +125,7 @@ Deno.serve(async (req) => {
     const palette = { background: '#ffffff', foreground: '#354d64', primary: '#d35b7e', muted: '#737373', border: '#e6e6e6' };
     const logoHtml = [...(draft.show_brand_logo && draft.brand_logo_url ? [{ url: draft.brand_logo_url, alt: 'אחותי כלה' }] : []), ...logos]
       .map((logo) => `<img src="${escape(absolute(logo.url))}" alt="${escape(logo.alt)}" width="100" style="max-width:120px;max-height:72px;object-fit:contain;margin:8px;vertical-align:middle">`).join('');
-    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: event.cover_image ? absolute(event.cover_image) : '', event, unsubscribeUrl: UNSUBSCRIBE_URL });
+    const html = eventEmailHtml({ title: draft.title, body: draft.body, registrationHref, logoHtml, coverUrl: coverUrl ? absolute(coverUrl) : '', event, unsubscribeUrl: UNSUBSCRIBE_URL });
 
     // Hidden copy: the batch goes out in Bcc so no reader sees the other addresses.
     const mime = [

@@ -15,3 +15,5 @@
 - Store email registration as a validated single-address mailto in the existing communication registration_url and share validation/labels across preview and senders; this avoids duplicate registration storage and preserves older drafts.
 - Expose blog loading separately from its post array and defer static fallbacks until the live request settles; this prevents old posts flashing before current content arrives.
 - Keep medicine-fridge public rows separate from admin-only contacts, requests and token hashes; allow anonymous writes only through the validating edge function and service-only atomic RPCs, so public reads never expose private data or account links.
+- Reuse communication drafts, Gmail senders and email layout for system announcements, publishing each draft into one existing community system post through an admin-only atomic RPC; this avoids duplicate mailing and community systems.
+- Use the shared WhatsApp dialog for event and system messages, keeping direct text opening and image download available independently of native sharing; browser share acceptance does not prove WhatsApp delivery.

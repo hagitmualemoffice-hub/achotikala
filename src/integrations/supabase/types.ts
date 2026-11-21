@@ -2660,17 +2660,21 @@ export type Database = {
           audience: string
           body: string
           brand_logo_url: string
+          communication_kind: string
+          cover_image: string
           created_at: string
-          event_id: string
+          event_id: string | null
           extra_logos: Json
           google_label: string
           id: string
           message_kind: string
           planned_at: string | null
+          published_at: string | null
           registration_url: string
           show_brand_logo: boolean
           status: string
           subject: string
+          system_post_id: string | null
           title: string
           updated_at: string
         }
@@ -2678,17 +2682,21 @@ export type Database = {
           audience?: string
           body?: string
           brand_logo_url?: string
+          communication_kind?: string
+          cover_image?: string
           created_at?: string
-          event_id: string
+          event_id?: string | null
           extra_logos?: Json
           google_label?: string
           id?: string
           message_kind?: string
           planned_at?: string | null
+          published_at?: string | null
           registration_url?: string
           show_brand_logo?: boolean
           status?: string
           subject?: string
+          system_post_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -2696,17 +2704,21 @@ export type Database = {
           audience?: string
           body?: string
           brand_logo_url?: string
+          communication_kind?: string
+          cover_image?: string
           created_at?: string
-          event_id?: string
+          event_id?: string | null
           extra_logos?: Json
           google_label?: string
           id?: string
           message_kind?: string
           planned_at?: string | null
+          published_at?: string | null
           registration_url?: string
           show_brand_logo?: boolean
           status?: string
           subject?: string
+          system_post_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -2716,6 +2728,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events_db"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_communications_system_post_id_fkey"
+            columns: ["system_post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -3733,6 +3752,10 @@ export type Database = {
       community_my_hearts: { Args: never; Returns: Json }
       community_onboarding_state: { Args: never; Returns: Json }
       community_profile_json: { Args: { _uid: string }; Returns: Json }
+      community_publish_communication: {
+        Args: { _draft_id: string }
+        Returns: string
+      }
       community_pulse_admin_set: {
         Args: {
           _featured?: boolean

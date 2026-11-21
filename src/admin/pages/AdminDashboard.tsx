@@ -60,6 +60,10 @@ export default function AdminDashboard() {
       <OfflineSyncCard />
       <ApartmentAccessCard />
       <ManualAccessCard />
+      <Link to="/admin/system-messages" className="block bg-background rounded-lg border p-5 hover:border-primary/40">
+        <h2 className="font-medium">הודעות מערכת</h2>
+        <p className="text-sm text-muted-foreground mt-2">הודעות בליבה, במייל ובוואטסאפ ←</p>
+      </Link>
       <Link to="/admin/medicine-fridge" className="block bg-background rounded-lg border p-5 hover:border-primary/40">
         <h2 className="font-medium">מקרר התרופות השיתופי</h2>
         <p className="text-sm text-muted-foreground mt-2">בקשות, פרטי מסירה וקטלוג תרופות ←</p>

@@ -43,7 +43,7 @@ export function eventEmailHtml({ title, body, registrationHref, logoHtml, coverU
   const time = event.event_time ? ` | ${escape(event.event_time)}${event.end_time ? ` עד ${escape(event.end_time)}` : ''}` : '';
   const when = `${escape(hebrewDay(event.event_date))}${event.hebrew_date ? ` · ${escape(event.hebrew_date)}` : ''}${time}`;
   const where = event.location ? `${escape(event.location)}${event.city ? ` · ${escape(event.city)}` : ''}` : '';
-  const details = [row('calendar', when), where ? row('map-pin', where) : '',
+  const details = [when ? row('calendar', when) : '', where ? row('map-pin', where) : '',
     event.menu ? row('utensils', escape(event.menu).replace(/\n/g, '<br>')) : '',
     event.capacity != null ? row('users', `${escape(event.capacity)} מקומות`) : ''].join('');
 
@@ -53,7 +53,7 @@ export function eventEmailHtml({ title, body, registrationHref, logoHtml, coverU
     ? `<td width="50%" valign="top" style="padding:0 4px 0 0"><div style="border:1px solid ${palette.border};background:${palette.mutedBox};border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:${palette.muted}">רישום רגיל</div><div style="font-size:18px;font-weight:600;color:${palette.foreground}">₪${escape(event.regular_price)}</div></div></td>` : '';
   const prices = early || regular ? `<table role="presentation" width="100%" style="margin:20px 0 0;border-collapse:collapse"><tr>${early}${regular}</tr></table>` : '';
 
-  const cover = coverUrl ? `<tr><td><img src="${escape(coverUrl)}" alt="${escape(event.title)}" width="600" style="display:block;width:100%;height:auto"></td></tr>` : '';
+  const cover = coverUrl ? `<tr><td><img src="${escape(coverUrl)}" alt="${escape(title)}" width="600" style="display:block;width:100%;height:auto"></td></tr>` : '';
   const button = registrationHref
     ? `<table role="presentation" width="100%" style="margin:24px 0 0"><tr><td align="center" style="background:${palette.primary};border-radius:10px"><a href="${escape(registrationHref)}" style="display:block;color:${palette.background};padding:14px 8px;overflow-wrap:anywhere;word-break:break-word;text-decoration:none;font-size:16px;font-weight:600;text-align:center">${escape(registrationLabel(registrationHref))}</a></td></tr></table>`
     : '';

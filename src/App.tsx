@@ -156,6 +156,7 @@ const App = () => (
               <Route path="events/templates" element={<AdminEventTemplates />} />
               <Route path="events/:id" element={<AdminEventEditor />} />
               <Route path="events/:id/communications" element={<AdminEventCommunications />} />
+              <Route path="system-messages" element={<AdminEventCommunications key="system" system />} />
               <Route path="podcast" element={<AdminPodcast />} />
               <Route path="media" element={<AdminMedia />} />
               <Route path="donation-texts" element={<AdminDonationArchive />} />

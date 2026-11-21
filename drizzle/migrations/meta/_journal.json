@@ -225,6 +225,20 @@
       "when": 1794777049857,
       "tag": "0031_medicine_anonymous_read_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795296478395,
+      "tag": "0032_system_communication_drafts",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795296746098,
+      "tag": "0033_system_publication_update_guard",
+      "breakpoints": true
     }
   ]
 }
